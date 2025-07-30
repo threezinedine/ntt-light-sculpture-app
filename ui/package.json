@@ -1,0 +1,15 @@
+{
+	"name": "Light Sculpture Application",
+	"description": "A web application for creating and sharing light sculptures",
+	"version": "1.0.0",
+	"author": "threezinedine",
+	"main": "app-dist/index.js",
+	"scripts": {
+		"compile:app": "tsc --project src/app/tsconfig.json",
+		"start": "npm run compile:app && electron ."
+	},
+	"devDependencies": {
+		"electron": "^37.2.4",
+		"typescript": "^5.8.3"
+	}
+}
