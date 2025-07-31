@@ -4,5 +4,8 @@
 	"semi": true,
 	"singleQuote": true,
 	"trailingComma": "es5",
-	"editor.formatOnSave": true
+	"editor.formatOnSave": true,
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.black-formatter"
+	}
 }
