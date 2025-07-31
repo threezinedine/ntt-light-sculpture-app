@@ -1,11 +1,13 @@
 import os
 import sys
 import logging
+import datetime
 import argparse
 import subprocess
 
 # ================== DIRECTORIES RELATED SETTINGS =================
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "temp"))
 
 APP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "app"))
 UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "uis"))
@@ -54,6 +56,77 @@ APPLICATION_PYTHON_EXE_PATH = os.path.normpath(
     )
 )
 # ================================================================
+
+
+def get_last_modified_timestamp(file_name: str) -> datetime.datetime:
+    """
+    Cross-platform method to get the last modified timestamp of a file.
+    """
+    if sys.platform == "win32":
+        return os.path.getmtime(file_name)
+    else:
+        return os.path.getmtime(file_name)
+
+
+def get_timestamp_file_path(file_name: str) -> str:
+    relative_file_name = os.path.relpath(file_name, PROJECT_DIR)
+    relative_dir = os.path.dirname(relative_file_name)
+    raw_file_name = os.path.split(relative_file_name)[-1]
+
+    # creating the folder recursively
+    folders = os.path.split(relative_dir)
+    tempFolder = TEMP_DIR
+
+    try:
+        for folder in folders:
+            tempFolder = os.path.normpath(
+                os.path.join(
+                    tempFolder,
+                    folder,
+                )
+            )
+
+            if not os.path.exists(tempFolder):
+                logger.debug(
+                    f'Creating the "{os.path.relpath(tempFolder, PROJECT_DIR)}" directory...'
+                )
+                os.makedirs(tempFolder)
+
+    except Exception as e:
+        logger.error(f'Error while creating the stamp file for "{file_name}": {e}')
+        exit(1)
+
+    return os.path.normpath(
+        os.path.join(
+            TEMP_DIR,
+            relative_dir,
+            f"{raw_file_name}.stamp",
+        )
+    )
+
+
+def check_a_file_is_modified(file_name: str) -> bool:
+    """
+    Assume that the file exists. If the stamp file does not exist or the stamp file is older than
+        the modified time of the file, then return True.
+    """
+    stamp_file = get_timestamp_file_path(file_name)
+    if not os.path.exists(stamp_file):
+        return True
+
+    return get_last_modified_timestamp(file_name) > get_last_modified_timestamp(
+        stamp_file
+    )
+
+
+def update_stamp_file_of_a_file(file_name: str) -> None:
+    """
+    Update the stamp file of a file.
+    """
+    stamp_file = get_timestamp_file_path(file_name)
+
+    with open(stamp_file, "w") as f:
+        f.write("")
 
 
 def create_application_virtual_environment() -> None:
@@ -143,6 +216,9 @@ def convert_ui_files() -> None:
         if file.endswith(".ui")
     ]
     for ui_file in ui_files:
+        if not check_a_file_is_modified(ui_file):
+            continue
+
         try:
             logger.debug(f'Converting "{os.path.relpath(ui_file, APP_DIR)}"...')
             converted_ui_path = os.path.normpath(
@@ -160,6 +236,7 @@ def convert_ui_files() -> None:
             logger.debug(
                 f'The "{os.path.relpath(ui_file, APP_DIR)}" has been converted.'
             )
+            update_stamp_file_of_a_file(ui_file)
         except Exception as e:
             logger.error(
                 f'Error while converting "{os.path.relpath(ui_file, APP_DIR)}": {e}'
@@ -206,9 +283,8 @@ def main():
         )
         exit(1)
 
-    # create venv if it does not exist
     create_application_virtual_environment()
-    # ================================================================
+    create_folder_if_not_exists(TEMP_DIR, PROJECT_DIR)
 
     # ================== ARGUMENTS RELATED SETTINGS ==================
     parser = argparse.ArgumentParser(
