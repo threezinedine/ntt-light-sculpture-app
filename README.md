@@ -37,4 +37,4 @@ This project has no license - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-For questions, support, or collaboration: [Email](mailto:threezinedine@gmail.com)
+For questions, support, or collaboration, please feel free to contact me at [threezinedine@gmail.com](mailto:threezinedine@gmail.com)
