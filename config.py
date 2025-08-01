@@ -4,6 +4,8 @@ import logging
 import datetime
 import argparse
 import subprocess
+from glob import glob
+from typing import List
 
 # ================== DIRECTORIES RELATED SETTINGS =================
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +18,9 @@ CONVERTED_UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "converted_uis"))
 ENGINE_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "engine"))
 ENGINE_BUILD_DIR = os.path.normpath(os.path.join(ENGINE_DIR, "build"))
 ENGINE_INSTALL_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "install"))
+
+AUTOGEN_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "autogen"))
+AUTOGEN_TEMPLATE_DIR = os.path.normpath(os.path.join(AUTOGEN_DIR, "template"))
 # =================================================================
 
 # ================== CONSTANTS RELATED SETTINGS ===================
@@ -429,6 +434,41 @@ def install_engine(release: bool = False) -> None:
         exit(1)
 
 
+def get_all_h_files() -> List[str]:
+    engine_include_dir = os.path.normpath(os.path.join(ENGINE_DIR, "include"))
+
+    h_files = []
+    for file in glob(os.path.join(engine_include_dir, "**/*.h"), recursive=True):
+        h_files.append(file)
+
+    return h_files
+
+
+def get_h_files_as_input_args() -> str:
+    return " ".join([f"-i {file}" for file in get_all_h_files()])
+
+
+def run_autogen() -> None:
+    try:
+        logger.info("Running the autogen...")
+        binding_output = os.path.normpath(os.path.join(ENGINE_DIR, "binding.cpp"))
+        template_file = os.path.normpath(
+            os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.jinja")
+        )
+        subprocess.run(
+            f"{get_python_exe_path(AUTOGEN_DIR)} main.py {get_h_files_as_input_args()} -j {template_file} -o {binding_output}".split(
+                " "
+            ),
+            cwd=AUTOGEN_DIR,
+            shell=True,
+            check=True,
+        )
+        logger.info("The autogen has been run successfully.")
+    except Exception as e:
+        logger.error(f"Error while running the autogen: {e}")
+        exit(1)
+
+
 def main():
     # ================== APPLICATION RELATED SETTINGS ================
     # check the existence of application folder
@@ -453,12 +493,14 @@ def main():
     # ================== CREATE VIRTUAL ENVIRONMENT ==================
     logger.info("Creating the virtual environments...")
     create_virtual_environment(APP_DIR)
+    create_virtual_environment(AUTOGEN_DIR)
     logger.info("The virtual environments have been created.")
     # ================================================================
 
     # ================== UPDATE REQUIREMENTS ========================
     logger.info("Updating the requirements...")
     update_requirements(APP_DIR)
+    update_requirements(AUTOGEN_DIR)
     logger.info("The requirements have been updated.")
     # ================================================================
 
@@ -483,6 +525,8 @@ def main():
         "engine_action", choices=["generate", "build", "install"]
     )
 
+    subparsers.add_parser("autogen", help="Autogen related actions")
+
     args = parser.parse_args()
 
     if args.action == "designer":
@@ -502,6 +546,8 @@ def main():
             generator_if_not_exists(release=True)
             build_engine(release=True)
             install_engine(release=True)
+    elif args.action == "autogen":
+        run_autogen()
     # ================================================================
 
 
