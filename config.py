@@ -195,6 +195,17 @@ def system_health_check() -> None:
         logger.error(f"Error with your Git, the project cannot be run: {e}")
         exit(1)
 
+    try:
+        subprocess.run(
+            f"clang --version".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+    except Exception as e:
+        logger.error(f"Error with your Clang, the project cannot be run: {e}")
+        exit(1)
+
 
 def create_virtual_environment(folder: str) -> None:
     venv_dir = get_venv_dir(folder)
@@ -448,15 +459,29 @@ def get_h_files_as_input_args() -> str:
     return " ".join([f"-i {file}" for file in get_all_h_files()])
 
 
+def get_libclangdll_path() -> str:
+    try:
+        output = subprocess.run(
+            "where clang", shell=True, check=True, capture_output=True
+        )
+        return os.path.dirname(output.stdout.decode("utf-8")[:-2])
+    except Exception as e:
+        logger.error(f"Error while getting the libclang.dll path: {e}")
+        exit(1)
+
+
 def run_autogen() -> None:
+    libclangdll_path = os.path.join(get_libclangdll_path(), "libclang.dll")
+
     try:
         logger.info("Running the autogen...")
         binding_output = os.path.normpath(os.path.join(ENGINE_DIR, "binding.cpp"))
         template_file = os.path.normpath(
             os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.jinja")
         )
+        python_exe_path = get_python_exe_path(AUTOGEN_DIR)
         subprocess.run(
-            f"{get_python_exe_path(AUTOGEN_DIR)} main.py {get_h_files_as_input_args()} -j {template_file} -o {binding_output}".split(
+            f"{python_exe_path} main.py {get_h_files_as_input_args()} -j {template_file} -o {binding_output} -c {libclangdll_path}".split(
                 " "
             ),
             cwd=AUTOGEN_DIR,

@@ -51,6 +51,13 @@ class Args:
             help="The output file name for the generated python interface code",
         )
 
+        parser.add_argument(
+            "-c",
+            "--clang",
+            help="The absolute path to the libclang.dll file",
+            required=True,
+        )
+
         self._args = parser.parse_args()
 
         # ================== VALIDATION ==============================
@@ -68,6 +75,9 @@ class Args:
             raise ValueError(
                 f"The jinja template file {self.jinja_template} is not a valid jinja template file"
             )
+
+        if not os.path.exists(self.clang):
+            raise FileNotFoundError(f"The clang file {self.clang} does not exist")
 
         # ============================================================
 
@@ -101,3 +111,10 @@ class Args:
         the output file name will be the same as the input file name with the suffix .py
         """
         return self._args.output_file
+
+    @property
+    def clang(self) -> str:
+        """
+        The absolute path to the libclang.dll file
+        """
+        return self._args.clang
