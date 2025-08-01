@@ -371,22 +371,23 @@ def main():
     create_virtual_environment(ENGINE_DIR)
     create_folder_if_not_exists(TEMP_DIR, PROJECT_DIR)
 
+    # ================== UPDATE REQUIREMENTS ========================
+    update_requirements(APP_DIR)
+    update_requirements(ENGINE_DIR)
+    # ================================================================
+
     # ================== ARGUMENTS RELATED SETTINGS ==================
     parser = argparse.ArgumentParser(
         description="The configuration helper for the current project"
     )
+    subparsers = parser.add_subparsers(dest="action", help="The action to perform")
 
-    parser.add_argument(
-        "action",
-        choices=[
-            "designer",
-            "run",
-            "convert",
-            "write-requirements",
-            "generate",
-            "build-engine",
-        ],
-    )
+    subparsers.add_parser("designer", help="Open the designer")
+
+    run_parser = subparsers.add_parser("run", help="Run the application")
+
+    engine_parser = subparsers.add_parser("engine", help="Engine related actions")
+    engine_parser.add_argument("engine_action", choices=["generate", "build"])
 
     args = parser.parse_args()
 
@@ -395,15 +396,11 @@ def main():
     elif args.action == "run":
         convert_ui_files()
         run_application()
-    elif args.action == "convert":
-        convert_ui_files()
-    elif args.action == "write-requirements":
-        update_requirements(APP_DIR)
-        update_requirements(ENGINE_DIR)
-    elif args.action == "generate":
-        generate_build_system()
-    elif args.action == "build-engine":
-        build_engine()
+    elif args.action == "engine":
+        if args.engine_action == "generate":
+            generate_build_system()
+        elif args.engine_action == "build":
+            build_engine()
     # ================================================================
 
 
