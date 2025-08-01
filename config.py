@@ -153,6 +153,44 @@ def update_stamp_file_of_a_file(file_name: str) -> None:
         f.write("")
 
 
+def system_health_check() -> None:
+    try:
+        subprocess.run(
+            f"cmake --version".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+        logger.info("CMake is installed and ready to use.")
+    except Exception as e:
+        logger.error(f"Error with your CMake, the project cannot be run: {e}")
+        exit(1)
+
+    try:
+        subprocess.run(
+            f"python --version".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+        logger.info("Python is installed and ready to use.")
+    except Exception as e:
+        logger.error(f"Error with your Python, the project cannot be run: {e}")
+        exit(1)
+
+    try:
+        subprocess.run(
+            f"git --version".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+        logger.info("Git is installed and ready to use.")
+    except Exception as e:
+        logger.error(f"Error with your Git, the project cannot be run: {e}")
+        exit(1)
+
+
 def create_virtual_environment(folder: str) -> None:
     venv_dir = get_venv_dir(folder)
     python_exe_path = get_python_exe_path(folder)
@@ -400,14 +438,28 @@ def main():
         )
         exit(1)
 
+    # ================== SYSTEM HEALTH CHECK =========================
+    logger.info("Checking the system health...")
+    system_health_check()
+    logger.info("The system health check is done.")
+    # ================================================================
+
+    # ================== CREATE TEMP ENVIRONMENT =====================
+    logger.info("Creating the temp environment...")
     create_folder_if_not_exists(TEMP_DIR, PROJECT_DIR)
+    logger.info("The temp environment has been created.")
+    # ================================================================
 
     # ================== CREATE VIRTUAL ENVIRONMENT ==================
+    logger.info("Creating the virtual environments...")
     create_virtual_environment(APP_DIR)
+    logger.info("The virtual environments have been created.")
     # ================================================================
 
     # ================== UPDATE REQUIREMENTS ========================
+    logger.info("Updating the requirements...")
     update_requirements(APP_DIR)
+    logger.info("The requirements have been updated.")
     # ================================================================
 
     # ================== ARGUMENTS RELATED SETTINGS ==================
