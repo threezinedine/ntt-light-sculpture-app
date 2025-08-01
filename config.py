@@ -15,6 +15,7 @@ CONVERTED_UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "converted_uis"))
 
 ENGINE_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "engine"))
 ENGINE_BUILD_DIR = os.path.normpath(os.path.join(ENGINE_DIR, "build"))
+ENGINE_INSTALL_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "install"))
 # =================================================================
 
 # ================== CONSTANTS RELATED SETTINGS ===================
@@ -328,11 +329,27 @@ def update_requirements(folder: str) -> None:
         exit(1)
 
 
-def generate_build_system() -> None:
+def get_build_type(release: bool = False) -> str:
+    return "Release" if release else "Debug"
+
+
+def get_build_dir(release: bool = False) -> str:
+    return os.path.normpath(os.path.join(ENGINE_BUILD_DIR, get_build_type(release)))
+
+
+def generator_if_not_exists(release: bool = False) -> None:
+    if not os.path.exists(get_build_dir(release)):
+        generate_build_system(release)
+
+
+def generate_build_system(release: bool = False) -> None:
+    build_dir = get_build_dir(release)
     try:
         logger.info(f"Generating the build system...")
         subprocess.run(
-            f"cmake -B {ENGINE_BUILD_DIR} -S {ENGINE_DIR}".split(" "),
+            f"cmake -B {build_dir} -S {ENGINE_DIR} -DCMAKE_INSTALL_PREFIX={ENGINE_INSTALL_DIR} -DCMAKE_BUILD_TYPE={get_build_type(release)}".split(
+                " "
+            ),
             cwd=ENGINE_DIR,
             shell=True,
             check=True,
@@ -343,11 +360,12 @@ def generate_build_system() -> None:
         exit(1)
 
 
-def build_engine() -> None:
+def build_engine(release: bool = False) -> None:
+    build_dir = get_build_dir(release)
     try:
         logger.info("Building the engine...")
         subprocess.run(
-            f"cmake --build {ENGINE_BUILD_DIR}".split(" "),
+            f"cmake --build {build_dir} --config {get_build_type(release)}".split(" "),
             cwd=ENGINE_DIR,
             shell=True,
             check=True,
@@ -355,6 +373,21 @@ def build_engine() -> None:
         logger.info(f"The engine has been built successfully.")
     except Exception as e:
         logger.error(f"Error while building the engine: {e}")
+        exit(1)
+
+
+def install_engine(release: bool = False) -> None:
+    build_dir = get_build_dir(release)
+    try:
+        logger.info("Installing the engine...")
+        subprocess.run(
+            f"cmake --install {build_dir}".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+    except Exception as e:
+        logger.error(f"Error while installing the engine: {e}")
         exit(1)
 
 
@@ -367,27 +400,36 @@ def main():
         )
         exit(1)
 
-    create_virtual_environment(APP_DIR)
-    create_virtual_environment(ENGINE_DIR)
     create_folder_if_not_exists(TEMP_DIR, PROJECT_DIR)
+
+    # ================== CREATE VIRTUAL ENVIRONMENT ==================
+    create_virtual_environment(APP_DIR)
+    # ================================================================
 
     # ================== UPDATE REQUIREMENTS ========================
     update_requirements(APP_DIR)
-    update_requirements(ENGINE_DIR)
     # ================================================================
 
     # ================== ARGUMENTS RELATED SETTINGS ==================
     parser = argparse.ArgumentParser(
         description="The configuration helper for the current project"
     )
+    parser.add_argument(
+        "-r",
+        "--release",
+        action="store_true",
+        help="Generate the build system for the release mode",
+    )
+
     subparsers = parser.add_subparsers(dest="action", help="The action to perform")
 
     subparsers.add_parser("designer", help="Open the designer")
-
-    run_parser = subparsers.add_parser("run", help="Run the application")
+    subparsers.add_parser("run", help="Run the application")
 
     engine_parser = subparsers.add_parser("engine", help="Engine related actions")
-    engine_parser.add_argument("engine_action", choices=["generate", "build"])
+    engine_parser.add_argument(
+        "engine_action", choices=["generate", "build", "install"]
+    )
 
     args = parser.parse_args()
 
@@ -395,12 +437,19 @@ def main():
         open_designer()
     elif args.action == "run":
         convert_ui_files()
+        generator_if_not_exists(release=args.release)
+        build_engine(release=args.release)
         run_application()
     elif args.action == "engine":
         if args.engine_action == "generate":
-            generate_build_system()
+            generate_build_system(release=args.release)
         elif args.engine_action == "build":
-            build_engine()
+            generator_if_not_exists(release=args.release)
+            build_engine(release=args.release)
+        elif args.engine_action == "install":
+            generator_if_not_exists(release=True)
+            build_engine(release=True)
+            install_engine(release=True)
     # ================================================================
 
 
