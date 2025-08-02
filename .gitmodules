@@ -1,3 +1,9 @@
 [submodule "engine/vendors/pybind11"]
 	path = engine/vendors/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "engine/vendors/glfw"]
+	path = engine/vendors/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "engine/vendors/glew"]
+	path = engine/vendors/glew
+	url = https://github.com/Perlmint/glew-cmake.git

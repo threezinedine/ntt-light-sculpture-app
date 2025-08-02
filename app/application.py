@@ -8,6 +8,7 @@ sys.path.append(
     "C:/Users/Acer/Project/ntt-light-sculpture-app/engine/build/Debug/Debug"
 )
 from Engine import add, subtract, Logging
+from components.openg_widget import OpenGlWidget
 
 # ignore the deprecation warning
 import warnings
@@ -31,9 +32,7 @@ class LightSculptureMainWindow(QMainWindow):
         self.ui = Ui_lightSculptureApplication()
         self.ui.setupUi(self)
 
-        self.ui.addButton.clicked.connect(lambda: print(self._add(1, 2)))
-        self.ui.subtractButton.clicked.connect(lambda: print(subtract(1, 2)))
-        self.ui.logButton.clicked.connect(lambda: Logging().info("Hello, World!"))
+        self.ui.centerLayout.addWidget(OpenGlWidget())
 
     def _add(self, a: int, b: int) -> int:
         return add(a, b)

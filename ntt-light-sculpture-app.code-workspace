@@ -1,9 +1,6 @@
 {
 	"folders": [
 		{
-			"path": "."
-		},
-		{
 			"path": "engine"
 		},
 		{
@@ -13,6 +10,9 @@
 		{
 			"path": "app",
 			"python.defaultInterpreterPath": "${workspaceFolder}/app/venv/Scripts/python.exe"
+		},
+		{
+			"path": "."
 		}
 	],
 	"settings": {

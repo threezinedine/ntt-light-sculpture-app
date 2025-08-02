@@ -632,9 +632,11 @@ def main():
             generate_build_system(release=args.release)
         elif args.engine_action == "build":
             generator_if_not_exists(release=args.release)
+            run_autogen()
             build_engine(release=args.release)
         elif args.engine_action == "install":
             generator_if_not_exists(release=True)
+            run_autogen()
             build_engine(release=True)
             install_engine(release=True)
     elif args.action == "autogen":

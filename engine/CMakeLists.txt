@@ -19,6 +19,12 @@ file(
     include/**/*.h
 )
 
+# =================== externals ===================
+set(CMAKE_FOLDER "externals")
+find_package(ntt-opengl REQUIRED)
+unset(CMAKE_FOLDER)
+# =====================================================
+
 # =================== c++ libraries ===================
 set(CMAKE_FOLDER "lib")
 set(LIBRARY_NAME ${PROJECT_NAME}_LIB)
@@ -26,6 +32,7 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 
 add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADERS})
 target_include_directories(${LIBRARY_NAME} PUBLIC include)
+target_link_libraries(${LIBRARY_NAME} PUBLIC ntt-opengl)
 set_target_properties(${LIBRARY_NAME} PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 unset(CMAKE_FOLDER)
 # =====================================================
