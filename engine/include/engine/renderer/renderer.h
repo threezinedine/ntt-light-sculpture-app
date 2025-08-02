@@ -31,9 +31,6 @@ namespace NTT_NS
          */
         void Shutdown();
 
-        void BeforeRender();
-        void AfterRender();
-
         /**
          * @brief Render the scene for every frame
          * This method will be called every frame, it will render the scene and update the window.
@@ -42,10 +39,24 @@ namespace NTT_NS
          */
         void Render();
 
+        /**
+         * @brief Resize the window
+         * This method will be called when the size of the window is changed,
+         *      it will update the viewport and the projection matrix.
+         *
+         * @param width The new width of the window.
+         * @param height The new height of the window.
+         */
+        void Resize(unsigned int width, unsigned int height);
+
     private:
         /**
          * The window that will be used to render the scene.
          */
         GLFWwindow *m_window;
+
+        unsigned int m_shaderProgram;
+        unsigned int m_VAO;
+        unsigned int m_VBO;
     };
 }
