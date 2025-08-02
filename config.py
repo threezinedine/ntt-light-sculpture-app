@@ -58,6 +58,12 @@ def get_python_exe_path(folder: str) -> str:
     )
 
 
+def get_pytest_exe_path(folder: str) -> str:
+    return os.path.normpath(
+        os.path.join(get_script_dir(folder), "pytest" + SCRIPT_EXTENSION)
+    )
+
+
 def get_requirements_file_path(folder: str) -> str:
     return os.path.normpath(os.path.join(folder, "requirements.txt"))
 
@@ -537,6 +543,21 @@ def run_autogen() -> None:
         exit(1)
 
 
+def run_autogen_test() -> None:
+    try:
+        logger.info("Running the autogen test...")
+        pytest_exe_path = get_pytest_exe_path(AUTOGEN_DIR)
+        subprocess.run(
+            f"{pytest_exe_path}",
+            cwd=AUTOGEN_DIR,
+            check=True,
+            shell=True,
+        )
+    except Exception as e:
+        logger.error(f"Error while running the autogen test: {e}")
+        exit(1)
+
+
 def main():
     # ================== APPLICATION RELATED SETTINGS ================
     # check the existence of application folder
@@ -608,6 +629,9 @@ def main():
         "engine_action", choices=["generate", "build", "install"]
     )
 
+    test_parser = subparsers.add_parser("test", help="Test related actions")
+    test_parser.add_argument("test_action", choices=["autogen", "engine", "app"])
+
     subparsers.add_parser("autogen", help="Autogen related actions")
 
     args = parser.parse_args()
@@ -627,6 +651,9 @@ def main():
         generator_if_not_exists(release=args.release)
         build_engine(release=args.release)
         run_application()
+    elif args.action == "test":
+        if args.test_action == "autogen":
+            run_autogen_test()
     elif args.action == "engine":
         if args.engine_action == "generate":
             generate_build_system(release=args.release)
