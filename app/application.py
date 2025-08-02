@@ -32,8 +32,11 @@ class LightSculptureMainWindow(QMainWindow):
         self.ui = Ui_lightSculptureApplication()
         self.ui.setupUi(self)
 
-        self.ui.addButton.clicked.connect(lambda: print(add(1, 2)))
+        self.ui.addButton.clicked.connect(lambda: print(self._add(1, 2)))
         self.ui.subtractButton.clicked.connect(lambda: print(subtract(1, 2)))
+
+    def _add(self, a: int, b: int) -> int:
+        return add(a, b)
 
 
 class LighSculptureApplication(QApplication):
