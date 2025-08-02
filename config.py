@@ -574,6 +574,22 @@ def run_autogen_test() -> None:
         exit(1)
 
 
+def run_engine_test(release: bool = False) -> None:
+    try:
+        logger.info("Running the engine test...")
+        build_dir = get_build_dir(release)
+        exe_path = os.path.normpath(
+            os.path.join(
+                build_dir, get_build_type(release), "engine-test" + SCRIPT_EXTENSION
+            )
+        )
+
+        subprocess.run(f"{exe_path}", check=True, shell=True)
+    except Exception as e:
+        logger.error(f"Error while running the engine test: {e}")
+        exit(1)
+
+
 def run_config() -> None:
     # ================== APPLICATION RELATED SETTINGS ================
     # check the existence of application folder
@@ -691,10 +707,11 @@ def main():
         if args.test_action == "autogen":
             run_autogen_test()
         elif args.test_action == "engine":
-            pass
+            run_engine_test(release=args.release)
         elif args.test_action == "app":
             pass
         elif args.test_action == "all":
+            run_engine_test(release=args.release)
             run_autogen_test()
     elif args.action == "engine":
         if args.engine_action == "generate":

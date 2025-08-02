@@ -10,18 +10,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(
     GLOB
     SOURCES
-    src/**/*.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp"
 )
 
 file(
     GLOB 
     HEADERS
-    include/**/*.h
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h"
 )
 
 # =================== externals ===================
 set(CMAKE_FOLDER "externals")
 find_package(ntt-opengl REQUIRED)
+find_package(ntt-gtest REQUIRED)
 unset(CMAKE_FOLDER)
 # =====================================================
 
@@ -42,6 +43,21 @@ set(CMAKE_FOLDER "binding")
 find_package(pybind11 REQUIRED)
 pybind11_add_module(${PROJECT_NAME} "binding.cpp")
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBRARY_NAME})
+unset(CMAKE_FOLDER)
+# ========================================================
+
+# =================== test libraries ===================
+set(CMAKE_FOLDER "test")
+file(
+    GLOB
+    ENGINE_TEST_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/**/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
+)
+
+set(ENGINE_TEST_NAME "engine-test")
+add_executable(${ENGINE_TEST_NAME} ${ENGINE_TEST_SOURCES})
+target_link_libraries(${ENGINE_TEST_NAME} PRIVATE ntt-gtest)
 unset(CMAKE_FOLDER)
 # ========================================================
 
