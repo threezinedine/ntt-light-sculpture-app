@@ -558,7 +558,7 @@ def run_autogen_test() -> None:
         exit(1)
 
 
-def main():
+def run_config() -> None:
     # ================== APPLICATION RELATED SETTINGS ================
     # check the existence of application folder
     if not os.path.exists(APP_DIR):
@@ -605,6 +605,17 @@ def main():
     logger.info("The py engine binding has been created.")
     # ================================================================
 
+
+def main():
+    # ================== CONFIG RELATED SETTINGS =====================
+    has_run_config = False
+
+    # always run the config if the temp directory does not exist
+    if not os.path.exists(TEMP_DIR):
+        has_run_config = True
+        run_config()
+    # ================================================================
+
     # ================== ARGUMENTS RELATED SETTINGS ==================
     parser = argparse.ArgumentParser(
         description="The configuration helper for the current project"
@@ -618,6 +629,7 @@ def main():
 
     subparsers = parser.add_subparsers(dest="action", help="The action to perform")
 
+    subparsers.add_parser("config", help="Run the configuration")
     subparsers.add_parser("designer", help="Open the designer")
     subparsers.add_parser("run", help="Run the application")
 
@@ -636,7 +648,10 @@ def main():
 
     args = parser.parse_args()
 
-    if args.action == "designer":
+    if args.action == "config":
+        if not has_run_config:
+            run_config()
+    elif args.action == "designer":
         open_designer()
     elif args.action == "convert":
         if args.type == "ui":
@@ -648,6 +663,7 @@ def main():
             run_autogen()
     elif args.action == "run":
         convert_ui_files()
+        run_autogen()
         generator_if_not_exists(release=args.release)
         build_engine(release=args.release)
         run_application()
