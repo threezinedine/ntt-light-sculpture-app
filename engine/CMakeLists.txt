@@ -13,12 +13,18 @@ file(
     src/**/*.cpp
 )
 
+file(
+    GLOB 
+    HEADERS
+    include/**/*.h
+)
+
 # =================== c++ libraries ===================
 set(CMAKE_FOLDER "lib")
 set(LIBRARY_NAME ${PROJECT_NAME}_LIB)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${LIBRARY_NAME})
 
-add_library(${LIBRARY_NAME} STATIC ${SOURCES})
+add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADERS})
 target_include_directories(${LIBRARY_NAME} PUBLIC include)
 set_target_properties(${LIBRARY_NAME} PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 unset(CMAKE_FOLDER)

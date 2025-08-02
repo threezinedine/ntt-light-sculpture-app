@@ -2,6 +2,7 @@ import os
 import clang.cindex as clang
 from clang.cindex import Config
 from .function import Function
+from .class_ import Class
 from jinja2 import Template
 
 
@@ -59,11 +60,14 @@ class Parser:
         }
 
         for c in self._ast.cursor.get_children():
-            if c.kind == clang.CursorKind.NAMESPACE:
+            if c.kind == clang.CursorKind.NAMESPACE and c.spelling == "ntt":
                 for child in c.get_children():
                     if child.kind == clang.CursorKind.FUNCTION_DECL:
                         function = Function(child)
                         self.data["functions"].append(function)
+                    elif child.kind == clang.CursorKind.CLASS_DECL:
+                        class_ = Class(child)
+                        self.data["classes"].append(class_)
 
     def parse(self, template: Template) -> str:
         return template.render(self.data)

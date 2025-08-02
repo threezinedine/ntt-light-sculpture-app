@@ -12,4 +12,17 @@ m.def("{{ function.name }}", &::NTT_NS::{{ function.name }}, "{{ function.commen
 {% endfor %}
 // ===================================================================
 
+// ============================ CLASSES ============================
+{% for class in classes %}
+class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
+    .def(init<>())
+
+    {% for method in class.methods %}
+    .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+    {% endfor %}
+
+    ;
+
+{% endfor %}
+// ===================================================================
 }

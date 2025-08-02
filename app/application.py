@@ -1,6 +1,5 @@
 import os
 import sys
-import logging
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 from converted_uis.main_window import Ui_lightSculptureApplication
@@ -8,7 +7,7 @@ from converted_uis.main_window import Ui_lightSculptureApplication
 sys.path.append(
     "C:/Users/Acer/Project/ntt-light-sculpture-app/engine/build/Debug/Debug"
 )
-from Engine import add, subtract
+from Engine import add, subtract, Logging
 
 # ignore the deprecation warning
 import warnings
@@ -34,6 +33,7 @@ class LightSculptureMainWindow(QMainWindow):
 
         self.ui.addButton.clicked.connect(lambda: print(self._add(1, 2)))
         self.ui.subtractButton.clicked.connect(lambda: print(subtract(1, 2)))
+        self.ui.logButton.clicked.connect(lambda: Logging().info("Hello, World!"))
 
     def _add(self, a: int, b: int) -> int:
         return add(a, b)

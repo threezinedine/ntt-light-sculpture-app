@@ -571,6 +571,9 @@ def main():
     subparsers.add_parser("designer", help="Open the designer")
     subparsers.add_parser("run", help="Run the application")
 
+    convert_parser = subparsers.add_parser("convert", help="Convert the ui files")
+    convert_parser.add_argument("type", choices=["ui", "cpp", "all"])
+
     engine_parser = subparsers.add_parser("engine", help="Engine related actions")
     engine_parser.add_argument(
         "engine_action", choices=["generate", "build", "install"]
@@ -582,6 +585,14 @@ def main():
 
     if args.action == "designer":
         open_designer()
+    elif args.action == "convert":
+        if args.type == "ui":
+            convert_ui_files()
+        elif args.type == "cpp":
+            run_autogen()
+        elif args.type == "all":
+            convert_ui_files()
+            run_autogen()
     elif args.action == "run":
         convert_ui_files()
         generator_if_not_exists(release=args.release)
