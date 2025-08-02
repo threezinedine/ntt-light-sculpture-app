@@ -34,7 +34,7 @@ class Args:
             "--input_files",
             nargs="+",
             required=True,
-            help="The .h file to be analyzed, multiple files are supported",
+            help="The .h files to be analyzed, multiple files are supported",
         )
 
         parser.add_argument(
@@ -63,7 +63,6 @@ class Args:
         # ================== VALIDATION ==============================
         if not isinstance(self.input_files, list):
             self.input_files = [self.input_files]
-
         for input_file in self.input_files:
             self._validate_input_file(input_file)
 

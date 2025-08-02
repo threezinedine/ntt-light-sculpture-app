@@ -1,6 +1,7 @@
 #pragma once
+#include "engine/common/common.h"
 
-namespace ntt
+namespace NTT_NS
 {
     int add(int a, int b);
 } // namespace ntt

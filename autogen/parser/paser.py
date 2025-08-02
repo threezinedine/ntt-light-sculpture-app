@@ -1,6 +1,7 @@
 import os
 import clang.cindex as clang
 from clang.cindex import Config
+from .method import Method
 
 
 class Parser:
@@ -50,7 +51,13 @@ class Parser:
             raise FileNotFoundError(f"Input file '{input_file}' does not exist")
 
         index = clang.Index.create()
-        self._ast = index.parse(input_file, args=[])
+        self._ast = index.parse(input_file, args=["-x", "c++"])
 
         for c in self._ast.cursor.get_children():
-            print(c.kind)
+            if c.kind == clang.CursorKind.NAMESPACE:
+                for child in c.get_children():
+                    if child.kind == clang.CursorKind.FUNCTION_DECL:
+                        print(Method(child))
+
+    def parse(self) -> None:
+        pass

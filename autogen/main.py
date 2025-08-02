@@ -1,13 +1,29 @@
+import logging
 from utils.args import Args
 from utils.template import AutoGenTemplate
 from parser.paser import Parser
 
 
 def main():
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="[%(levelname)s] - %(asctime)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     args = Args()
 
+    logging.info("Starting the autogen process ...")
+
+    logging.info("Parsing the input files ...")
     Parser.ConfigClang(args.clang)
-    parser = Parser(args.input_files[0])
+    logging.info(f"H files: {args.input_files}")
+    for input_file in args.input_files:
+        logging.debug(f"Parsing the input file: {input_file} ...")
+        parser = Parser(input_file)
+        logging.debug(f"Parsed the input file: {input_file} ...")
+
+    logging.info("Generating the output file ...")
 
     template = AutoGenTemplate(args.jinja_template)
 

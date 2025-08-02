@@ -452,11 +452,13 @@ def get_all_h_files() -> List[str]:
     for file in glob(os.path.join(engine_include_dir, "**/*.h"), recursive=True):
         h_files.append(file)
 
+    logger.debug(f"Found {len(h_files)} h files.")
+
     return h_files
 
 
 def get_h_files_as_input_args() -> str:
-    return " ".join([f"-i {file}" for file in get_all_h_files()])
+    return " ".join([f"{file}" for file in get_all_h_files()])
 
 
 def get_libclangdll_path() -> str:
@@ -480,8 +482,11 @@ def run_autogen() -> None:
             os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.jinja")
         )
         python_exe_path = get_python_exe_path(AUTOGEN_DIR)
+        engine_global_header = os.path.normpath(
+            os.path.join(ENGINE_DIR, "include", "engine", "engine.h")
+        )
         subprocess.run(
-            f"{python_exe_path} main.py {get_h_files_as_input_args()} -j {template_file} -o {binding_output} -c {libclangdll_path}".split(
+            f"{python_exe_path} main.py -i {engine_global_header} -j {template_file} -o {binding_output} -c {libclangdll_path}".split(
                 " "
             ),
             cwd=AUTOGEN_DIR,
