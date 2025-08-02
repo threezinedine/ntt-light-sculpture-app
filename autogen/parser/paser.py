@@ -1,7 +1,8 @@
 import os
 import clang.cindex as clang
 from clang.cindex import Config
-from .method import Method
+from .function import Function
+from jinja2 import Template
 
 
 class Parser:
@@ -52,12 +53,17 @@ class Parser:
 
         index = clang.Index.create()
         self._ast = index.parse(input_file, args=["-x", "c++"])
+        self.data = {
+            "classes": [],
+            "functions": [],
+        }
 
         for c in self._ast.cursor.get_children():
             if c.kind == clang.CursorKind.NAMESPACE:
                 for child in c.get_children():
                     if child.kind == clang.CursorKind.FUNCTION_DECL:
-                        print(Method(child))
+                        function = Function(child)
+                        self.data["functions"].append(function)
 
-    def parse(self) -> None:
-        pass
+    def parse(self, template: Template) -> str:
+        return template.render(self.data)

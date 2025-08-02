@@ -20,7 +20,7 @@ ENGINE_BUILD_DIR = os.path.normpath(os.path.join(ENGINE_DIR, "build"))
 ENGINE_INSTALL_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "install"))
 
 AUTOGEN_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "autogen"))
-AUTOGEN_TEMPLATE_DIR = os.path.normpath(os.path.join(AUTOGEN_DIR, "template"))
+AUTOGEN_TEMPLATE_DIR = os.path.normpath(os.path.join(AUTOGEN_DIR, "templates"))
 # =================================================================
 
 # ================== CONSTANTS RELATED SETTINGS ===================
@@ -383,6 +383,21 @@ def update_requirements(folder: str) -> None:
         exit(1)
 
 
+def clone_vendor_libraries() -> None:
+    logger.info("Cloning the vendor libraries...")
+
+    try:
+        subprocess.run(
+            f"git submodule update --init --recursive".split(" "),
+            cwd=ENGINE_DIR,
+            shell=True,
+            check=True,
+        )
+    except Exception as e:
+        logger.error(f"Error while cloning the vendor libraries: {e}")
+        exit(1)
+
+
 def get_build_type(release: bool = False) -> str:
     return "Release" if release else "Debug"
 
@@ -532,6 +547,12 @@ def main():
     update_requirements(APP_DIR)
     update_requirements(AUTOGEN_DIR)
     logger.info("The requirements have been updated.")
+    # ================================================================
+
+    # ================== CLONE THE VENDOR LIBRARIES ==================
+    logger.info("Cloning the vendor libraries...")
+    clone_vendor_libraries()
+    logger.info("The vendor libraries have been cloned.")
     # ================================================================
 
     # ================== ARGUMENTS RELATED SETTINGS ==================

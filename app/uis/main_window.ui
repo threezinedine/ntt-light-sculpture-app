@@ -14,17 +14,30 @@
    <string>Light Sculpture Application</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="addButton">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>40</x>
       <y>100</y>
-      <width>75</width>
-      <height>23</height>
+      <width>181</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Add</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="subtractButton">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>220</y>
+      <width>181</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Subtract</string>
     </property>
    </widget>
   </widget>

@@ -31,10 +31,9 @@ class Args:
 
         parser.add_argument(
             "-i",
-            "--input_files",
-            nargs="+",
+            "--input_file",
             required=True,
-            help="The .h files to be analyzed, multiple files are supported",
+            help="The .h file to be analyzed",
         )
 
         parser.add_argument(
@@ -61,10 +60,7 @@ class Args:
         self._args = parser.parse_args()
 
         # ================== VALIDATION ==============================
-        if not isinstance(self.input_files, list):
-            self.input_files = [self.input_files]
-        for input_file in self.input_files:
-            self._validate_input_file(input_file)
+        self._validate_input_file(self.input_file)
 
         if not os.path.exists(self.jinja_template):
             raise FileNotFoundError(
@@ -88,12 +84,12 @@ class Args:
             raise ValueError(f"The input file {input_file} is not a valid .h file")
 
     @property
-    def input_files(self) -> List[str]:
+    def input_file(self) -> List[str]:
         """
         The .h file which will be analyzed by the autogen, this should be a valid .h file
         The macro is also supported, e.g. `#include "input.h"`
         """
-        return self._args.input_files
+        return self._args.input_file
 
     @property
     def jinja_template(self) -> str:
