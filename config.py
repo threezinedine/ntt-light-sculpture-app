@@ -704,6 +704,8 @@ def main():
         build_engine(release=args.release)
         run_application()
     elif args.action == "test":
+        build_engine(release=args.release)
+
         if args.test_action == "autogen":
             run_autogen_test()
         elif args.test_action == "engine":
