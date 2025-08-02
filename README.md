@@ -18,11 +18,25 @@ The core functionality revolves around computational geometry and light simulati
 -   CMake [3.20](https://cmake.org/download/) or higher
 -   Clang [18.1.1](https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.1) or higher
 -   Git [2.30](https://git-scm.com/downloads) or higher
--   [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) or [MinGW 14.2](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z/download)
+-   [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
 
 ## Instalation
 
 ### Build from source
+
+Firstly, ensure that you have `python` installed and be added to the `PATH` environment variable.
+
+```bash
+python --version # should be 3.11 or higher
+```
+
+After that, you can run `config.py` to setup and build the project.
+
+```bash
+python config.py config # to configure the project
+python config.py run # to run the application
+python config.py test all # to run all the tests (or autogen, engine, app for each subproject)
+```
 
 ## Examples
 
