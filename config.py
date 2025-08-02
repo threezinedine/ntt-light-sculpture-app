@@ -658,7 +658,11 @@ def main():
     )
 
     test_parser = subparsers.add_parser("test", help="Test related actions")
-    test_parser.add_argument("test_action", choices=["autogen", "engine", "app"])
+    test_parser.add_argument(
+        "test_action",
+        choices=["all", "autogen", "engine", "app"],
+        default="all",
+    )
 
     subparsers.add_parser("autogen", help="Autogen related actions")
 
@@ -685,6 +689,12 @@ def main():
         run_application()
     elif args.action == "test":
         if args.test_action == "autogen":
+            run_autogen_test()
+        elif args.test_action == "engine":
+            pass
+        elif args.test_action == "app":
+            pass
+        elif args.test_action == "all":
             run_autogen_test()
     elif args.action == "engine":
         if args.engine_action == "generate":
