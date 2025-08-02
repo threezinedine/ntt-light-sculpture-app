@@ -66,7 +66,7 @@ class Args:
             raise FileNotFoundError(
                 f"The jinja template file {self.jinja_template} does not exist"
             )
-        if not self.jinja_template.endswith(".jinja"):
+        if not self.jinja_template.endswith(".j2"):
             raise ValueError(
                 f"The jinja template file {self.jinja_template} is not a valid jinja template file"
             )

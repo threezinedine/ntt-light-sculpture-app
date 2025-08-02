@@ -1,0 +1,11 @@
+# Engine pyi binding
+
+# ============================ FUNCTIONS ============================
+{% for function in functions %}
+def {{ function.name}}(
+    {% for arg in function.arguments %}
+    {{ arg.name }}: {{ arg.type }},
+    {% endfor %}
+) -> {{ function.return_type }}: ...
+{% endfor%}
+# ===================================================================

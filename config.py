@@ -14,6 +14,7 @@ TEMP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "temp"))
 APP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "app"))
 UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "uis"))
 CONVERTED_UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "converted_uis"))
+ENGINE_BINDING_DIR = os.path.normpath(os.path.join(APP_DIR, "Engine"))
 
 ENGINE_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "engine"))
 ENGINE_BUILD_DIR = os.path.normpath(os.path.join(ENGINE_DIR, "build"))
@@ -492,22 +493,44 @@ def run_autogen() -> None:
 
     try:
         logger.info("Running the autogen...")
-        binding_output = os.path.normpath(os.path.join(ENGINE_DIR, "binding.cpp"))
-        template_file = os.path.normpath(
-            os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.jinja")
-        )
         python_exe_path = get_python_exe_path(AUTOGEN_DIR)
         engine_global_header = os.path.normpath(
             os.path.join(ENGINE_DIR, "include", "engine", "engine.h")
         )
+
+        # ================== BINDING RELATED SETTINGS ==================
+        logger.info("Binding cpp library to python...")
+        binding_output = os.path.normpath(os.path.join(ENGINE_DIR, "binding.cpp"))
+        binding_template_file = os.path.normpath(
+            os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.j2")
+        )
         subprocess.run(
-            f"{python_exe_path} main.py -i {engine_global_header} -j {template_file} -o {binding_output} -c {libclangdll_path}".split(
+            f"{python_exe_path} main.py -i {engine_global_header} -j {binding_template_file} -o {binding_output} -c {libclangdll_path}".split(
                 " "
             ),
             cwd=AUTOGEN_DIR,
             shell=True,
             check=True,
         )
+        logger.info("The binding has been run successfully.")
+        # ================================================================
+
+        # ================== PYI BINDING RELATED SETTINGS ==================
+        logger.info("Generating the pyi binding...")
+        pyi_output = os.path.normpath(os.path.join(ENGINE_BINDING_DIR, "__init__.pyi"))
+        pyi_template_file = os.path.normpath(
+            os.path.join(AUTOGEN_TEMPLATE_DIR, "pyi_binding.j2")
+        )
+        subprocess.run(
+            f"{python_exe_path} main.py -i {engine_global_header} -j {pyi_template_file} -o {pyi_output} -c {libclangdll_path}".split(
+                " "
+            ),
+            cwd=AUTOGEN_DIR,
+            shell=True,
+            check=True,
+        )
+        logger.info("The pyi binding has been generated successfully.")
+        # ================================================================
         logger.info("The autogen has been run successfully.")
     except Exception as e:
         logger.error(f"Error while running the autogen: {e}")
@@ -553,6 +576,12 @@ def main():
     logger.info("Cloning the vendor libraries...")
     clone_vendor_libraries()
     logger.info("The vendor libraries have been cloned.")
+    # ================================================================
+
+    # ================== CREATE PY ENGINE BINDING ==================
+    logger.info("Creating the py engine binding...")
+    create_folder_if_not_exists(ENGINE_BINDING_DIR, APP_DIR)
+    logger.info("The py engine binding has been created.")
     # ================================================================
 
     # ================== ARGUMENTS RELATED SETTINGS ==================

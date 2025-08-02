@@ -11,7 +11,8 @@ class Class:
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.CXX_METHOD:
-                self.methods.append(Method(child))
+                if child.access_specifier == clang.AccessSpecifier.PUBLIC:
+                    self.methods.append(Method(child))
 
     def __repr__(self) -> str:
         return f'<Class: name="{self.name}">'
