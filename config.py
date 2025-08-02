@@ -500,6 +500,22 @@ def run_autogen() -> None:
     try:
         logger.info("Running the autogen...")
         python_exe_path = get_python_exe_path(AUTOGEN_DIR)
+
+        # ================== CHECKING MODIFICATIONS ==================
+        # only run the autogen if the engine.h is modified
+        all_headers = get_all_h_files()
+        has_modified_header = False
+        for header in all_headers:
+            if check_a_file_is_modified(header):
+                has_modified_header = True
+                update_stamp_file_of_a_file(header)
+
+        if not has_modified_header:
+            logger.info("No header is modified, skipping the autogen.")
+            return
+
+        # ============================================================
+
         engine_global_header = os.path.normpath(
             os.path.join(ENGINE_DIR, "include", "engine", "engine.h")
         )
