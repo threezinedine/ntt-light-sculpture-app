@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "engine"
+		},
+		{
+			"path": "autogen",
+			"python.defaultInterpreterPath": "${workspaceFolder}/autogen/venv/Scripts/python.exe"
+		},
+		{
+			"path": "app",
+			"python.defaultInterpreterPath": "${workspaceFolder}/app/venv/Scripts/python.exe"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.py": "python",
+			"algorithm": "cpp",
+			"array": "cpp",
+			"bit": "cpp",
+			"charconv": "cpp",
+			"chrono": "cpp",
+			"deque": "cpp",
+			"format": "cpp",
+			"memory": "cpp",
+			"numeric": "cpp",
+			"system_error": "cpp",
+			"xutility": "cpp"
+		}
+	}
+}

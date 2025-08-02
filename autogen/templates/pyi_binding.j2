@@ -9,3 +9,20 @@ def {{ function.name}}(
 ) -> {{ function.return_type }}: ...
 {% endfor%}
 # ===================================================================
+
+# ============================ CLASSES ==============================
+{% for class in classes %}
+class {{ class.name }}:
+    {% if class.methods != [] %}
+        {% for method in class.methods %}
+    def {{ method.name }}(
+        {% for arg in method.arguments %}
+        {{ arg.name }}: {{ arg.type }},
+        {% endfor %}
+    ) -> {{ method.return_type }}: ...
+        {% endfor %}
+    {% else %}
+        ...
+    {% endif %}
+{% endfor %}
+# ===================================================================
