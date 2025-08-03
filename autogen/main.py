@@ -32,9 +32,21 @@ def main():
 
     logger.info("Generating the output file ...")
 
-    template = AutoGenTemplate(args.jinja_template, TypeConverter())
+    typeConverter = TypeConverter()
+    data = parser.data
 
-    result = parser.parse(template)
+    for enum in data["enums"]:
+        typeConverter.addType(enum.name, f"{enum.name}")
+    for struct in data["structs"]:
+        typeConverter.addType(struct.name, f"{struct.name}")
+    for function in data["functions"]:
+        typeConverter.addType(function.name, f"{function.name}")
+    for class_ in data["classes"]:
+        typeConverter.addType(class_.name, f"{class_.name}")
+
+    template = AutoGenTemplate(args.jinja_template, typeConverter)
+
+    result = template.render(data)
 
     with open(args.output_file, "w") as f:
         f.write(result)

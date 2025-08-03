@@ -1,7 +1,7 @@
 from clang.cindex import Cursor  # type: ignore
 
 
-class Argument:
+class PyArgument:
     def __init__(self, cursor: Cursor) -> None:
         self.name = cursor.spelling
         self.type = cursor.type.spelling

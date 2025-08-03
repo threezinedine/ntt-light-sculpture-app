@@ -5,6 +5,11 @@ from enum import Enum
 # ============================ ENUMS ============================
 {% for enum in enums %}
 class {{ enum.name }}(Enum):
+    {% if enum.comment %}
+    """
+    {{ enum.comment }}
+    """
+    {% endif %}
     {% for constant in enum.constants %}
     {{ constant.name }} = {{ constant.value }}
     {% endfor %}
@@ -14,8 +19,20 @@ class {{ enum.name }}(Enum):
 # ============================ STRUCTS ============================
 {% for struct in structs %}
 class {{ struct.name }}:
+    {% if struct.comment %}
+    """
+    {{ struct.comment }}
+    """
+    {% endif %}
     {% for attribute in struct.attributes %}
-    {{ attribute.name }}: {{ convertType(attribute.type) }}
+    @property
+    def {{ attribute.name }}(self) -> {{ convertType(attribute.type) }}:
+        {% if attribute.comment %}
+        """
+        {{ attribute.comment }}
+        """
+        {% endif %}
+        ...
     {% endfor %}
 {% endfor %}
 # ===================================================================
@@ -26,13 +43,25 @@ def {{ function.name}}(
     {% for arg in function.arguments %}
     {{ arg.name }}: {{ convertType(arg.type) }},
     {% endfor %}
-) -> {{ convertType(function.return_type) }}: ...
+) -> {{ convertType(function.return_type) }}:
+    {% if function.comment %}
+    """
+    {{ function.comment }}
+    """
+    {% endif %}
+    ...
 {% endfor%}
 # ===================================================================
 
 # ============================ CLASSES ==============================
 {% for class in classes %}
 class {{ class.name }}:
+    {% if class.comment %}
+    """
+    {{ class.comment }}
+    """
+    {% endif %}
+
     {% if class.methods != [] %}
         {% for method in class.methods %}
             {% if method.is_static %}
@@ -46,7 +75,13 @@ class {{ class.name }}:
                 {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
                 {% endfor %}
-    ) -> {{ convertType(method.return_type) }}: ...
+    ) -> {{ convertType(method.return_type) }}: 
+        {% if method.comment %}
+        """
+        {{ method.comment }}
+        """
+        {% endif %}
+        ...
         {% endfor %}
     {% else %}
         ...

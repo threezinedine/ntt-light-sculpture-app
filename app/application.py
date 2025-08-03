@@ -29,7 +29,7 @@ class LightSculptureMainWindow(QMainWindow):
 
         Logging.SetLogCallback(self._handleLog)
 
-        Logging.Log(LogLevel.DEBUG, "Hello, world!")
+        Logging.Log(LogLevel.INFO, "Hello, world!")
 
         # ================= DETERMINE THE PROCESS ID =================
         self.process_id = os.getpid()

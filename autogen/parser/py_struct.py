@@ -6,6 +6,7 @@ from .py_attribute import PyAttribute
 class PyStruct:
     def __init__(self, cursor: clang.Cursor):
         self.name = cursor.spelling
+        self.comment = cursor.brief_comment
         self.attributes: List[PyAttribute] = []
 
         for child in cursor.get_children():

@@ -15,6 +15,7 @@ class PyEnum:
     def __init__(self, cursor: clang.Cursor) -> None:
         self.name = cursor.spelling
         self.constants: List[PyEnumConstant] = []
+        self.comment = cursor.brief_comment
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.ENUM_CONSTANT_DECL:

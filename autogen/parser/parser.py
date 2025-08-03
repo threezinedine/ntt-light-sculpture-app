@@ -1,13 +1,14 @@
 import os
 import clang.cindex as clang  # type: ignore
 from clang.cindex import Config  # type: ignore
+from typing import Dict, List, Union
 
-from utils.template import AutoGenTemplate  # type: ignore
-from .function import Function
-from .class_ import Class
+from .py_function import PyFunction
+from .py_class import PyClass
 from .py_enum import PyEnum
 from .py_struct import PyStruct
 
+ParserDataType = Union[PyFunction, PyClass, PyEnum, PyStruct]
 
 class Parser:
     """
@@ -57,7 +58,7 @@ class Parser:
 
         index = clang.Index.create()
         self._ast = index.parse(input_file, args=["-x", "c++"])  # type: ignore
-        self.data: dict[str, list[Function | Class | PyEnum | PyStruct]] = {
+        self._data: Dict[str, List[ParserDataType]] = {
             "enums": [],
             "structs": [],
             "classes": [],
@@ -68,10 +69,10 @@ class Parser:
             if c.kind == clang.CursorKind.NAMESPACE and c.spelling == "ntt":
                 for child in c.get_children():
                     if child.kind == clang.CursorKind.FUNCTION_DECL:
-                        function = Function(child)
+                        function = PyFunction(child)
                         self.data["functions"].append(function)
                     elif child.kind == clang.CursorKind.CLASS_DECL:
-                        class_ = Class(child)
+                        class_ = PyClass(child)
                         self.data["classes"].append(class_)
                     elif child.kind == clang.CursorKind.ENUM_DECL:
                         enum = PyEnum(child)
@@ -80,5 +81,6 @@ class Parser:
                         struct = PyStruct(child)
                         self.data["structs"].append(struct)
 
-    def parse(self, template: AutoGenTemplate) -> str:
-        return template.render(self.data)
+    @property
+    def data(self) -> Dict[str, List[ParserDataType]]:
+        return self._data

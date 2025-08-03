@@ -1,26 +1,26 @@
 from typing import List
 import clang.cindex as clang  # type: ignore
-from clang.cindex import Cursor  # type: ignore
-from .argument import Argument
+from .py_argument import PyArgument
 
 
-class Function:
-    def __init__(self, cursor: Cursor) -> None:
+class PyMethod:
+    def __init__(self, cursor: clang.Cursor):
         self.name = cursor.spelling
-        self.arguments: List[Argument] = []
+        self.arguments: List[PyArgument] = []
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.PARM_DECL:
-                self.arguments.append(Argument(child))
+                self.arguments.append(PyArgument(child))
 
         self.return_type = cursor.result_type.spelling
+        self.is_static = cursor.is_static_method()
         self.comment = self._get_comment(cursor)
 
-    def _get_comment(self, cursor: Cursor) -> str:
+    def _get_comment(self, cursor: clang.Cursor) -> str:
         if cursor.brief_comment:
             return cursor.brief_comment
         else:
-            return f"Function {self.name} is not documented"
+            return f"Method {self.name} is not documented"
 
     def __repr__(self) -> str:
         return f'<Method: name="{self.name}">'
