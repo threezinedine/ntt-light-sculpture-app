@@ -6,6 +6,7 @@ from utils.template import AutoGenTemplate  # type: ignore
 from .function import Function
 from .class_ import Class
 from .py_enum import PyEnum
+from .py_struct import PyStruct
 
 
 class Parser:
@@ -56,8 +57,9 @@ class Parser:
 
         index = clang.Index.create()
         self._ast = index.parse(input_file, args=["-x", "c++"])  # type: ignore
-        self.data: dict[str, list[Function | Class | PyEnum]] = {
+        self.data: dict[str, list[Function | Class | PyEnum | PyStruct]] = {
             "enums": [],
+            "structs": [],
             "classes": [],
             "functions": [],
         }
@@ -74,6 +76,9 @@ class Parser:
                     elif child.kind == clang.CursorKind.ENUM_DECL:
                         enum = PyEnum(child)
                         self.data["enums"].append(enum)
+                    elif child.kind == clang.CursorKind.STRUCT_DECL:
+                        struct = PyStruct(child)
+                        self.data["structs"].append(struct)
 
     def parse(self, template: AutoGenTemplate) -> str:
         return template.render(self.data)

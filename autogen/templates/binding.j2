@@ -1,4 +1,5 @@
 #include "pybind11/pybind11.h"
+#include "pybind11/functional.h"
 #include "engine/engine.h"
 
 using namespace pybind11;
@@ -14,6 +15,17 @@ enum_<::NTT_NS::{{ enum.name }}>(m, "{{ enum.name }}")
     .export_values();
 {% endfor %}
 // ===============================================================
+
+// ============================ STRUCTS ============================
+{% for struct in structs %}
+class_<::NTT_NS::{{ struct.name }}>(m, "{{ struct.name }}")
+    .def(init<>())
+    {% for attribute in struct.attributes %}
+    .def_readwrite("{{ attribute.name }}", &::NTT_NS::{{ struct.name }}::{{ attribute.name }})
+    {% endfor %}
+    ;
+{% endfor %}
+// ===================================================================
 
 // ============================ FUNCTIONS ============================
 {% for function in functions %}

@@ -43,6 +43,7 @@ class TypeConverter:
         registeredTypeKeys = list(self._registeredTypes.keys())
         registeredTypeKeys.sort(key=len, reverse=True)
 
+        # Try to match the type with the registered types.
         for typeName in registeredTypeKeys:
             if re.match(TypeConverter.getRawTypeRegex(typeName), type):
                 return self._registeredTypes[typeName]

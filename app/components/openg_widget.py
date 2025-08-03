@@ -16,7 +16,6 @@ class OpenGlWidget(QOpenGLWidget):
         self._application = Application()
 
     def initializeGL(self):
-        super(OpenGlWidget, self).initializeGL()
         try:
             self._application.Initialize()
         except Exception as e:

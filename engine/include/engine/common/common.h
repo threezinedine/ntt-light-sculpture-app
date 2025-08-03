@@ -5,6 +5,8 @@
 #include <cassert>
 #include <memory>
 #include <vector>
+#include <chrono>
+#include <functional>
 
 typedef uint64_t u64;
 static_assert(sizeof(u64) == 8, "u64 is not 8 bytes");
@@ -57,3 +59,6 @@ inline Ref<T> CreateRef(Args &&...args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
+
+template <typename T, typename... Args>
+using Function = std::function<T(Args...)>;

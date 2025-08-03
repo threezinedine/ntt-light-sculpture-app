@@ -11,6 +11,15 @@ class {{ enum.name }}(Enum):
 {% endfor %}
 # ===================================================================
 
+# ============================ STRUCTS ============================
+{% for struct in structs %}
+class {{ struct.name }}:
+    {% for attribute in struct.attributes %}
+    {{ attribute.name }}: {{ convertType(attribute.type) }}
+    {% endfor %}
+{% endfor %}
+# ===================================================================
+
 # ============================ FUNCTIONS ============================
 {% for function in functions %}
 def {{ function.name}}(

@@ -1,6 +1,7 @@
 import os
 import sys
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
 from converted_uis.main_window import Ui_lightSculptureApplication
 
@@ -9,7 +10,7 @@ sys.path.append(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine")
 )
 
-from Engine import Logging, LogLevel
+from Engine import Logging, LogLevel, EngineLogRecord
 from components.openg_widget import OpenGlWidget
 
 # ignore the deprecation warning
@@ -25,6 +26,9 @@ class LightSculptureMainWindow(QMainWindow):
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
         super().__init__(parent, flags)
+
+        Logging.SetLogCallback(self._handleLog)
+
         Logging.Log(LogLevel.DEBUG, "Hello, world!")
 
         # ================= DETERMINE THE PROCESS ID =================
@@ -36,6 +40,12 @@ class LightSculptureMainWindow(QMainWindow):
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.centerLayout.addWidget(OpenGlWidget())
+
+    def _handleLog(self, record: EngineLogRecord) -> None:
+        print(f"{record.level}: {record.message}")
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        Logging.SetLogCallback(None)
 
 
 class LighSculptureApplication(QApplication):

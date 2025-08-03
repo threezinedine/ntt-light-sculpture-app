@@ -3,7 +3,7 @@ import logging
 from utils.args import Args
 from utils.template import AutoGenTemplate
 from utils.types import TypeConverter
-from parser.paser import Parser
+from parser.parser import Parser
 from data import LOGGER_NAME
 
 

@@ -20,7 +20,7 @@ namespace NTT_NS
      * The application should implement the callback (should be the handler in logging) for
      *      handling this message data.
      */
-    typedef void (*LogCallback)(const EngineLogRecord &record);
+    typedef Function<void, const EngineLogRecord &> LogCallback;
 
     class Logging
     {
@@ -34,8 +34,19 @@ namespace NTT_NS
          */
         static void Log(LogLevel level, const string &message);
 
+        /**
+         * @brief Configure the python callback for handling the message Record.
+         *
+         * @note If the python set the callback, it must release the callback when the application is closing.
+         *      Otherwise, the application will crash when the engine is shutting down.
+         */
+        static void SetLogCallback(LogCallback callback);
+
     private:
-        static string _get_timestamp();
+        static u32 _get_timestamp();
+
+    private:
+        static LogCallback s_logCallback;
     };
 } // namespace NTT_NS
 
