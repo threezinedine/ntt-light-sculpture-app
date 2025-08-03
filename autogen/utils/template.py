@@ -33,7 +33,7 @@ class AutoGenTemplate:
 
         try:
             self._env = Environment(loader=FileSystemLoader(template_dir))
-            self._env.globals["convertType"] = convertType
+            self._env.globals["convertType"] = convertType  # type: ignore
             self._template = self._env.get_template(file_name)
         except Exception as e:
             raise RuntimeError(f"Error loading template named '{file_name}': {e}")

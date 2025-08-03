@@ -1,3 +1,4 @@
+from typing import List
 import clang.cindex as clang  # type: ignore
 from .argument import Argument
 
@@ -5,7 +6,7 @@ from .argument import Argument
 class Method:
     def __init__(self, cursor: clang.Cursor):
         self.name = cursor.spelling
-        self.arguments = []
+        self.arguments: List[Argument] = []
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.PARM_DECL:

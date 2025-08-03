@@ -1,4 +1,3 @@
-from math import log
 import os
 import sys
 from PyQt6.QtCore import Qt
@@ -35,7 +34,7 @@ class LightSculptureMainWindow(QMainWindow):
         # ============================================================
 
         self.ui = Ui_lightSculptureApplication()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore
 
         self.ui.centerLayout.addWidget(OpenGlWidget())
 

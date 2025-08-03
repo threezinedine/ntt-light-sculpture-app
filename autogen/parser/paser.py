@@ -1,10 +1,10 @@
 import os
 import clang.cindex as clang  # type: ignore
-from clang.cindex import Config
-from utils.types import TypeConverter
+from clang.cindex import Config  # type: ignore
+
+from utils.template import AutoGenTemplate  # type: ignore
 from .function import Function
 from .class_ import Class
-from jinja2 import Template
 
 
 class Parser:
@@ -54,13 +54,13 @@ class Parser:
             raise FileNotFoundError(f"Input file '{input_file}' does not exist")
 
         index = clang.Index.create()
-        self._ast = index.parse(input_file, args=["-x", "c++"])
+        self._ast = index.parse(input_file, args=["-x", "c++"])  # type: ignore
         self.data: dict[str, list[Function | Class]] = {
             "classes": [],
             "functions": [],
         }
 
-        for c in self._ast.cursor.get_children():
+        for c in self._ast.cursor.get_children():  # type: ignore
             if c.kind == clang.CursorKind.NAMESPACE and c.spelling == "ntt":
                 for child in c.get_children():
                     if child.kind == clang.CursorKind.FUNCTION_DECL:
@@ -70,6 +70,5 @@ class Parser:
                         class_ = Class(child)
                         self.data["classes"].append(class_)
 
-    def parse(self, template: Template) -> str:
-        # register type converter
+    def parse(self, template: AutoGenTemplate) -> str:
         return template.render(self.data)

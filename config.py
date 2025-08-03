@@ -100,9 +100,9 @@ def get_last_modified_timestamp(file_name: str) -> datetime.datetime:
     Cross-platform method to get the last modified timestamp of a file.
     """
     if sys.platform == "win32":
-        return os.path.getmtime(file_name)  # type: ignore
+        return datetime.datetime.fromtimestamp(os.path.getmtime(file_name))
     else:
-        return os.path.getmtime(file_name)
+        return datetime.datetime.fromtimestamp(os.path.getmtime(file_name))
 
 
 def get_timestamp_file_path(file_name: str) -> str:
@@ -353,7 +353,7 @@ def open_designer() -> None:
 def run_application() -> None:
     logger.info("Running the application ...")
     try:
-        application_path = os.path.normpath(os.path.join(APP_DIR, "application.py"))
+        application_path = os.path.normpath(os.path.join(APP_DIR, "application.py"))  # type: ignore
         subprocess.run(
             f"{APPLICATION_PYTHON_EXE_PATH} {application_path}".split(" "),
             cwd=APP_DIR,
@@ -362,7 +362,7 @@ def run_application() -> None:
         logger.info(f"The application has been closed.")
     except Exception as e:
         logger.error(
-            f'Error while running the "{os.path.relpath(application_path, APP_DIR)}": {e}'
+            f'Error while running the "{os.path.relpath(application_path, APP_DIR)}": {e}'  # type: ignore
         )
         exit(1)
 
@@ -486,7 +486,7 @@ def install_engine(release: bool = False) -> None:
 def get_all_h_files() -> List[str]:
     engine_include_dir = os.path.normpath(os.path.join(ENGINE_DIR, "include"))
 
-    h_files = []
+    h_files: List[str] = []
     for file in glob(os.path.join(engine_include_dir, "**/*.h"), recursive=True):
         h_files.append(file)
 

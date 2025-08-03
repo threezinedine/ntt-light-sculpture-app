@@ -7,4 +7,4 @@ class WidgetView(QWidget):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.ui = Ui_Form()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore

@@ -16,6 +16,7 @@ class {{ class.name }}:
     {% if class.methods != [] %}
         {% for method in class.methods %}
     def {{ method.name }}(
+        self,
         {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
         {% endfor %}

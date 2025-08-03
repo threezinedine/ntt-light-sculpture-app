@@ -3,6 +3,7 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/venv/Lib/site-packages"
     ],
+    "python.analysis.typeCheckingMode": "strict",
     "python.testing.pytestArgs": [
         "--qt-api=pyqt6"
     ]

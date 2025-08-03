@@ -1,6 +1,5 @@
 import os
 import argparse
-from typing import List
 
 
 class Args:
@@ -84,7 +83,7 @@ class Args:
             raise ValueError(f"The input file {input_file} is not a valid .h file")
 
     @property
-    def input_file(self) -> List[str]:
+    def input_file(self) -> str:
         """
         The .h file which will be analyzed by the autogen, this should be a valid .h file
         The macro is also supported, e.g. `#include "input.h"`
