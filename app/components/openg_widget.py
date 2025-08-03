@@ -1,18 +1,18 @@
 from typing import Optional
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtOpenGL import QGLWidget
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QCloseEvent
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from Engine import Renderer
 
 
-class OpenGlWidget(QGLWidget):
+class OpenGlWidget(QOpenGLWidget):
     def __init__(
         self,
         parent: Optional[QWidget] = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
-        super(OpenGlWidget, self).__init__(parent, shareWidget=None, flags=flags)
+        super(OpenGlWidget, self).__init__(parent, flags=flags)
         self._renderer = Renderer()
 
     def initializeGL(self):

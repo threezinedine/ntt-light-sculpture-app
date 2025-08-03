@@ -1,7 +1,7 @@
 import os
 import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
 from converted_uis.main_window import Ui_lightSculptureApplication
 
 sys.path.append(
@@ -44,4 +44,4 @@ class LighSculptureApplication(QApplication):
 if __name__ == "__main__":
     app = LighSculptureApplication(sys.argv)
     app.main_window.showMaximized()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

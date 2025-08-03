@@ -71,17 +71,17 @@ def get_requirements_file_path(folder: str) -> str:
 # ================================================================
 
 # ================== EXECUTABLES RELATED SETTINGS ================
-PYQT5_TOOL_EXE_PATH = os.path.normpath(
+PYQT6_TOOL_EXE_PATH = os.path.normpath(
     os.path.join(
         get_script_dir(APP_DIR),
-        "pyqt5-tools" + SCRIPT_EXTENSION,
+        "pyqt6-tools" + SCRIPT_EXTENSION,
     )
 )
 
-PYUIC5_EXE_PATH = os.path.normpath(
+PYUIC6_EXE_PATH = os.path.normpath(
     os.path.join(
         get_script_dir(APP_DIR),
-        "pyuic5" + SCRIPT_EXTENSION,
+        "pyuic6" + SCRIPT_EXTENSION,
     )
 )
 
@@ -99,7 +99,7 @@ def get_last_modified_timestamp(file_name: str) -> datetime.datetime:
     Cross-platform method to get the last modified timestamp of a file.
     """
     if sys.platform == "win32":
-        return os.path.getmtime(file_name)
+        return os.path.getmtime(file_name)  # type: ignore
     else:
         return os.path.getmtime(file_name)
 
@@ -320,7 +320,7 @@ def convert_ui_files() -> None:
                 )
             )
             subprocess.run(
-                f"{PYUIC5_EXE_PATH} {ui_file} -o {converted_ui_path}",
+                f"{PYUIC6_EXE_PATH} {ui_file} -o {converted_ui_path}",
                 cwd=PROJECT_DIR,
                 shell=True,
                 check=True,
@@ -341,7 +341,7 @@ def open_designer() -> None:
     logger.info("Opening the designer...")
     try:
         subprocess.run(
-            f"{PYQT5_TOOL_EXE_PATH} designer".split(" "),
+            f"{PYQT6_TOOL_EXE_PATH} designer".split(" "),
             cwd=APP_DIR,
         )
     except Exception as e:
@@ -590,6 +590,21 @@ def run_engine_test(release: bool = False) -> None:
         exit(1)
 
 
+def run_test_app() -> None:
+    try:
+        logger.info("Running the test app...")
+        pytest_exe_path = get_pytest_exe_path(APP_DIR)
+        subprocess.run(
+            f"{pytest_exe_path}",
+            cwd=APP_DIR,
+            check=True,
+            shell=True,
+        )
+    except Exception as e:
+        logger.error(f"Error while running the test app: {e}")
+        exit(1)
+
+
 def run_config() -> None:
     # ================== APPLICATION RELATED SETTINGS ================
     # check the existence of application folder
@@ -711,10 +726,11 @@ def main():
         elif args.test_action == "engine":
             run_engine_test(release=args.release)
         elif args.test_action == "app":
-            pass
+            run_test_app()
         elif args.test_action == "all":
             run_engine_test(release=args.release)
             run_autogen_test()
+            run_test_app()
     elif args.action == "engine":
         if args.engine_action == "generate":
             generate_build_system(release=args.release)

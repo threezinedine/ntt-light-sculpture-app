@@ -49,6 +49,9 @@
    <widget class="QWidget" name="dockWidgetContents"/>
   </widget>
   <widget class="QDockWidget" name="logWidget">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
    <property name="windowTitle">
     <string>Log</string>
    </property>

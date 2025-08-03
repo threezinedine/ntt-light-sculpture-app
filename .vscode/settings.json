@@ -5,8 +5,8 @@
 	"python.autoComplete.extraPaths": [
 		"${workspaceFolder}/engine/build/Debug/Debug"
 	],
-	"python.analysis.extraPaths": [
+	"cmake.ignoreCMakeListsMissing": true,
+	"cursorpyright.analysis.extraPaths": [
 		"${workspaceFolder}/engine/build/Debug/Debug"
-	],
-	"cmake.ignoreCMakeListsMissing": true
+	]
 }
