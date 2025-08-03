@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import logging
 import datetime
 import argparse
@@ -436,6 +437,20 @@ def generate_build_system(release: bool = False) -> None:
         exit(1)
 
 
+def copy_pyd_files(release: bool = False) -> None:
+    logger.info("Copying the pyd files...")
+    build_dir = get_build_dir(release)
+    pyd_files = glob(os.path.join(build_dir, get_build_type(release), "*.pyd"))
+    for pyd_file in pyd_files:
+        try:
+            logger.debug(f"Copying the {pyd_file} file...")
+            shutil.copy(pyd_file, os.path.join(APP_DIR, "Engine"))
+        except Exception as e:
+            logger.warning(f"Error while copying the {pyd_file} file: {e}")
+
+    logger.info("The pyd files have been copied successfully.")
+
+
 def build_engine(release: bool = False) -> None:
     build_dir = get_build_dir(release)
     try:
@@ -446,6 +461,7 @@ def build_engine(release: bool = False) -> None:
             shell=True,
             check=True,
         )
+        copy_pyd_files(release)
         logger.info(f"The engine has been built successfully.")
     except Exception as e:
         logger.error(f"Error while building the engine: {e}")

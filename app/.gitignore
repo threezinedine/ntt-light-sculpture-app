@@ -1,4 +1,7 @@
 venv/
 converted_uis/
 __pycache__/
-Engine/
+Engine/*.pyi
+Engine/*.pyd
+.pytest_cache/
+.mypy_cache/

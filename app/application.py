@@ -4,9 +4,11 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
 from converted_uis.main_window import Ui_lightSculptureApplication
 
+print(os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine"))
 sys.path.append(
-    "C:/Users/Acer/Project/ntt-light-sculpture-app/engine/build/Debug/Debug"
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine")
 )
+
 from Engine import Logging
 from components.openg_widget import OpenGlWidget
 
