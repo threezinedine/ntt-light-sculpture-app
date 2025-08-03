@@ -26,7 +26,7 @@ AUTOGEN_TEMPLATE_DIR = os.path.normpath(os.path.join(AUTOGEN_DIR, "templates"))
 # =================================================================
 
 # ================== CONSTANTS RELATED SETTINGS ===================
-LOGGER_NAME = "config"
+LOGGER_NAME = "CONFIG"
 SCRIPT_EXTENSION = ".exe" if sys.platform == "win32" else ""
 # =================================================================
 
@@ -35,7 +35,7 @@ logger = logging.getLogger(LOGGER_NAME)
 logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter(
-    "[%(levelname)-5s] %(asctime)s - %(message)s",
+    "[%(levelname)-5s] - [%(name)-7s] - %(asctime)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 stream_handler = logging.StreamHandler(sys.stdout)
@@ -483,11 +483,11 @@ def install_engine(release: bool = False) -> None:
         exit(1)
 
 
-def get_all_h_files() -> List[str]:
+def get_all_public_headers() -> List[str]:
     engine_include_dir = os.path.normpath(os.path.join(ENGINE_DIR, "include"))
 
     h_files: List[str] = []
-    for file in glob(os.path.join(engine_include_dir, "**/*.h"), recursive=True):
+    for file in glob(os.path.join(engine_include_dir, "engine/**/*.h"), recursive=True):
         h_files.append(file)
 
     logger.debug(f"Found {len(h_files)} h files.")
@@ -496,7 +496,7 @@ def get_all_h_files() -> List[str]:
 
 
 def get_h_files_as_input_args() -> str:
-    return " ".join([f"{file}" for file in get_all_h_files()])
+    return " ".join([f"{file}" for file in get_all_public_headers()])
 
 
 def get_libclangdll_path() -> str:
@@ -519,7 +519,7 @@ def run_autogen(force: bool = False) -> None:
 
         # ================== CHECKING MODIFICATIONS ==================
         # only run the autogen if the engine.h is modified
-        all_headers = get_all_h_files()
+        all_headers = get_all_public_headers()
         has_modified_header = False
         for header in all_headers:
             if check_a_file_is_modified(header) or force:
@@ -532,8 +532,8 @@ def run_autogen(force: bool = False) -> None:
 
         # ============================================================
 
-        engine_global_header = os.path.normpath(
-            os.path.join(ENGINE_DIR, "include", "engine", "engine.h")
+        engine_global_public_header = os.path.normpath(
+            os.path.join(ENGINE_DIR, "include", "engine", "public.h")
         )
 
         # ================== BINDING RELATED SETTINGS ==================
@@ -543,11 +543,13 @@ def run_autogen(force: bool = False) -> None:
             os.path.join(AUTOGEN_TEMPLATE_DIR, "binding.j2")
         )
         subprocess.run(
-            f"{python_exe_path} main.py -i {engine_global_header} -j {binding_template_file} -o {binding_output} -c {libclangdll_path}".split(
+            f"{python_exe_path} main.py -i {engine_global_public_header} -j {binding_template_file} -o {binding_output} -c {libclangdll_path}".split(
                 " "
             ),
             cwd=AUTOGEN_DIR,
             shell=True,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
             check=True,
         )
         logger.info("The binding has been run successfully.")
@@ -560,7 +562,7 @@ def run_autogen(force: bool = False) -> None:
             os.path.join(AUTOGEN_TEMPLATE_DIR, "pyi_binding.j2")
         )
         subprocess.run(
-            f"{python_exe_path} main.py -i {engine_global_header} -j {pyi_template_file} -o {pyi_output} -c {libclangdll_path}".split(
+            f"{python_exe_path} main.py -i {engine_global_public_header} -j {pyi_template_file} -o {pyi_output} -c {libclangdll_path}".split(
                 " "
             ),
             cwd=AUTOGEN_DIR,

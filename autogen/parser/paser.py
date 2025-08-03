@@ -5,6 +5,7 @@ from clang.cindex import Config  # type: ignore
 from utils.template import AutoGenTemplate  # type: ignore
 from .function import Function
 from .class_ import Class
+from .py_enum import PyEnum
 
 
 class Parser:
@@ -55,7 +56,8 @@ class Parser:
 
         index = clang.Index.create()
         self._ast = index.parse(input_file, args=["-x", "c++"])  # type: ignore
-        self.data: dict[str, list[Function | Class]] = {
+        self.data: dict[str, list[Function | Class | PyEnum]] = {
+            "enums": [],
             "classes": [],
             "functions": [],
         }
@@ -69,6 +71,9 @@ class Parser:
                     elif child.kind == clang.CursorKind.CLASS_DECL:
                         class_ = Class(child)
                         self.data["classes"].append(class_)
+                    elif child.kind == clang.CursorKind.ENUM_DECL:
+                        enum = PyEnum(child)
+                        self.data["enums"].append(enum)
 
     def parse(self, template: AutoGenTemplate) -> str:
         return template.render(self.data)

@@ -28,7 +28,8 @@
 			"memory": "cpp",
 			"numeric": "cpp",
 			"system_error": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"cstdint": "cpp"
 		}
 	}
 }

@@ -3,9 +3,12 @@
 #include <cstdio>
 #include <stdexcept>
 #include "engine/renderer/renderer.h"
+#include "engine/singletonManager/singletonManager.h"
 
 namespace NTT_NS
 {
+    NTT_DEFINE_SINGLETON(Renderer);
+
     Renderer::Renderer()
         : m_window(nullptr), m_shaderProgram(0), m_VAO(0), m_VBO(0)
     {

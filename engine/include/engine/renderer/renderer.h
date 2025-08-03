@@ -10,10 +10,9 @@ namespace NTT_NS
      */
     class Renderer
     {
-    public:
-        Renderer();
-        ~Renderer();
+        NTT_DECLARE_SINGLETON(Renderer);
 
+    public:
         /**
          * @brief Initialize the renderer
          * Should be run once at the beginning of the application, this method will

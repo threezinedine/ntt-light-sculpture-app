@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
-from Engine import Renderer
+from Engine import Application
 
 
 class OpenGlWidget(QOpenGLWidget):
@@ -13,24 +13,24 @@ class OpenGlWidget(QOpenGLWidget):
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
         super(OpenGlWidget, self).__init__(parent, flags=flags)
-        self._renderer = Renderer()
+        self._application = Application()
 
     def initializeGL(self):
         super(OpenGlWidget, self).initializeGL()
         try:
-            self._renderer.Initialize()
+            self._application.Initialize()
         except Exception as e:
             print(e)
 
-    def resizeGL(self, width: int, height: int):
-        self._renderer.Resize(width, height)
+    def resizeGL(self, w: int, h: int):
+        self._application.Resize(w, h)
 
     def paintGL(self):
         try:
-            self._renderer.Render()
+            self._application.Update()
         except Exception as e:
             print(e)
 
-    def closeEvent(self, event: QCloseEvent):
-        self._renderer.Shutdown()
-        event.accept()
+    def closeEvent(self, a0: QCloseEvent):
+        self._application.Finalize()
+        a0.accept()

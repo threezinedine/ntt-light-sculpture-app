@@ -5,6 +5,15 @@ using namespace pybind11;
 
 PYBIND11_MODULE(Engine, m) 
 {
+// ============================ ENUMS ============================
+{% for enum in enums %}
+enum_<::NTT_NS::{{ enum.name }}>(m, "{{ enum.name }}")
+    {% for constant in enum.constants %}
+    .value("{{ constant.name }}", ::NTT_NS::{{ enum.name }}::{{ constant.name }})
+    {% endfor %}
+    .export_values();
+{% endfor %}
+// ===============================================================
 
 // ============================ FUNCTIONS ============================
 {% for function in functions %}
@@ -16,9 +25,12 @@ m.def("{{ function.name }}", &::NTT_NS::{{ function.name }}, "{{ function.commen
 {% for class in classes %}
 class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
     .def(init<>())
-
     {% for method in class.methods %}
+    {% if method.is_static %}
+    .def_static("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+    {% else %}
     .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+    {% endif %}
     {% endfor %}
 
     ;

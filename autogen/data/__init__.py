@@ -6,3 +6,5 @@ PYTHON_TYPE_KEYWORDS = [
     "None",
     "Any",
 ]
+
+LOGGER_NAME = "AUTOGEN"

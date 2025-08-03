@@ -9,7 +9,7 @@ sys.path.append(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine")
 )
 
-from Engine import Logging
+from Engine import Logging, LogLevel
 from components.openg_widget import OpenGlWidget
 
 # ignore the deprecation warning
@@ -25,8 +25,7 @@ class LightSculptureMainWindow(QMainWindow):
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
         super().__init__(parent, flags)
-        logger = Logging()
-        logger.info("Hello, world!")
+        Logging.Log(LogLevel.DEBUG, "Hello, world!")
 
         # ================= DETERMINE THE PROCESS ID =================
         self.process_id = os.getpid()

@@ -5,15 +5,26 @@ from typing import Dict
 class TypeConverter:
     def __init__(self):
         self._typeMatchMap = {
-            f"int": "int",
-            f"long": "int",
-            f"short": "int",
-            f"char": "int",
-            f"float": "float",
-            f"double": "float",
-            f"bool": "bool",
-            f"string": "str",
-            f"void": "None",
+            "int": "int",
+            "long": "int",
+            "short": "int",
+            "char": "int",
+            "u32": "int",
+            "u64": "int",
+            "u16": "int",
+            "u8": "int",
+            "i32": "int",
+            "i64": "int",
+            "i16": "int",
+            "i8": "int",
+            "float": "float",
+            "f32": "float",
+            "double": "float",
+            "f64": "float",
+            "bool": "bool",
+            "b8": "bool",
+            "string": "str",
+            "void": "None",
         }
 
         self._registeredTypes: Dict[str, str] = {}  # type: ignore

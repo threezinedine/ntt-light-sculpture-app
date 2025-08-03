@@ -1,4 +1,15 @@
+from typing import Any
+from enum import Enum
 # Engine pyi binding
+
+# ============================ ENUMS ============================
+{% for enum in enums %}
+class {{ enum.name }}(Enum):
+    {% for constant in enum.constants %}
+    {{ constant.name }} = {{ constant.value }}
+    {% endfor %}
+{% endfor %}
+# ===================================================================
 
 # ============================ FUNCTIONS ============================
 {% for function in functions %}
@@ -15,11 +26,17 @@ def {{ function.name}}(
 class {{ class.name }}:
     {% if class.methods != [] %}
         {% for method in class.methods %}
+            {% if method.is_static %}
+    @staticmethod
+            {% endif %}
     def {{ method.name }}(
+                {% if method.is_static %}
+                {% else %}
         self,
-        {% for arg in method.arguments %}
+                {% endif %}
+                {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
-        {% endfor %}
+                {% endfor %}
     ) -> {{ convertType(method.return_type) }}: ...
         {% endfor %}
     {% else %}

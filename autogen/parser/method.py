@@ -13,6 +13,7 @@ class Method:
                 self.arguments.append(Argument(child))
 
         self.return_type = cursor.result_type.spelling
+        self.is_static = cursor.is_static_method()
         self.comment = self._get_comment(cursor)
 
     def _get_comment(self, cursor: clang.Cursor) -> str:
