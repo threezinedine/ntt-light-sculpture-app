@@ -1,4 +1,4 @@
-from clang.cindex import Cursor
+from clang.cindex import Cursor  # type: ignore
 
 
 class Argument:

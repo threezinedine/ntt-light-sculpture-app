@@ -1,3 +1,5 @@
 temp/
 install/
 *-design.txt
+.mypy_cache/
+.pytest_cache/

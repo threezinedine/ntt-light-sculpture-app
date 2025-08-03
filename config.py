@@ -510,7 +510,7 @@ def get_libclangdll_path() -> str:
         exit(1)
 
 
-def run_autogen() -> None:
+def run_autogen(force: bool = False) -> None:
     libclangdll_path = os.path.join(get_libclangdll_path(), "libclang.dll")
 
     try:
@@ -522,7 +522,7 @@ def run_autogen() -> None:
         all_headers = get_all_h_files()
         has_modified_header = False
         for header in all_headers:
-            if check_a_file_is_modified(header):
+            if check_a_file_is_modified(header) or force:
                 has_modified_header = True
                 update_stamp_file_of_a_file(header)
 
@@ -711,7 +711,13 @@ def main():
         default="all",
     )
 
-    subparsers.add_parser("autogen", help="Autogen related actions")
+    autogen_parser = subparsers.add_parser("autogen", help="Autogen related actions")
+    autogen_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force the autogen to run even if no header is modified",
+    )
 
     args = parser.parse_args()
 
@@ -760,7 +766,7 @@ def main():
             build_engine(release=True)
             install_engine(release=True)
     elif args.action == "autogen":
-        run_autogen()
+        run_autogen(force=args.force)
     # ================================================================
 
 

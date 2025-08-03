@@ -4,9 +4,9 @@
 {% for function in functions %}
 def {{ function.name}}(
     {% for arg in function.arguments %}
-    {{ arg.name }}: {{ arg.type }},
+    {{ arg.name }}: {{ convertType(arg.type) }},
     {% endfor %}
-) -> {{ function.return_type }}: ...
+) -> {{ convertType(function.return_type) }}: ...
 {% endfor%}
 # ===================================================================
 
@@ -17,9 +17,9 @@ class {{ class.name }}:
         {% for method in class.methods %}
     def {{ method.name }}(
         {% for arg in method.arguments %}
-        {{ arg.name }}: {{ arg.type }},
+        {{ arg.name }}: {{ convertType(arg.type) }},
         {% endfor %}
-    ) -> {{ method.return_type }}: ...
+    ) -> {{ convertType(method.return_type) }}: ...
         {% endfor %}
     {% else %}
         ...

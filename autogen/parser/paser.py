@@ -1,6 +1,7 @@
 import os
-import clang.cindex as clang
+import clang.cindex as clang  # type: ignore
 from clang.cindex import Config
+from utils.types import TypeConverter
 from .function import Function
 from .class_ import Class
 from jinja2 import Template
@@ -54,7 +55,7 @@ class Parser:
 
         index = clang.Index.create()
         self._ast = index.parse(input_file, args=["-x", "c++"])
-        self.data = {
+        self.data: dict[str, list[Function | Class]] = {
             "classes": [],
             "functions": [],
         }
@@ -70,4 +71,5 @@ class Parser:
                         self.data["classes"].append(class_)
 
     def parse(self, template: Template) -> str:
+        # register type converter
         return template.render(self.data)

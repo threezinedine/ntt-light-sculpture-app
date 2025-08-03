@@ -1,4 +1,4 @@
-import clang.cindex as clang
+import clang.cindex as clang  # type: ignore
 from clang.cindex import Cursor
 from .method import Method
 

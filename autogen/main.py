@@ -1,6 +1,7 @@
 import logging
 from utils.args import Args
 from utils.template import AutoGenTemplate
+from utils.types import TypeConverter
 from parser.paser import Parser
 
 
@@ -24,7 +25,7 @@ def main():
 
     logging.info("Generating the output file ...")
 
-    template = AutoGenTemplate(args.jinja_template)
+    template = AutoGenTemplate(args.jinja_template, TypeConverter())
 
     result = parser.parse(template)
 

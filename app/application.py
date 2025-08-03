@@ -1,3 +1,4 @@
+from math import log
 import os
 import sys
 from PyQt6.QtCore import Qt
@@ -25,6 +26,8 @@ class LightSculptureMainWindow(QMainWindow):
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
         super().__init__(parent, flags)
+        logger = Logging()
+        logger.info("Hello, world!")
 
         # ================= DETERMINE THE PROCESS ID =================
         self.process_id = os.getpid()

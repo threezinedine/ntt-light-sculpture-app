@@ -1,28 +1,45 @@
-from typing import Dict
 import re
+from typing import Dict
 
 
-def get_raw_type_regex(type: str) -> str:
-    """
-    Getting the raw type (the primitive type) regex pattern.
-    """
-    return f"^[\\s\\S:]*{type}[\\s\\S]*$"
+class TypeConverter:
+    def __init__(self):
+        self._typeMatchMap = {
+            f"int": "int",
+            f"long": "int",
+            f"short": "int",
+            f"char": "int",
+            f"float": "float",
+            f"double": "float",
+            f"bool": "bool",
+            f"string": "str",
+            f"void": "None",
+        }
 
+        self._registeredTypes: Dict[str, str] = {}  # type: ignore
 
-_RAW_TYPE_MAP: Dict[str, str] = {
-    f"{get_raw_type_regex('int')}": "int",
-    f"{get_raw_type_regex('float')}": "float",
-    f"{get_raw_type_regex('double')}": "float",
-    f"{get_raw_type_regex('bool')}": "bool",
-    f"{get_raw_type_regex('string')}": "str",
-}
+    @staticmethod
+    def getRawTypeRegex(type: str) -> str:
+        """
+        Getting the raw type (the primitive type) regex pattern.
+        """
+        return f"^[\\s\\S:]*{type}[\\s\\S]*$"
 
+    def convertType(self, type: str) -> str:
+        """
+        Convert the type from c++ header code into python type.
+        """
+        registeredTypeKeys = list(self._registeredTypes.keys())
+        registeredTypeKeys.sort(key=len, reverse=True)
 
-def convert_type(type: str) -> str:
-    """
-    Convert the type from c++ header code into python type.
-    """
-    for regex, output in _RAW_TYPE_MAP.items():
-        if re.match(regex, type):
-            return output
-    return None
+        for typeName in registeredTypeKeys:
+            if re.match(TypeConverter.getRawTypeRegex(typeName), type):
+                return self._registeredTypes[typeName]
+
+        for typeName, output in self._typeMatchMap.items():
+            if re.match(TypeConverter.getRawTypeRegex(typeName), type):
+                return output
+        return "Any"
+
+    def addType(self, type: str, output: str) -> None:
+        self._registeredTypes[type] = output

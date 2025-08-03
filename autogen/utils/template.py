@@ -1,6 +1,8 @@
 import os
 from typing import Any, Dict
-from jinja2 import FileSystemLoader, Template, Environment
+from jinja2 import FileSystemLoader, Environment
+from utils.types import TypeConverter
+from data import PYTHON_TYPE_KEYWORDS
 
 
 class AutoGenTemplate:
@@ -18,12 +20,20 @@ class AutoGenTemplate:
     ```
     """
 
-    def __init__(self, template_file) -> None:
+    def __init__(self, template_file: str, typeConverter: TypeConverter) -> None:
         template_dir = os.path.dirname(template_file)
         file_name = os.path.basename(template_file)
 
+        def convertType(type: str) -> str:
+            convertedType = typeConverter.convertType(type)
+            if convertedType in PYTHON_TYPE_KEYWORDS:
+                return convertedType
+            else:
+                return f'"{convertedType}"'
+
         try:
             self._env = Environment(loader=FileSystemLoader(template_dir))
+            self._env.globals["convertType"] = convertType
             self._template = self._env.get_template(file_name)
         except Exception as e:
             raise RuntimeError(f"Error loading template named '{file_name}': {e}")

@@ -1,4 +1,4 @@
-import clang.cindex as clang
+import clang.cindex as clang  # type: ignore
 from .argument import Argument
 
 
