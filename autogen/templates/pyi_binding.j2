@@ -68,7 +68,7 @@ class {{ class.name }}:
     @staticmethod
             {% endif %}
     def {{ method.name }}(
-                {% if method.isStatic %}
+                {% if method.isStatic or "singleton" in class.annotations %}
                 {% else %}
         self,
                 {% endif %}
