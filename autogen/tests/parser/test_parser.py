@@ -1,3 +1,4 @@
+from typing import Optional
 import pytest
 from parser.py_method import PyMethod
 from parser.py_attribute import PyAttribute
@@ -17,13 +18,15 @@ def assert_method(
     name: str,
     isStatic: bool,
     returnType: str,
+    annotation: Optional[str] = None,
 ) -> None:
     assert method.name == name
     assert method.isStatic == isStatic
     assert method.returnType == returnType
+    assert method.annotation == annotation
 
 
-def assert_function_arguments(
+def assert_arguments(
     argument: PyArgument,
     name: str,
     type: str,
@@ -103,8 +106,8 @@ def test_parse_function() -> None:
     parsedFunction: PyFunction = parser.data["functions"][0]  # type: ignore
 
     assert_function(parsedFunction, "run", "void")
-    assert_function_arguments(parsedFunction.arguments[0], "a", "int")
-    assert_function_arguments(parsedFunction.arguments[1], "b", "int")
+    assert_arguments(parsedFunction.arguments[0], "a", "int")
+    assert_arguments(parsedFunction.arguments[1], "b", "int")
 
 
 def test_parse_struct() -> None:
@@ -145,9 +148,16 @@ def test_parse_static_method_inside_class() -> None:
         content="""
         namespace ntt 
         {
-            class Engine {
+            struct Data 
+            {
+                int a;
+                int b;
+            };
+
+            class Engine 
+            {
             public:
-                void run();
+                void run(const Data &data) __attribute__((annotate("python")));
                 static void sRun();
             }
         }
@@ -159,5 +169,7 @@ def test_parse_static_method_inside_class() -> None:
     assert_class(parsedClass, "Engine")
 
     assert len(parsedClass.methods) == 2
-    assert_method(parsedClass.methods[0], "run", False, "void")
+    assert_method(parsedClass.methods[0], "run", False, "void", "python")
+    assert len(parsedClass.methods[0].arguments) == 1
+    assert_arguments(parsedClass.methods[0].arguments[0], "data", "const Data &")
     assert_method(parsedClass.methods[1], "sRun", True, "void")

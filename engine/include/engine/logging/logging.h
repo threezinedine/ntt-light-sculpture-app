@@ -32,7 +32,7 @@ namespace NTT_NS
          *      log system level, it will not be sent to the application).
          * @param message The content of the sent message.
          */
-        static void Log(LogLevel level, const string &message);
+        static void Log(LogLevel level, const string &message) NTT_PYTHON_BINDING;
 
         /**
          * @brief Configure the python callback for handling the message Record.
@@ -40,7 +40,7 @@ namespace NTT_NS
          * @note If the python set the callback, it must release the callback when the application is closing.
          *      Otherwise, the application will crash when the engine is shutting down.
          */
-        static void SetLogCallback(LogCallback callback);
+        static void SetLogCallback(LogCallback callback) NTT_PYTHON_BINDING;
 
     private:
         static u32 _get_timestamp();

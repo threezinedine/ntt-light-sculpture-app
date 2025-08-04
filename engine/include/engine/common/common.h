@@ -62,3 +62,5 @@ inline Ref<T> CreateRef(Args &&...args)
 
 template <typename T, typename... Args>
 using Function = std::function<T(Args...)>;
+
+#include "annotate.h"

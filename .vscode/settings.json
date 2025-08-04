@@ -8,5 +8,9 @@
 	"cmake.ignoreCMakeListsMissing": true,
 	"cursorpyright.analysis.extraPaths": [
 		"${workspaceFolder}/engine/build/Debug/Debug"
-	]
+	],
+	"files.associations": {
+		"*.py": "python",
+		"cmath": "cpp"
+	}
 }

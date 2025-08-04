@@ -78,7 +78,13 @@ class Parser:
         index = clang.Index.create()
         self._ast = index.parse(  # type: ignore
             inputFile,
-            args=["-x", "c++"],
+            args=[
+                "-x",
+                "c++",
+                "-std=c++17",
+                "-fgnu-extensions",
+                "-fparse-all-comments",
+            ],
             unsaved_files=[(inputFile, content)] if content else None,
         )
         self._data: Dict[ParserDataKey, List[ParserDataType]] = {

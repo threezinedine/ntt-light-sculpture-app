@@ -12,7 +12,9 @@ class PyClass:
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.CXX_METHOD:
                 if child.access_specifier == clang.AccessSpecifier.PUBLIC:
-                    self.methods.append(PyMethod(child))
+                    method = PyMethod(child)
+                    if method.annotation == "python":
+                        self.methods.append(method)
 
     def __repr__(self) -> str:
         return f'<Class: name="{self.name}">'
