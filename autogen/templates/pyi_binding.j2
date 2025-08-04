@@ -43,7 +43,7 @@ def {{ function.name}}(
     {% for arg in function.arguments %}
     {{ arg.name }}: {{ convertType(arg.type) }},
     {% endfor %}
-) -> {{ convertType(function.return_type) }}:
+) -> {{ convertType(function.returnType) }}:
     {% if function.comment %}
     """
     {{ function.comment }}
@@ -64,18 +64,18 @@ class {{ class.name }}:
 
     {% if class.methods != [] %}
         {% for method in class.methods %}
-            {% if method.is_static %}
+            {% if method.isStatic %}
     @staticmethod
             {% endif %}
     def {{ method.name }}(
-                {% if method.is_static %}
+                {% if method.isStatic %}
                 {% else %}
         self,
                 {% endif %}
                 {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
                 {% endfor %}
-    ) -> {{ convertType(method.return_type) }}: 
+    ) -> {{ convertType(method.returnType) }}: 
         {% if method.comment %}
         """
         {{ method.comment }}

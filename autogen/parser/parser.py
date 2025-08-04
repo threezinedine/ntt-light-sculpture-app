@@ -1,20 +1,29 @@
 import os
 import clang.cindex as clang  # type: ignore
 from clang.cindex import Config  # type: ignore
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union, Literal
 
 from .py_function import PyFunction
 from .py_class import PyClass
 from .py_enum import PyEnum
 from .py_struct import PyStruct
 
+ParserDataKey = Literal["types", "enums", "structs", "classes", "functions"]
 ParserDataType = Union[PyFunction, PyClass, PyEnum, PyStruct]
+
 
 class Parser:
     """
     The parser will read the input file and parse them into a predefined data structure
         inside this project, after that, user can use the jinja template for rendering
         the generated source code.
+
+    Parameters:
+        inputFile: The file to parse, this file will be parsed by clang, all #include will be
+                    solved by the clang.
+        content: This attribute is used for testing only, do not used it for other purposes. If
+                    this attribute is not None, then the inputFile will not be searched in the
+                    real file system, instead, the content will be used as the input file.
 
     Example:
     ```cpp
@@ -46,19 +55,34 @@ class Parser:
     """
 
     @staticmethod
-    def ConfigClang(libclang_path: str) -> None:
+    def ConfigClang(libClangDllPath: str) -> None:
         """
         Must be called before creating the parser.
-        """
-        Config.set_library_file(libclang_path)
 
-    def __init__(self, input_file: str) -> None:
-        if not os.path.exists(input_file):
-            raise FileNotFoundError(f"Input file '{input_file}' does not exist")
+        Parameters:
+            libClangDllPath: The absolute path of the libclang.dll which will be
+                loaded into the current project for parsing the .h files.
+
+        Example:
+        ```python
+        Parser.ConfigClang("libclang.dll")
+        ```
+        """
+        Config.set_library_file(libClangDllPath)
+
+    def __init__(self, inputFile: str, content: Optional[str] = None) -> None:
+        if content is None:
+            if not os.path.exists(inputFile):
+                raise FileNotFoundError(f"Input file '{inputFile}' does not exist")
 
         index = clang.Index.create()
-        self._ast = index.parse(input_file, args=["-x", "c++"])  # type: ignore
-        self._data: Dict[str, List[ParserDataType]] = {
+        self._ast = index.parse(  # type: ignore
+            inputFile,
+            args=["-x", "c++"],
+            unsaved_files=[(inputFile, content)] if content else None,
+        )
+        self._data: Dict[ParserDataKey, List[ParserDataType]] = {
+            "types": [],
             "enums": [],
             "structs": [],
             "classes": [],
@@ -82,5 +106,5 @@ class Parser:
                         self.data["structs"].append(struct)
 
     @property
-    def data(self) -> Dict[str, List[ParserDataType]]:
+    def data(self) -> Dict[ParserDataKey, List[ParserDataType]]:
         return self._data

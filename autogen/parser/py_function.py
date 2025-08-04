@@ -13,7 +13,7 @@ class PyFunction:
             if child.kind == clang.CursorKind.PARM_DECL:
                 self.arguments.append(PyArgument(child))
 
-        self.return_type = cursor.result_type.spelling
+        self.returnType = cursor.result_type.spelling
         self.comment = self._get_comment(cursor)
 
     def _get_comment(self, cursor: Cursor) -> str:

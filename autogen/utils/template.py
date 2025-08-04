@@ -1,8 +1,9 @@
 import os
-from typing import Any, Dict
+from typing import Dict, List
 from jinja2 import FileSystemLoader, Environment
 from utils.types import TypeConverter
 from data import PYTHON_TYPE_KEYWORDS
+from parser.parser import ParserDataKey, ParserDataType
 
 
 class AutoGenTemplate:
@@ -38,13 +39,13 @@ class AutoGenTemplate:
         except Exception as e:
             raise RuntimeError(f"Error loading template named '{file_name}': {e}")
 
-    def render(self, data: Dict[str, Any]) -> str:
+    def render(self, data: Dict[ParserDataKey, List[ParserDataType]]) -> str:
         """
         Receives a dictionary of data and renders the template.
 
         Return the rendered template as a string.
         """
         try:
-            return self._template.render(**data)
+            return self._template.render(**data)  # type: ignore
         except Exception as e:
             raise RuntimeError(f"Error rendering template: {e}")

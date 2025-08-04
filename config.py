@@ -8,6 +8,10 @@ import subprocess
 from glob import glob
 from typing import List
 
+# ================== CONSTANTS RELATED SETTINGS ===================
+CLANG_PATH_KEY = "CLANG_PATH"
+# =================================================================
+
 # ================== DIRECTORIES RELATED SETTINGS =================
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "temp"))
@@ -504,14 +508,15 @@ def get_libclangdll_path() -> str:
         output = subprocess.run(
             "where clang", shell=True, check=True, capture_output=True
         )
-        return os.path.dirname(output.stdout.decode("utf-8")[:-2])
+        clang_dir = os.path.dirname(output.stdout.decode("utf-8")[:-2])
+        return os.path.join(clang_dir, "libclang.dll")
     except Exception as e:
         logger.error(f"Error while getting the libclang.dll path: {e}")
         exit(1)
 
 
 def run_autogen(force: bool = False) -> None:
-    libclangdll_path = os.path.join(get_libclangdll_path(), "libclang.dll")
+    libclangdll_path = get_libclangdll_path()
 
     try:
         logger.info("Running the autogen...")
@@ -579,6 +584,7 @@ def run_autogen(force: bool = False) -> None:
 
 def run_autogen_test() -> None:
     try:
+        os.environ[CLANG_PATH_KEY] = get_libclangdll_path()
         logger.info("Running the autogen test...")
         pytest_exe_path = get_pytest_exe_path(AUTOGEN_DIR)
         subprocess.run(

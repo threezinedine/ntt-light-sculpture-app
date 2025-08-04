@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 import clang.cindex as clang  # type: ignore
 from clang.cindex import Cursor  # type: ignore
 from .py_method import PyMethod
@@ -7,7 +7,7 @@ from .py_method import PyMethod
 class PyClass:
     def __init__(self, cursor: Cursor) -> None:
         self.name = cursor.spelling
-        self.methods: List[Union[PyMethod, "PyClass"]] = []
+        self.methods: List[PyMethod] = []
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.CXX_METHOD:

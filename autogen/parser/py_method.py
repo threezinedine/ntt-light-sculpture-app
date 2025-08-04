@@ -12,8 +12,8 @@ class PyMethod:
             if child.kind == clang.CursorKind.PARM_DECL:
                 self.arguments.append(PyArgument(child))
 
-        self.return_type = cursor.result_type.spelling
-        self.is_static = cursor.is_static_method()
+        self.returnType = cursor.result_type.spelling
+        self.isStatic: bool = cursor.is_static_method()
         self.comment = self._get_comment(cursor)
 
     def _get_comment(self, cursor: clang.Cursor) -> str:
