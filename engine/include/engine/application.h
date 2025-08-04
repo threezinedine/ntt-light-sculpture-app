@@ -9,10 +9,10 @@ namespace NTT_NS
         Application();
         ~Application();
 
-        void Initialize();
-        void Resize(u32 width, u32 height);
-        void Update();
-        void Finalize();
+        void Initialize() NTT_PYTHON_BINDING;
+        void Resize(u32 width, u32 height) NTT_PYTHON_BINDING;
+        void Update() NTT_PYTHON_BINDING;
+        void Finalize() NTT_PYTHON_BINDING;
 
         NTT_DECLARE_PUBLIC_CLASS_PRIVATE_IMPL(Application);
     };

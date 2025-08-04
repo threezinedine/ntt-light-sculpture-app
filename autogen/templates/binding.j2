@@ -3,6 +3,7 @@
 #include "engine/engine.h"
 
 using namespace pybind11;
+using namespace ::NTT_NS;
 
 PYBIND11_MODULE(Engine, m) 
 {
@@ -36,17 +37,38 @@ m.def("{{ function.name }}", &::NTT_NS::{{ function.name }}, "{{ function.commen
 // ============================ CLASSES ============================
 {% for class in classes %}
 class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
-    .def(init<>())
-    {% for method in class.methods %}
-    {% if method.is_static %}
-    .def_static("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+    {% if "singleton" in class.annotations %}
+        {% for method in class.methods %}
+            {% if "python" in method.annotations %}
+    .def_static("{{ method.name}}", [](
+                {% for argument in method.arguments %}
+            {{ argument.type }} {{ argument.name }}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+    ) -> {{ method.returnType }}
+    {
+        return ::NTT_NS::{{ class.name }}::GetInstance()->{{ method.name }}(
+                {% for argument in method.arguments %}
+            {{ argument.name }}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+        );
+    }, "{{ method.comment }}")
+            {% endif %}
+        {% endfor %}
     {% else %}
-    .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+    .def(init<>())
+        {% for method in class.methods %}
+            {% if "python" in method.annotations %}
+                {% if method.is_static %}
+        .def_static("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+                {% else %}
+        .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+                {% endif %}
+            {% endif %}
+        {% endfor %}
     {% endif %}
-    {% endfor %}
-
     ;
-
 {% endfor %}
 // ===================================================================
 }

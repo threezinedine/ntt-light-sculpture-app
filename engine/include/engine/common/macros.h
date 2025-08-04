@@ -13,15 +13,17 @@ private:                                 \
     static className *s_instance;        \
                                          \
 public:                                  \
-    static className &GetInstance();     \
+    static className *GetInstance();     \
                                          \
 private:                                 \
     className();                         \
+                                         \
+public:                                  \
     ~className();
 
 #define NTT_DEFINE_SINGLETON(className)                        \
     className *className::s_instance = nullptr;                \
-    className &className::GetInstance()                        \
+    className *className::GetInstance()                        \
     {                                                          \
         if (s_instance == nullptr)                             \
         {                                                      \
@@ -33,7 +35,7 @@ private:                                 \
                     delete static_cast<className *>(instance); \
                 });                                            \
         }                                                      \
-        return *s_instance;                                    \
+        return s_instance;                                     \
     }
 
 /**

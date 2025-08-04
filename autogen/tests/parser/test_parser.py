@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 import pytest
 from parser.py_method import PyMethod
 from parser.py_attribute import PyAttribute
@@ -9,8 +9,16 @@ from parser.py_function import PyFunction
 from parser.parser import Parser
 
 
-def assert_class(cls: PyClass, name: str) -> None:
+def assert_class(
+    cls: PyClass,
+    name: str,
+    annotations: Optional[List[str]] = None,
+) -> None:
     assert cls.name == name
+
+    if annotations is not None:
+        for annotation in annotations:
+            assert annotation in cls.annotations
 
 
 def assert_method(
@@ -18,12 +26,15 @@ def assert_method(
     name: str,
     isStatic: bool,
     returnType: str,
-    annotation: Optional[str] = None,
+    annotations: Optional[List[str]] = None,
 ) -> None:
     assert method.name == name
     assert method.isStatic == isStatic
     assert method.returnType == returnType
-    assert method.annotation == annotation
+
+    if annotations is not None:
+        for annotation in annotations:
+            assert annotation in method.annotations
 
 
 def assert_arguments(
@@ -158,7 +169,7 @@ def test_parse_static_method_inside_class() -> None:
             {
             public:
                 void run(const Data &data) __attribute__((annotate("python")));
-                static void sRun();
+                static void sRun() __attribute__((annotate("python")));
             }
         }
         """,
@@ -169,7 +180,30 @@ def test_parse_static_method_inside_class() -> None:
     assert_class(parsedClass, "Engine")
 
     assert len(parsedClass.methods) == 2
-    assert_method(parsedClass.methods[0], "run", False, "void", "python")
+    assert_method(parsedClass.methods[0], "run", False, "void", ["python"])
     assert len(parsedClass.methods[0].arguments) == 1
     assert_arguments(parsedClass.methods[0].arguments[0], "data", "const Data &")
-    assert_method(parsedClass.methods[1], "sRun", True, "void")
+    assert_method(parsedClass.methods[1], "sRun", True, "void", ["python"])
+
+
+def test_parse_singleton_class() -> None:
+    parser = Parser(
+        "input.h",
+        content="""
+        namespace ntt 
+        {
+            class __attribute__((annotate("singleton"))) Engine 
+            {
+            public:
+                void run() __attribute__((annotate("python")));
+            };
+        }
+        """,
+    )
+
+    assert len(parser.data["classes"]) == 1
+    parsedClass: PyClass = parser.data["classes"][0]  # type: ignore
+    assert_class(parsedClass, "Engine", ["singleton"])
+
+    assert len(parsedClass.methods) == 1
+    assert_method(parsedClass.methods[0], "run", False, "void", ["python"])

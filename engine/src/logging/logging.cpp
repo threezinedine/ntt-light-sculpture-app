@@ -6,18 +6,28 @@
 
 namespace NTT_NS
 {
-    LogCallback Logging::s_logCallback = nullptr;
+    NTT_DEFINE_SINGLETON(Logging);
+
+    Logging::Logging()
+        : m_logCallback(nullptr)
+    {
+    }
+
+    Logging::~Logging()
+    {
+        m_logCallback = nullptr;
+    }
 
     void Logging::Log(LogLevel level, const string &message)
     {
         printf("[%s] - %d - %s\n", LogLevelToString(level).c_str(), _get_timestamp(), message.c_str());
-        if (s_logCallback != nullptr)
+        if (m_logCallback != nullptr)
         {
             EngineLogRecord record;
             record.level = level;
             record.message = message;
             record.unixTimestamp = _get_timestamp();
-            s_logCallback(record);
+            m_logCallback(record);
         }
     }
 
@@ -26,10 +36,5 @@ namespace NTT_NS
         auto now = std::chrono::system_clock::now();
         auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
         return now_ms;
-    }
-
-    void Logging::SetLogCallback(LogCallback callback)
-    {
-        s_logCallback = callback;
     }
 } // namespace NTT_NS

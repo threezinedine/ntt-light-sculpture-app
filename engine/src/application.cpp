@@ -24,26 +24,26 @@ namespace NTT_NS
     {
         SingletonManager::Initialize();
 
-        Renderer::GetInstance().Initialize();
+        Renderer::GetInstance()->Initialize();
 
         NTT_LOG_INFO("Application initialized");
     }
 
     void Application::Resize(u32 width, u32 height)
     {
-        Renderer::GetInstance().Resize(width, height);
+        Renderer::GetInstance()->Resize(width, height);
     }
 
     void Application::Update()
     {
-        Renderer::GetInstance().Render();
+        Renderer::GetInstance()->Render();
     }
 
     void Application::Finalize()
     {
         NTT_LOG_INFO("Application finalized");
 
-        Renderer::GetInstance().Shutdown();
+        Renderer::GetInstance()->Shutdown();
 
         SingletonManager::Finalize();
     }
