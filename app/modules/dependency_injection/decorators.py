@@ -6,6 +6,20 @@ T = TypeVar("T")
 
 
 def as_singleton(cls: type[T]) -> type[T]:
+    """
+    Used for annotating a class be used as a singleton inside the current project.
+
+    Example:
+    ```python
+    @as_singleton
+    class SingletonClass:
+        def __init__(self) -> None:
+            self.value: int = 0
+    ```
+
+    For now other class which is used `@as_transition` or `@as_singleton` can retrieve the
+        global instance of the `SingletonClass` via the constructor
+    """
     logger.debug(f'Registering singleton: "{cls.__name__}"')
 
     arguments: List[Any] = []
@@ -26,6 +40,20 @@ def as_singleton(cls: type[T]) -> type[T]:
 
 
 def as_transition(cls: type[T]) -> type[T]:
+    """
+    Used for annotating a class be used as a transition inside the current project.
+
+    Example:
+    ```python
+    @as_transition
+    class TransitionClass:
+        def __init__(self) -> None:
+            self.value: int = 0
+    ```
+
+    For now other class which is used `@as_transition` or `@as_singleton` can retrieve the
+        new instance of the `TransitionClass` via the constructor
+    """
 
     def transition_factory(cls: type[T]) -> T:
         arguments: List[Any] = []
@@ -44,6 +72,22 @@ def as_transition(cls: type[T]) -> type[T]:
 
 
 def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:
+    """
+    Be used for annotating a class be used as a dependency of another class.
+    This decorator can be used with `@as_transition` or `@as_singleton` decorators but
+        no effect is active, must be used with `@as_transition` or `@as_singleton` decorators
+        for the dependency to be used.
+
+    Example:
+    ```python
+    @as_transition
+    @as_dependency(TransitionClass) # the as_dependency must be behind the as_transition decorator
+    class DependencyClass:
+        def __init__(self, transition: TransitionClass) -> None:
+            self.transition = transition
+    ```
+    """
+
     def dependency_decorator(cls: Type[T]) -> Type[T]:
         if cls.__name__ not in DependencyContainer._dependencies:  # type: ignore
             DependencyContainer._dependencies[cls.__name__] = []  # type: ignore
