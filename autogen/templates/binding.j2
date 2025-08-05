@@ -36,39 +36,41 @@ m.def("{{ function.name }}", &::NTT_NS::{{ function.name }}, "{{ function.commen
 
 // ============================ CLASSES ============================
 {% for class in classes %}
+    {% if "python" in class.annotations %}
 class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
-    {% if "singleton" in class.annotations %}
-        {% for method in class.methods %}
-            {% if "python" in method.annotations %}
+        {% if "singleton" in class.annotations %}
+            {% for method in class.methods %}
+                {% if "python" in method.annotations %}
     .def_static("{{ method.name}}", [](
-                {% for argument in method.arguments %}
+                    {% for argument in method.arguments %}
             {{ argument.type }} {{ argument.name }}
-                    {% if not loop.last %},{% endif %}
-                {% endfor %}
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
     ) -> {{ method.returnType }}
     {
         return ::NTT_NS::{{ class.name }}::GetInstance()->{{ method.name }}(
-                {% for argument in method.arguments %}
+                    {% for argument in method.arguments %}
             {{ argument.name }}
-                    {% if not loop.last %},{% endif %}
-                {% endfor %}
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
         );
     }, "{{ method.comment }}")
-            {% endif %}
-        {% endfor %}
-    {% else %}
-    .def(init<>())
-        {% for method in class.methods %}
-            {% if "python" in method.annotations %}
-                {% if method.is_static %}
-        .def_static("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
-                {% else %}
-        .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
                 {% endif %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    ;
+            {% endfor %}
+        {% else %}
+    .def(init<>())
+            {% for method in class.methods %}
+                {% if "python" in method.annotations %}
+                    {% if method.is_static %}
+        .def_static("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+                    {% else %}
+        .def("{{ method.name }}", &::NTT_NS::{{ class.name }}::{{ method.name }}, "{{ method.comment }}")
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        ;
+    {%endif%}
 {% endfor %}
 // ===================================================================
 }
