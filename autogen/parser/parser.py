@@ -3,6 +3,8 @@ import clang.cindex as clang  # type: ignore
 from clang.cindex import Config  # type: ignore
 from typing import Dict, List, Optional, Union, Literal
 
+from utils.types import TypeConverter
+
 from .py_function import PyFunction
 from .py_class import PyClass
 from .py_enum import PyEnum
@@ -114,3 +116,18 @@ class Parser:
     @property
     def data(self) -> Dict[ParserDataKey, List[ParserDataType]]:
         return self._data
+
+    def GenerateTypeConverter(self) -> TypeConverter:
+        typeConverter = TypeConverter()
+        data = self.data
+
+        for enum in data["enums"]:
+            typeConverter.addType(enum.name, f"{enum.name}")
+        for struct in data["structs"]:
+            typeConverter.addType(struct.name, f"{struct.name}")
+        for function in data["functions"]:
+            typeConverter.addType(function.name, f"{function.name}")
+        for class_ in data["classes"]:
+            typeConverter.addType(class_.name, f"{class_.name}")
+
+        return typeConverter

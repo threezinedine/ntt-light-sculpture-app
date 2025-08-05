@@ -2,7 +2,6 @@ import sys
 import logging
 from utils.args import Args
 from utils.template import AutoGenTemplate
-from utils.types import TypeConverter
 from parser.parser import Parser
 from data import LOGGER_NAME
 
@@ -32,21 +31,9 @@ def main():
 
     logger.info("Generating the output file ...")
 
-    typeConverter = TypeConverter()
-    data = parser.data
-
-    for enum in data["enums"]:
-        typeConverter.addType(enum.name, f"{enum.name}")
-    for struct in data["structs"]:
-        typeConverter.addType(struct.name, f"{struct.name}")
-    for function in data["functions"]:
-        typeConverter.addType(function.name, f"{function.name}")
-    for class_ in data["classes"]:
-        typeConverter.addType(class_.name, f"{class_.name}")
-
+    typeConverter = parser.GenerateTypeConverter()
     template = AutoGenTemplate(args.jinja_template, typeConverter)
-
-    result = template.render(data)
+    result = template.render(parser.data)
 
     with open(args.output_file, "w") as f:
         f.write(result)
