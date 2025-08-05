@@ -77,4 +77,6 @@ class DependencyContainer:
         elif name in DependencyContainer._transitions:
             return DependencyContainer._transitions[name]()
         else:
-            raise ValueError(f"Instance with name {name} not found")
+            content = f"Instance with name {name} not found"
+            logger.fatal(content)
+            raise ValueError(content)

@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
 from converted_uis.main_window import Ui_lightSculptureApplication
+from utils.logger import engineLogger
 
 print(os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine"))
 sys.path.append(
@@ -42,7 +43,14 @@ class LightSculptureMainWindow(QMainWindow):
         self.ui.centerLayout.addWidget(OpenGlWidget())
 
     def _handleLog(self, record: EngineLogRecord) -> None:
-        print(f"{record.level}: {record.message}")
+        if record.level == LogLevel.INFO:
+            engineLogger.info(record.message)
+        elif record.level == LogLevel.WARNING:
+            engineLogger.warning(record.message)
+        elif record.level == LogLevel.ERROR:
+            engineLogger.error(record.message)
+        elif record.level == LogLevel.FATAL:
+            engineLogger.fatal(record.message)
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         Logging.SetLogCallback(None)

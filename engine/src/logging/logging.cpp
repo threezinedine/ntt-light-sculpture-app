@@ -20,7 +20,6 @@ namespace NTT_NS
 
     void Logging::Log(LogLevel level, const string &message)
     {
-        printf("[%s] - %d - %s\n", LogLevelToString(level).c_str(), _get_timestamp(), message.c_str());
         if (m_logCallback != nullptr)
         {
             EngineLogRecord record;
