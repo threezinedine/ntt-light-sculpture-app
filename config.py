@@ -538,7 +538,7 @@ def run_autogen(force: bool = False) -> None:
         # ============================================================
 
         engine_global_public_header = os.path.normpath(
-            os.path.join(ENGINE_DIR, "include", "engine", "public.h")
+            os.path.join(ENGINE_DIR, "include", "engine", "engine.h")
         )
 
         # ================== BINDING RELATED SETTINGS ==================

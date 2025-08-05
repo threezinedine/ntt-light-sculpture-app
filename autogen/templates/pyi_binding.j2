@@ -1,4 +1,4 @@
-from typing import Any, TypeAlias # type: ignore
+from typing import Any, TypeAlias, Callable, Union # type: ignore
 from enum import Enum # type: ignore
 # Engine pyi binding
 
@@ -61,36 +61,38 @@ def {{ function.name}}(
 
 # ============================ CLASSES ==============================
 {% for class in classes %}
+    {% if "python" in class.annotations %}
 class {{ class.name }}:
-    {% if class.comment %}
+        {% if class.comment %}
     """
     {{ class.comment }}
     """
-    {% endif %}
+        {% endif %}
 
-    {% if class.methods != [] %}
-        {% for method in class.methods %}
-            {% if method.isStatic or "singleton" in class.annotations %}
-    @staticmethod
-            {% endif %}
-    def {{ method.name }}(
+        {% if class.methods != [] %}
+            {% for method in class.methods %}
                 {% if method.isStatic or "singleton" in class.annotations %}
-                {% else %}
-        self,
+    @staticmethod
                 {% endif %}
-                {% for arg in method.arguments %}
+    def {{ method.name }}(
+                    {% if method.isStatic or "singleton" in class.annotations %}
+                    {% else %}
+        self,
+                    {% endif %}
+                    {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
-                {% endfor %}
+                    {% endfor %}
     ) -> {{ convertType(method.returnType) }}: 
-        {% if method.comment %}
+            {% if method.comment %}
         """
         {{ method.comment }}
         """
+            {% endif %}
+        ...
+            {% endfor %}
+        {% else %}
+        ...
         {% endif %}
-        ...
-        {% endfor %}
-    {% else %}
-        ...
     {% endif %}
 {% endfor %}
 # ===================================================================

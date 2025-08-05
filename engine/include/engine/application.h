@@ -3,7 +3,7 @@
 
 namespace NTT_NS
 {
-    class Application
+    class NTT_PYTHON_BINDING Application
     {
     public:
         Application();

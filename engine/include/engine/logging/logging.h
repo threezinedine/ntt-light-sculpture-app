@@ -24,7 +24,7 @@ namespace NTT_NS
 
     typedef u32 TestCallback;
 
-    class NTT_SINGLETON Logging
+    class NTT_SINGLETON NTT_PYTHON_BINDING Logging
     {
         NTT_DECLARE_SINGLETON(Logging);
 
