@@ -677,6 +677,25 @@ def run_config() -> None:
     # ================================================================
 
 
+def install_dependencies(project: str, package: str) -> None:
+    folder: str = APP_DIR if project == "app" else AUTOGEN_DIR
+
+    try:
+        logger.info(f"Installing the {package} package...")
+        subprocess.run(
+            f"{get_python_exe_path(folder)} -m pip install {package}".split(" "),
+            cwd=folder,
+            check=True,
+            shell=True,
+        )
+        logger.info(f"The {package} package has been installed successfully.")
+        update_requirements(folder)
+        logger.info(f"The requirements file has been updated successfully.")
+    except Exception as e:
+        logger.error(f"Error while installing the {package} package: {e}")
+        exit(1)
+
+
 def main():
     # ================== CONFIG RELATED SETTINGS =====================
     has_run_config = False
@@ -703,6 +722,16 @@ def main():
     subparsers.add_parser("config", help="Run the configuration")
     subparsers.add_parser("designer", help="Open the designer")
     subparsers.add_parser("run", help="Run the application")
+
+    deploy_parser = subparsers.add_parser("package", help="Install the dependencies")
+    deploy_parser.add_argument(
+        "project",
+        choices=["autogen", "app"],
+    )
+    deploy_parser.add_argument(
+        "package",
+        help="The package to be installed",
+    )
 
     convert_parser = subparsers.add_parser("convert", help="Convert the ui files")
     convert_parser.add_argument("type", choices=["ui", "cpp", "all"])
@@ -742,6 +771,8 @@ def main():
         elif args.type == "all":
             convert_ui_files()
             run_autogen()
+    elif args.action == "package":
+        install_dependencies(args.project, args.package)
     elif args.action == "run":
         convert_ui_files()
         run_autogen()

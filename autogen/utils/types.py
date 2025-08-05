@@ -1,5 +1,9 @@
+import logging
 import re
 from typing import Dict
+from data import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 
 class TypeConverter:
@@ -27,6 +31,7 @@ class TypeConverter:
             "void": "None",
         }
 
+        self._typeMap: Dict[str, str] = {}  # type: ignore
         self._registeredTypes: Dict[str, str] = {}  # type: ignore
 
     @staticmethod
@@ -43,15 +48,25 @@ class TypeConverter:
         registeredTypeKeys = list(self._registeredTypes.keys())
         registeredTypeKeys.sort(key=len, reverse=True)
 
+        for typeName, output in self._typeMap.items():
+            if re.match(TypeConverter.getRawTypeRegex(typeName), type):
+                return output
+
         # Try to match the type with the registered types.
         for typeName in registeredTypeKeys:
             if re.match(TypeConverter.getRawTypeRegex(typeName), type):
-                return self._registeredTypes[typeName]
+                return f'"{self._registeredTypes[typeName]}"'
 
         for typeName, output in self._typeMatchMap.items():
             if re.match(TypeConverter.getRawTypeRegex(typeName), type):
                 return output
+
+        logger.warning(f"Type {type} is not defined, using Any instead.")
+
         return "Any"
 
     def addType(self, type: str, output: str) -> None:
         self._registeredTypes[type] = output
+
+    def addTypeMap(self, type: str, output: str) -> None:
+        self._typeMap[type] = output

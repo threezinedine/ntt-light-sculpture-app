@@ -22,6 +22,8 @@ namespace NTT_NS
      */
     typedef Function<void, const EngineLogRecord &> LogCallback;
 
+    typedef u32 TestCallback;
+
     class NTT_SINGLETON Logging
     {
         NTT_DECLARE_SINGLETON(Logging);

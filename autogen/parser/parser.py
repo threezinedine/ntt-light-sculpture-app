@@ -4,6 +4,7 @@ from clang.cindex import Config  # type: ignore
 from typing import Dict, List, Optional, Union, Literal
 
 from utils.types import TypeConverter
+from data.self_define_type import SELF_DEFINED_TYPE
 
 from .py_function import PyFunction
 from .py_class import PyClass
@@ -11,7 +12,8 @@ from .py_enum import PyEnum
 from .py_struct import PyStruct
 from .py_typedef import PyTypedef
 
-ParserDataKey = Literal["types", "enums", "structs", "classes", "functions"]
+
+ParserDataKey = Literal["typedefs", "enums", "structs", "classes", "functions"]
 ParserDataType = Union[PyFunction, PyClass, PyEnum, PyStruct, PyTypedef]
 
 
@@ -91,7 +93,7 @@ class Parser:
             unsaved_files=[(inputFile, content)] if content else None,
         )
         self._data: Dict[ParserDataKey, List[ParserDataType]] = {
-            "types": [],
+            "typedefs": [],
             "enums": [],
             "structs": [],
             "classes": [],
@@ -115,7 +117,7 @@ class Parser:
                         self.data["structs"].append(struct)
                     elif child.kind == clang.CursorKind.TYPEDEF_DECL:
                         typedef = PyTypedef(child)
-                        self.data["types"].append(typedef)
+                        self.data["typedefs"].append(typedef)
 
     @property
     def data(self) -> Dict[ParserDataKey, List[ParserDataType]]:
@@ -125,6 +127,8 @@ class Parser:
         typeConverter = TypeConverter()
         data = self.data
 
+        for name, type_ in SELF_DEFINED_TYPE.items():
+            typeConverter.addTypeMap(name, type_)
         for enum in data["enums"]:
             typeConverter.addType(enum.name, f"{enum.name}")
         for struct in data["structs"]:

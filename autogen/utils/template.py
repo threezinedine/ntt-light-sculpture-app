@@ -2,7 +2,6 @@ import os
 from typing import Dict, List
 from jinja2 import FileSystemLoader, Environment
 from utils.types import TypeConverter
-from data import PYTHON_TYPE_KEYWORDS
 from parser.parser import ParserDataKey, ParserDataType
 
 
@@ -26,11 +25,7 @@ class AutoGenTemplate:
         file_name = os.path.basename(template_file)
 
         def convertType(type: str) -> str:
-            convertedType = typeConverter.convertType(type)
-            if convertedType in PYTHON_TYPE_KEYWORDS:
-                return convertedType
-            else:
-                return f'"{convertedType}"'
+            return typeConverter.convertType(type)
 
         try:
             self._env = Environment(loader=FileSystemLoader(template_dir))

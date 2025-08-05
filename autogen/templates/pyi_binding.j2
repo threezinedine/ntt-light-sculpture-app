@@ -1,6 +1,12 @@
-from typing import Any # type: ignore
+from typing import Any, TypeAlias # type: ignore
 from enum import Enum # type: ignore
 # Engine pyi binding
+
+# ============================ TYPEDEFS ============================
+{% for typedef in typedefs %}
+{{ typedef.name }}: TypeAlias = {{ convertType(typedef.name) }}
+{% endfor %}
+# ===================================================================
 
 # ============================ ENUMS ============================
 {% for enum in enums %}

@@ -100,17 +100,17 @@ def test_convert_type_with_reference(rawConverter: TypeConverter):
 def test_registered_types(rawConverter: TypeConverter):
     rawConverter.addType("TestType", "TestType")
 
-    assert rawConverter.convertType("TestType") == "TestType"
-    assert rawConverter.convertType("TestType*") == "TestType"
-    assert rawConverter.convertType("const ntt::TestType&") == "TestType"
+    assert rawConverter.convertType("TestType") == '"TestType"'
+    assert rawConverter.convertType("TestType*") == '"TestType"'
+    assert rawConverter.convertType("const ntt::TestType&") == '"TestType"'
 
 
 def test_registered_test_type(rawConverter: TypeConverter):
     rawConverter.addType("TestType", "TestType")
     rawConverter.addType("TestType2", "TestType2")
 
-    assert rawConverter.convertType("TestType") == "TestType"
-    assert rawConverter.convertType("TestType2") == "TestType2"
-    assert rawConverter.convertType("TestType*") == "TestType"
-    assert rawConverter.convertType("TestType2*") == "TestType2"
-    assert rawConverter.convertType("const ntt::TestType&") == "TestType"
+    assert rawConverter.convertType("TestType") == '"TestType"'
+    assert rawConverter.convertType("TestType2") == '"TestType2"'
+    assert rawConverter.convertType("TestType*") == '"TestType"'
+    assert rawConverter.convertType("TestType2*") == '"TestType2"'
+    assert rawConverter.convertType("const ntt::TestType&") == '"TestType"'

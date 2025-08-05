@@ -37,11 +37,12 @@ class AutoGenUtil:
         parser = Parser(self.GetInputFileName())
         template = AutoGenTemplate(jinjaFilePath, parser.GenerateTypeConverter())
         result = template.render(parser.data)
-        return self.ReformatOutput(result)
+        return result
 
     def ReformatOutput(self, result: str) -> str:
         return (
-            result.replace("\n", "")
+            result.strip()
+            .replace("\n", "")
             .replace("    .", ".")
             .replace("\t.", ".")
             .replace("   .", ".")

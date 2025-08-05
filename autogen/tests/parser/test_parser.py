@@ -84,8 +84,8 @@ def test_parse_typedef(util: AutoGenUtil) -> None:
         """,
     )
     parsedData = util.GetParsedData()
-    assert len(parsedData["types"]) == 1
-    parsedTypedef: PyTypedef = parsedData["types"][0]  # type: ignore
+    assert len(parsedData["typedefs"]) == 1
+    parsedTypedef: PyTypedef = parsedData["typedefs"][0]  # type: ignore
     assert_typedef(parsedTypedef, "LogCallback")
 
 
