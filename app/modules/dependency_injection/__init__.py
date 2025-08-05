@@ -13,6 +13,8 @@ class DependencyContainer:
     _singletons: dict[str, Any] = {}
     _transitions: dict[str, Callable[..., Any]] = {}
 
+    _dependencies: dict[str, list[str]] = {}
+
     @staticmethod
     def Clear() -> None:
         """
@@ -20,6 +22,7 @@ class DependencyContainer:
         """
         DependencyContainer._singletons.clear()
         DependencyContainer._transitions.clear()
+        DependencyContainer._dependencies.clear()
 
     @staticmethod
     def RegisterSingleton(name: str, instance: Any) -> None:

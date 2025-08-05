@@ -10,6 +10,15 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/app/application.py",
 			"console": "integratedTerminal"
+		},
+		{
+			"name": "Application Tests",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/app/venv/Scripts/pytest.exe",
+			"cwd": "${workspaceFolder}/app",
+			"python": "${workspaceFolder}/app/venv/Scripts/python.exe",
+			"console": "integratedTerminal"
 		}
 	]
 }

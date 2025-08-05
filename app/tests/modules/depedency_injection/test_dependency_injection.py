@@ -1,6 +1,11 @@
 from typing import Generator
 import pytest
 from modules.dependency_injection import DependencyContainer
+from modules.dependency_injection.decorators import (
+    as_singleton,
+    as_transition,
+    as_dependency,
+)
 from unittest.mock import MagicMock, patch
 
 
@@ -106,7 +111,13 @@ def test_query_non_existent_instance(mockFatal: MagicMock) -> None:
 
 
 def test_register_object_using_decorator() -> None:
-    from .as_singleton import SingletonClass
+    @as_singleton
+    class SingletonClass:
+        count: int = 0
+
+        def __new__(cls) -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
 
     DependencyContainer.GetInstance(SingletonClass.__name__)
     DependencyContainer.GetInstance(SingletonClass.__name__)
@@ -115,9 +126,123 @@ def test_register_object_using_decorator() -> None:
 
 
 def test_register_object_using_decorator_with_parameters() -> None:
-    from .as_transition import TransitionClass
+    @as_transition
+    class TransitionClass:
+        count: int = 0
+
+        def __new__(cls) -> "TransitionClass":
+            cls.count += 1
+            return super().__new__(cls)
 
     DependencyContainer.GetInstance(TransitionClass.__name__)
     DependencyContainer.GetInstance(TransitionClass.__name__)
 
     assert TransitionClass.count == 2
+
+
+def test_register_object_as_singleton_and_its_dependency() -> None:
+    @as_singleton
+    class SingletonClass:
+        count: int = 0
+
+        def __new__(cls) -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self) -> None:
+            self.singletonValue = 0
+
+    DependencyContainer.GetInstance(SingletonClass.__name__).singletonValue = 1994
+
+    @as_singleton
+    @as_dependency(SingletonClass)
+    class DependencyClass:
+        count: int = 0
+
+        def __new__(cls, singleton: "SingletonClass") -> "DependencyClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self, singleton: "SingletonClass") -> None:
+            assert singleton.singletonValue == 1994
+            self.value: int = 0
+
+        def print(self) -> None:
+            print(self.value)
+
+    assert DependencyContainer.GetInstance(DependencyClass.__name__).count == 1
+    assert DependencyContainer.GetInstance(SingletonClass.__name__).count == 1
+
+
+@patch("utils.logger.logger.warning")
+def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
+    @as_transition
+    class TransitionClass:
+        count: int = 0
+
+        def __new__(cls) -> "TransitionClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self) -> None:
+            self.value: int = 0
+
+    DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
+
+    @as_singleton
+    @as_dependency(TransitionClass)
+    class SingletonClass:
+        count: int = 0
+
+        def __new__(cls, transition: "TransitionClass") -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self, transition: "TransitionClass") -> None:
+            assert transition.value == 0
+            self.value: int = 0
+            self.transition = transition
+            transition.value = 1
+
+    assert TransitionClass.count == 2
+    assert SingletonClass.count == 1
+    assert DependencyContainer.GetInstance(TransitionClass.__name__).value == 0
+    assert (
+        DependencyContainer.GetInstance(SingletonClass.__name__).transition.value == 1
+    )
+
+    mockWarning.assert_called_once()  # warning while registering transition as singleton dependency
+
+
+def test_register_transition_with_dependency_as_transition() -> None:
+    @as_transition
+    class TransitionClass:
+        count: int = 0
+
+        def __new__(cls) -> "TransitionClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self) -> None:
+            self.value: int = 0
+
+    DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
+
+    @as_transition
+    @as_dependency(TransitionClass)
+    class TransitionClass2:
+        count: int = 0
+
+        def __new__(cls, transition: "TransitionClass") -> "TransitionClass2":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self, transition: "TransitionClass") -> None:
+            assert transition.value == 0
+            self.value: int = 0
+
+    DependencyContainer.GetInstance(TransitionClass2.__name__)
+    DependencyContainer.GetInstance(TransitionClass2.__name__)
+
+    assert TransitionClass.count == 3
+    assert TransitionClass2.count == 2
