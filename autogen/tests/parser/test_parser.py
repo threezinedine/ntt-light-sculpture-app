@@ -1,12 +1,13 @@
 from typing import List, Optional
-import pytest
+import pytest  # type: ignore
 from parser.py_method import PyMethod
 from parser.py_attribute import PyAttribute
 from parser.py_struct import PyStruct
 from parser.py_argument import PyArgument
 from parser.py_class import PyClass
 from parser.py_function import PyFunction
-from parser.parser import Parser
+from parser.py_typedef import PyTypedef
+from conftest import AutoGenUtil
 
 
 def assert_class(
@@ -64,24 +65,33 @@ def assert_attribute(attribute: PyAttribute, name: str, type: str) -> None:
     assert attribute.type == type
 
 
-@pytest.mark.skip(reason="Not implemented")
-def test_parse_typedef() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def assert_typedef(typedef: PyTypedef, name: str) -> None:
+    assert typedef.name == name
+
+
+def test_parse_typedef(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+        #include <functional>
+
+        template <typename T, typename... Args>
+        using Function = std::function<T(Args...)>;
+
         namespace ntt 
         {
             typedef Function<void, const EngineLogRecord &> LogCallback;
         }
         """,
     )
-    assert len(parser.data["types"]) == 1
+    parsedData = util.GetParsedData()
+    assert len(parsedData["types"]) == 1
+    parsedTypedef: PyTypedef = parsedData["types"][0]  # type: ignore
+    assert_typedef(parsedTypedef, "LogCallback")
 
 
-def test_parse_class() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_parse_class(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         namespace ntt 
         {
             class Engine {
@@ -96,16 +106,16 @@ def test_parse_class() -> None:
         """,
     )
 
-    assert len(parser.data["classes"]) == 1  # only public methods are parsed
-    parsedClass: PyClass = parser.data["classes"][0]  # type: ignore
+    parsedData = util.GetParsedData()
+    assert len(parsedData["classes"]) == 1  # only public methods are parsed
+    parsedClass: PyClass = parsedData["classes"][0]  # type: ignore
     assert parsedClass.name == "Engine"
     assert len(parsedClass.methods) == 1
 
 
-def test_parse_function() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_parse_function(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         namespace ntt 
         {
             void run(int a, int b);
@@ -113,18 +123,18 @@ def test_parse_function() -> None:
         """,
     )
 
-    assert len(parser.data["functions"]) == 1
-    parsedFunction: PyFunction = parser.data["functions"][0]  # type: ignore
+    parsedData = util.GetParsedData()
+    assert len(parsedData["functions"]) == 1
+    parsedFunction: PyFunction = parsedData["functions"][0]  # type: ignore
 
     assert_function(parsedFunction, "run", "void")
     assert_arguments(parsedFunction.arguments[0], "a", "int")
     assert_arguments(parsedFunction.arguments[1], "b", "int")
 
 
-def test_parse_struct() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_parse_struct(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         namespace ntt 
         {
             struct Engine {
@@ -135,28 +145,28 @@ def test_parse_struct() -> None:
         """,
     )
 
-    assert len(parser.data["structs"]) == 1
-    parsedStruct: PyStruct = parser.data["structs"][0]  # type: ignore
+    parsedData = util.GetParsedData()
+    assert len(parsedData["structs"]) == 1
+    parsedStruct: PyStruct = parsedData["structs"][0]  # type: ignore
     assert_struct(parsedStruct, "Engine")
     assert_attribute(parsedStruct.attributes[0], "a", "int")
     assert_attribute(parsedStruct.attributes[1], "b", "int")
 
 
-def test_does_not_parse_function_outside_namespace() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_does_not_parse_function_outside_namespace(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         void run(int a, int b);
         """,
     )
 
-    assert len(parser.data["functions"]) == 0
+    parsedData = util.GetParsedData()
+    assert len(parsedData["functions"]) == 0
 
 
-def test_parse_static_method_inside_class() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_parse_static_method_inside_class(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         namespace ntt 
         {
             struct Data 
@@ -175,8 +185,9 @@ def test_parse_static_method_inside_class() -> None:
         """,
     )
 
-    assert len(parser.data["classes"]) == 1
-    parsedClass: PyClass = parser.data["classes"][0]  # type: ignore
+    parsedData = util.GetParsedData()
+    assert len(parsedData["classes"]) == 1
+    parsedClass: PyClass = parsedData["classes"][0]  # type: ignore
     assert_class(parsedClass, "Engine")
 
     assert len(parsedClass.methods) == 2
@@ -186,10 +197,9 @@ def test_parse_static_method_inside_class() -> None:
     assert_method(parsedClass.methods[1], "sRun", True, "void", ["python"])
 
 
-def test_parse_singleton_class() -> None:
-    parser = Parser(
-        "input.h",
-        content="""
+def test_parse_singleton_class(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
         namespace ntt 
         {
             class __attribute__((annotate("singleton"))) Engine 
@@ -201,8 +211,9 @@ def test_parse_singleton_class() -> None:
         """,
     )
 
-    assert len(parser.data["classes"]) == 1
-    parsedClass: PyClass = parser.data["classes"][0]  # type: ignore
+    parsedData = util.GetParsedData()
+    assert len(parsedData["classes"]) == 1
+    parsedClass: PyClass = parsedData["classes"][0]  # type: ignore
     assert_class(parsedClass, "Engine", ["singleton"])
 
     assert len(parsedClass.methods) == 1

@@ -9,9 +9,10 @@ from .py_function import PyFunction
 from .py_class import PyClass
 from .py_enum import PyEnum
 from .py_struct import PyStruct
+from .py_typedef import PyTypedef
 
 ParserDataKey = Literal["types", "enums", "structs", "classes", "functions"]
-ParserDataType = Union[PyFunction, PyClass, PyEnum, PyStruct]
+ParserDataType = Union[PyFunction, PyClass, PyEnum, PyStruct, PyTypedef]
 
 
 class Parser:
@@ -112,6 +113,9 @@ class Parser:
                     elif child.kind == clang.CursorKind.STRUCT_DECL:
                         struct = PyStruct(child)
                         self.data["structs"].append(struct)
+                    elif child.kind == clang.CursorKind.TYPEDEF_DECL:
+                        typedef = PyTypedef(child)
+                        self.data["types"].append(typedef)
 
     @property
     def data(self) -> Dict[ParserDataKey, List[ParserDataType]]:
