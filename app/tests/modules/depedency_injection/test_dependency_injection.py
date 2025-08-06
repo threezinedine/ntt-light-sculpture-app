@@ -1,4 +1,5 @@
 from typing import Generator
+from abc import ABC, abstractmethod
 import pytest
 from modules.dependency_injection import DependencyContainer
 from modules.dependency_injection.decorators import (
@@ -130,7 +131,7 @@ def test_query_non_existent_instance(mockFatal: MagicMock) -> None:
 
 
 def test_register_object_using_decorator() -> None:
-    @as_singleton
+    @as_singleton()
     class SingletonClass:
         count: int = 0
 
@@ -160,7 +161,7 @@ def test_register_object_using_decorator_with_parameters() -> None:
 
 
 def test_register_object_as_singleton_and_its_dependency() -> None:
-    @as_singleton
+    @as_singleton()
     class SingletonClass:
         count: int = 0
 
@@ -173,7 +174,7 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
 
     DependencyContainer.GetInstance(SingletonClass.__name__).singletonValue = 1994
 
-    @as_singleton
+    @as_singleton()
     @as_dependency(SingletonClass)
     class DependencyClass:
         count: int = 0
@@ -208,7 +209,7 @@ def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
 
     DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
 
-    @as_singleton
+    @as_singleton()
     @as_dependency(TransitionClass)
     class SingletonClass:
         count: int = 0
@@ -287,7 +288,7 @@ def test_get_transition_instance_with_arguments() -> None:
 def test_get_singleton_instance_does_not_create_new_instance_until_it_is_requested() -> (
     None
 ):
-    @as_singleton
+    @as_singleton()
     class SingletonClass:
         count: int = 0
 
@@ -300,3 +301,29 @@ def test_get_singleton_instance_does_not_create_new_instance_until_it_is_request
     DependencyContainer.GetInstance(SingletonClass.__name__)
 
     assert SingletonClass.count == 1
+
+
+def test_register_singleton_with_different_name() -> None:
+    class ISingleton(ABC):
+        @property
+        @abstractmethod
+        def value(self) -> int:
+            raise NotImplementedError
+
+    @as_singleton(ISingleton)
+    class SingletonClass(ISingleton):
+        count: int = 0
+
+        def __new__(cls) -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self) -> None:
+            pass
+
+        @property
+        def value(self) -> int:
+            return 1994
+
+    instance: ISingleton = DependencyContainer.GetInstance(ISingleton.__name__)
+    assert instance.value == 1994

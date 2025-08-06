@@ -1,11 +1,12 @@
-from typing import Any, Callable, List, TypeVar, Type
+from typing import Any, Callable, List, Optional, TypeVar, Type
 from modules.dependency_injection import DependencyContainer
 from utils.logger import logger
 
 T = TypeVar("T")
+V = TypeVar("V")
 
 
-def as_singleton(cls: type[T]) -> type[T]:
+def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], type[T]]:
     """
     Used for annotating a class be used as a singleton inside the current project.
 
@@ -20,23 +21,28 @@ def as_singleton(cls: type[T]) -> type[T]:
     For now other class which is used `@as_transition` or `@as_singleton` can retrieve the
         global instance of the `SingletonClass` via the constructor
     """
-    logger.debug(f'Registering singleton: "{cls.__name__}"')
 
-    arguments: List[Any] = []
+    def create_singleton(cls: type[T]) -> T:
+        name = cls.__name__ if annotation is None else annotation.__name__
 
-    if cls.__name__ in DependencyContainer._dependencies:  # type: ignore
-        dependencies = DependencyContainer._dependencies[cls.__name__]  # type: ignore
+        logger.debug(f'Registering singleton: "{name}"')
+        arguments: List[Any] = []
 
-        for dependency in dependencies:
-            if dependency in DependencyContainer._transitions:  # type: ignore
-                logger.warning(
-                    f'Transition "{dependency}" is registered as a dependency of "{cls.__name__}" which is a singleton'
-                )
+        if cls.__name__ in DependencyContainer._dependencies:  # type: ignore
+            dependencies = DependencyContainer._dependencies[cls.__name__]  # type: ignore
 
-            arguments.append(DependencyContainer.GetInstance(dependency))
+            for dependency in dependencies:
+                if dependency in DependencyContainer._transitions:  # type: ignore
+                    logger.warning(
+                        f'Transition "{dependency}" is registered as a dependency of "{name}" which is a singleton'
+                    )
 
-    DependencyContainer.RegisterSingleton(cls.__name__, lambda: cls(*arguments))
-    return cls
+                arguments.append(DependencyContainer.GetInstance(dependency))
+
+        DependencyContainer.RegisterSingleton(name, lambda: cls(*arguments))
+        return cls
+
+    return create_singleton  # type: ignore
 
 
 def as_transition(cls: type[T]) -> type[T]:
