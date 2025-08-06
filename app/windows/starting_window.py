@@ -43,6 +43,8 @@ class StartingWindow(QMainWindow):
             with open(applicationFile, "w") as f:
                 f.write(json.dumps(asdict(application), indent=4))
 
+        self.setFixedSize(self.size())
+
         self.application = application
 
         self.ui = Ui_StartingWindow()
