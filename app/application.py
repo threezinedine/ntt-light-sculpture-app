@@ -2,6 +2,7 @@ import os
 import sys
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QApplication
+from modules.dependency_injection import DependencyContainer
 from windows.starting_window import StartingWindow
 from utils.logger import engineLogger, logger
 
@@ -21,7 +22,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 class LighSculptureApplication(QApplication):
     def __init__(self, argv: list[str]):
         super().__init__(argv)
-        self.window = StartingWindow()
+        self.window = DependencyContainer.GetInstance(StartingWindow.__name__)
 
         # ================= DETERMINE THE PROCESS ID =================
         self.process_id = os.getpid()

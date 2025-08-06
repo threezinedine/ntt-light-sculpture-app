@@ -5,7 +5,7 @@ from converted_uis.recent_projects_container import Ui_RecentProjectsContainer
 from modules.dependency_injection.decorators import as_transition
 
 
-@as_transition
+@as_transition()
 class RecentProjectsContainer(QWidget):
     def __init__(
         self,

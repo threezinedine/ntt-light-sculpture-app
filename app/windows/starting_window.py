@@ -3,8 +3,10 @@ from PyQt6.QtCore import Qt
 from components.recent_projects.container import RecentProjectsContainer
 from converted_uis.starting_window import Ui_StartingWindow
 from modules.dependency_injection import DependencyContainer
+from modules.dependency_injection.decorators import as_singleton
 
 
+@as_singleton()
 class StartingWindow(QMainWindow):
     def __init__(
         self,

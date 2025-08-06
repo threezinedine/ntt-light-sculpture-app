@@ -12,7 +12,7 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
 
     Example:
     ```python
-    @as_singleton
+    @as_singleton()
     class SingletonClass:
         def __init__(self) -> None:
             self.value: int = 0
@@ -59,7 +59,7 @@ def as_transition(annotation: Optional[type[V]] = None) -> Callable[[type[T]], t
 
     Example:
     ```python
-    @as_transition
+    @as_transition()
     class TransitionClass:
         def __init__(self) -> None:
             self.value: int = 0
@@ -107,7 +107,7 @@ def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:
 
     Example:
     ```python
-    @as_transition
+    @as_transition()
     @as_dependency(TransitionClass) # the as_dependency must be behind the as_transition decorator
     class DependencyClass:
         def __init__(self, transition: TransitionClass) -> None:
