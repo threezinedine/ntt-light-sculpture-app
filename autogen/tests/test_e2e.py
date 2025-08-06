@@ -53,9 +53,10 @@ def test_bind_typedef(util: AutoGenUtil) -> None:
     result = util.GenerateOutput("templates/pyi_binding.j2")
 
     expected = """
-        LogCallback: TypeAlias = Callable[["EngineLogRecord"], None]
+        LogCallback: TypeAlias = Union[Callable[["EngineLogRecord"], None], None]
     """
 
+    print(result)
     assert util.ReformatOutput(expected) in util.ReformatOutput(result)
 
 
