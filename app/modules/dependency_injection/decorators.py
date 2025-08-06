@@ -23,7 +23,14 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
     """
 
     def create_singleton(cls: type[T]) -> T:
-        name = cls.__name__ if annotation is None else annotation.__name__
+        name = cls.__name__
+
+        if annotation is not None:
+            if not issubclass(cls, annotation):
+                raise TypeError(
+                    f'Class "{cls.__name__}" does not inherit from "{annotation.__name__}"'
+                )
+            name = annotation.__name__
 
         logger.debug(f'Registering singleton: "{name}"')
         arguments: List[Any] = []
@@ -40,7 +47,7 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
                 arguments.append(DependencyContainer.GetInstance(dependency))
 
         DependencyContainer.RegisterSingleton(name, lambda: cls(*arguments))
-        return cls
+        return cls  # type: ignore
 
     return create_singleton  # type: ignore
 

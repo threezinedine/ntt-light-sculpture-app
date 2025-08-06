@@ -327,3 +327,21 @@ def test_register_singleton_with_different_name() -> None:
 
     instance: ISingleton = DependencyContainer.GetInstance(ISingleton.__name__)
     assert instance.value == 1994
+
+
+def test_register_singleton_without_the_inheritance_of_the_interface() -> None:
+    class ISingleton(ABC):
+        @property
+        @abstractmethod
+        def value(self) -> int:
+            raise NotImplementedError
+
+    with pytest.raises(TypeError):
+
+        @as_singleton(ISingleton)
+        class SingletonClass:
+            count: int = 0
+
+            def __new__(cls) -> "SingletonClass":
+                cls.count += 1
+                return super().__new__(cls)
