@@ -52,7 +52,7 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
     return create_singleton  # type: ignore
 
 
-def as_transition(cls: type[T]) -> type[T]:
+def as_transition(annotation: Optional[type[V]] = None) -> Callable[[type[T]], type[T]]:
     """
     Used for annotating a class be used as a transition inside the current project.
     The dependencies are listed before other arguments.
@@ -69,20 +69,33 @@ def as_transition(cls: type[T]) -> type[T]:
         new instance of the `TransitionClass` via the constructor
     """
 
-    def transition_factory(cls: type[T], *args: Any, **kwargs: Any) -> T:
-        arguments: List[Any] = []
-        if cls.__name__ in DependencyContainer._dependencies:  # type: ignore
-            dependencies = DependencyContainer._dependencies[cls.__name__]  # type: ignore
+    def create_transition(cls: type[T]) -> T:
+        name = cls.__name__
 
-            for dependency in dependencies:
-                arguments.append(DependencyContainer.GetInstance(dependency))
+        if annotation is not None:
+            if not issubclass(cls, annotation):
+                raise TypeError(
+                    f'Class "{cls.__name__}" does not inherit from "{annotation.__name__}"'
+                )
+            name = annotation.__name__
 
-        return cls(*arguments, *args, **kwargs)
+        def transition_factory(cls: type[T], *args: Any, **kwargs: Any) -> T:
+            arguments: List[Any] = []
+            if name in DependencyContainer._dependencies:  # type: ignore
+                dependencies = DependencyContainer._dependencies[name]  # type: ignore
 
-    DependencyContainer.RegisterTransition(
-        cls.__name__, lambda *args, **kwargs: transition_factory(cls, *args, **kwargs)
-    )
-    return cls
+                for dependency in dependencies:
+                    arguments.append(DependencyContainer.GetInstance(dependency))
+
+            return cls(*arguments, *args, **kwargs)
+
+        DependencyContainer.RegisterTransition(
+            name,
+            lambda *args, **kwargs: transition_factory(cls, *args, **kwargs),  # type: ignore
+        )
+        return cls  # type: ignore
+
+    return create_transition  # type: ignore
 
 
 def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:

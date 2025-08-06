@@ -146,7 +146,7 @@ def test_register_object_using_decorator() -> None:
 
 
 def test_register_object_using_decorator_with_parameters() -> None:
-    @as_transition
+    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -196,7 +196,7 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
 
 @patch("utils.logger.logger.warning")
 def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
-    @as_transition
+    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -237,7 +237,7 @@ def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
 
 
 def test_register_transition_with_dependency_as_transition() -> None:
-    @as_transition
+    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -250,7 +250,7 @@ def test_register_transition_with_dependency_as_transition() -> None:
 
     DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
 
-    @as_transition
+    @as_transition()
     @as_dependency(TransitionClass)
     class TransitionClass2:
         count: int = 0
@@ -271,7 +271,7 @@ def test_register_transition_with_dependency_as_transition() -> None:
 
 
 def test_get_transition_instance_with_arguments() -> None:
-    @as_transition
+    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -345,3 +345,42 @@ def test_register_singleton_without_the_inheritance_of_the_interface() -> None:
             def __new__(cls) -> "SingletonClass":
                 cls.count += 1
                 return super().__new__(cls)
+
+
+def test_register_transition_with_different_name() -> None:
+    class ITransition(ABC):
+        @property
+        @abstractmethod
+        def value(self) -> int:
+            raise NotImplementedError
+
+    @as_transition(ITransition)
+    class TransitionClass(ITransition):
+        def __new__(cls) -> "TransitionClass":
+            return super().__new__(cls)
+
+        @property
+        def value(self) -> int:
+            return 1994
+
+    instance: ITransition = DependencyContainer.GetInstance(ITransition.__name__)
+    assert instance.value == 1994
+
+
+def test_register_transition_without_the_inheritance_of_the_interface() -> None:
+    class ITransition(ABC):
+        @property
+        @abstractmethod
+        def value(self) -> int:
+            raise NotImplementedError
+
+    with pytest.raises(TypeError):
+
+        @as_transition(ITransition)
+        class TransitionClass:
+            def __new__(cls) -> "TransitionClass":
+                return super().__new__(cls)
+
+            @property
+            def value(self) -> int:
+                return 1994
