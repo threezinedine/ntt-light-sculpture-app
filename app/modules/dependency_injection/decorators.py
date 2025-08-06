@@ -33,20 +33,23 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
             name = annotation.__name__
 
         logger.debug(f'Registering singleton: "{name}"')
-        arguments: List[Any] = []
 
-        if cls.__name__ in DependencyContainer._dependencies:  # type: ignore
-            dependencies = DependencyContainer._dependencies[cls.__name__]  # type: ignore
+        def singleton_factory(*args: Any, **kwargs: Any) -> Any:
+            arguments: List[Any] = []
 
-            for dependency in dependencies:
-                if dependency in DependencyContainer._transitions:  # type: ignore
-                    logger.warning(
-                        f'Transition "{dependency}" is registered as a dependency of "{name}" which is a singleton'
-                    )
+            if name in DependencyContainer._dependencies:  # type: ignore
+                dependencies = DependencyContainer._dependencies[name]  # type: ignore
 
-                arguments.append(DependencyContainer.GetInstance(dependency))
+                for dependency in dependencies:
+                    if dependency in DependencyContainer._transitions:  # type: ignore
+                        logger.warning(
+                            f'Transition "{dependency}" is registered as a dependency of "{name}" which is a singleton'
+                        )
 
-        DependencyContainer.RegisterSingleton(name, lambda: cls(*arguments))
+                    arguments.append(DependencyContainer.GetInstance(dependency))
+            return cls(*arguments, *args, **kwargs)
+
+        DependencyContainer.RegisterSingleton(name, singleton_factory)
         return cls  # type: ignore
 
     return create_singleton  # type: ignore

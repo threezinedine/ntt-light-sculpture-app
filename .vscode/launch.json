@@ -9,7 +9,8 @@
 			"type": "debugpy",
 			"request": "launch",
 			"program": "${workspaceFolder}/app/application.py",
-			"console": "integratedTerminal"
+			"console": "integratedTerminal",
+			"python": "${workspaceFolder}/app/venv/Scripts/python.exe"
 		},
 		{
 			"name": "Application Tests",

@@ -1,19 +1,32 @@
+import os
+from utils.logger import logger
 from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
 from components.recent_projects.container import RecentProjectsContainer
+from constants import APP_DATA_KEY
 from converted_uis.starting_window import Ui_StartingWindow
 from modules.dependency_injection import DependencyContainer
-from modules.dependency_injection.decorators import as_singleton
+from modules.dependency_injection.decorators import as_singleton, as_dependency
+from structs.application import Application
 
 
 @as_singleton()
+@as_dependency(Application)
 class StartingWindow(QMainWindow):
     def __init__(
         self,
+        application: Application,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
         super().__init__(parent, flags)
+
+        if APP_DATA_KEY not in os.environ:
+            message = f'The environment variable "{APP_DATA_KEY}" is not set'
+            logger.fatal(message)
+            raise EnvironmentError(message)
+
+        self.application = application
 
         self.ui = Ui_StartingWindow()
         self.ui.setupUi(self)  # type: ignore

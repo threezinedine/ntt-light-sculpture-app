@@ -1,7 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .version import Version
+from modules.dependency_injection.decorators import as_singleton
 
 
+@as_singleton()
 @dataclass
 class Application:
     """
@@ -9,7 +11,7 @@ class Application:
         for each user.
     """
 
-    version: Version
-    recentProjectFilePaths: dict[
-        str, str
-    ]  # key: project name, value: project file path
+    version: Version = field(default_factory=Version)
+    recentProjectFilePaths: dict[str, str] = field(
+        default_factory=dict
+    )  # key: project name, value: project file path
