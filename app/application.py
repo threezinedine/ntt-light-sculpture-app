@@ -10,7 +10,7 @@ sys.path.append(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine")
 )
 
-from Engine import Logging, LogLevel, EngineLogRecord
+from Engine import Logging, LogLevel, EngineLogRecord, Engine
 
 # ignore the deprecation warning
 import warnings
@@ -29,6 +29,8 @@ class LighSculptureApplication(QApplication):
         self.process_id = os.getpid()
         logger.info(f"Process ID: {self.process_id}")
         # ============================================================
+        self.engine = Engine()
+        self.engine.Initialize()
 
         Logging.SetLogCallback(self._handleLog)
 
@@ -44,6 +46,7 @@ class LighSculptureApplication(QApplication):
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         Logging.SetLogCallback(None)
+        self.engine.Finalize()
         logger.info("Closing application")
 
 

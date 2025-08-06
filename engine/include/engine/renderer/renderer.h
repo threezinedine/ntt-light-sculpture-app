@@ -8,7 +8,7 @@ namespace NTT_NS
     /**
      * @brief The renderer class is responsible for rendering the scene.
      */
-    class Renderer
+    class NTT_PYTHON_BINDING NTT_SINGLETON Renderer
     {
         NTT_DECLARE_SINGLETON(Renderer);
 
@@ -21,14 +21,14 @@ namespace NTT_NS
          *
          * @note This method must be called before any other method inside this class.
          */
-        void Initialize();
+        void Initialize() NTT_PYTHON_BINDING;
 
         /**
          * @brief Shutdown the renderer
          * Should be run once at the end of the application, this method will
          * clean up the window and the OpenGL context.
          */
-        void Shutdown();
+        void Shutdown() NTT_PYTHON_BINDING;
 
         /**
          * @brief Render the scene for every frame
@@ -36,7 +36,7 @@ namespace NTT_NS
          *
          * @note This method must be called every frame.
          */
-        void Render();
+        void Render() NTT_PYTHON_BINDING;
 
         /**
          * @brief Resize the window
@@ -46,7 +46,7 @@ namespace NTT_NS
          * @param width The new width of the window.
          * @param height The new height of the window.
          */
-        void Resize(unsigned int width, unsigned int height);
+        void Resize(unsigned int width, unsigned int height) NTT_PYTHON_BINDING;
 
     private:
         /**
