@@ -1,1 +1,4 @@
 APP_DATA_KEY = "APPDATA"
+
+APPLICATION_DATA_FOLDER = "LightSculpture"
+APPLICATION_DATA_FILE = "application.json"
