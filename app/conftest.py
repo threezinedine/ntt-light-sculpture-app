@@ -1,5 +1,7 @@
 # ignore the deprecation warning
+from typing import Generator
 import warnings
+
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -16,3 +18,13 @@ from application import LighSculptureApplication
 @pytest.fixture(scope="session")
 def qapp_cls() -> type[LighSculptureApplication]:
     return LighSculptureApplication
+
+
+from modules.dependency_injection import DependencyContainer
+
+
+@pytest.fixture(autouse=True)
+def CleanDependencyContainer() -> Generator[None, None, None]:
+    DependencyContainer.Clear()
+    yield
+    DependencyContainer.Clear()

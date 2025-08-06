@@ -26,6 +26,15 @@ class StartingWindow(QMainWindow):
             logger.fatal(message)
             raise EnvironmentError(message)
 
+        applicationAppDataFolder = os.path.join(
+            os.environ[APP_DATA_KEY], "LightSculpture"
+        )
+        if not os.path.exists(applicationAppDataFolder):
+            logger.info(
+                f'Folder "{applicationAppDataFolder}" does not exist. Creating it...'
+            )
+            os.makedirs(applicationAppDataFolder)
+
         self.application = application
 
         self.ui = Ui_StartingWindow()
