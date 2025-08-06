@@ -31,7 +31,7 @@ def dj() -> Generator[None, None, None]:
 def test_register_singleton() -> None:
     DependencyContainer.RegisterSingleton(
         DependencyTestClass.__name__,
-        DependencyTestClass(),
+        DependencyTestClass,
     )
 
     expectedValue = 23
@@ -91,10 +91,29 @@ def test_register_transition_with_same_name(mockWarning: MagicMock) -> None:
 def test_register_transition_with_same_name_as_singleton(mockFatal: MagicMock) -> None:
     DependencyContainer.RegisterSingleton(
         DependencyTestClass.__name__,
-        DependencyTestClass(),
+        DependencyTestClass,
     )
 
     with pytest.raises(ValueError):
+        DependencyContainer.RegisterTransition(
+            DependencyTestClass.__name__,
+            lambda: DependencyTestClass(),
+        )
+    mockFatal.assert_called_once()
+
+
+@patch("utils.logger.logger.fatal")
+def test_register_transition_with_same_name_as_initialized_singleton_factory(
+    mockFatal: MagicMock,
+) -> None:
+    DependencyContainer.RegisterSingleton(
+        DependencyTestClass.__name__,
+        DependencyTestClass,
+    )
+
+    with pytest.raises(ValueError):
+        DependencyContainer.GetInstance(DependencyTestClass.__name__)
+
         DependencyContainer.RegisterTransition(
             DependencyTestClass.__name__,
             lambda: DependencyTestClass(),
@@ -204,6 +223,8 @@ def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
             self.transition = transition
             transition.value = 1
 
+    DependencyContainer.GetInstance(SingletonClass.__name__)
+
     assert TransitionClass.count == 2
     assert SingletonClass.count == 1
     assert DependencyContainer.GetInstance(TransitionClass.__name__).value == 0
@@ -261,3 +282,21 @@ def test_get_transition_instance_with_arguments() -> None:
             self.value = value
 
     assert DependencyContainer.GetInstance(TransitionClass.__name__, 3).value == 3
+
+
+def test_get_singleton_instance_does_not_create_new_instance_until_it_is_requested() -> (
+    None
+):
+    @as_singleton
+    class SingletonClass:
+        count: int = 0
+
+        def __new__(cls) -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+    assert SingletonClass.count == 0
+
+    DependencyContainer.GetInstance(SingletonClass.__name__)
+
+    assert SingletonClass.count == 1

@@ -11,6 +11,7 @@ class DependencyContainer:
     """
 
     _singletons: dict[str, Any] = {}
+    _singletonFactories: dict[str, Callable[..., Any]] = {}
     _transitions: dict[str, Callable[..., Any]] = {}
 
     _dependencies: dict[str, list[str]] = {}
@@ -21,6 +22,7 @@ class DependencyContainer:
         Clear the container.
         """
         DependencyContainer._singletons.clear()
+        DependencyContainer._singletonFactories.clear()
         DependencyContainer._transitions.clear()
         DependencyContainer._dependencies.clear()
 
@@ -39,10 +41,14 @@ class DependencyContainer:
             content = f"Transition with name {name} already exists. The singleton will not be registered."
             logger.fatal(content)
             raise ValueError(content)
-        if name in DependencyContainer._singletons:
+        elif name in DependencyContainer._singletons:
             content = f"Singleton with name {name} already exists. The instance will be replaced."
             logger.warning(content)
-        DependencyContainer._singletons[name] = instance
+        elif name in DependencyContainer._singletonFactories:
+            content = f"Singleton factory with name {name} already exists. The instance will be replaced."
+            logger.warning(content)
+
+        DependencyContainer._singletonFactories[name] = lambda: instance()
 
     @staticmethod
     def RegisterTransition(name: str, factory: Callable[..., Any]) -> None:
@@ -61,10 +67,17 @@ class DependencyContainer:
             content = f"Singleton with name {name} already exists. The transition will not be registered."
             logger.fatal(content)
             raise ValueError(content)
-        if name in DependencyContainer._transitions:
+        elif name in DependencyContainer._singletonFactories:
+            content = f"Singleton factory with name {name} already exists. The transition will not be registered."
+            logger.fatal(content)
+            raise ValueError(content)
+        elif name in DependencyContainer._transitions:
             content = f"Transition with name {name} already exists. The instance will be replaced."
             logger.warning(content)
-        DependencyContainer._transitions[name] = factory
+
+        DependencyContainer._transitions[name] = lambda *args, **kwargs: factory(
+            *args, **kwargs
+        )
 
     @staticmethod
     def GetInstance(name: str, *args: Any, **kwargs: Any) -> Any:
@@ -79,6 +92,10 @@ class DependencyContainer:
             return DependencyContainer._singletons[name]
         elif name in DependencyContainer._transitions:
             return DependencyContainer._transitions[name](*args, **kwargs)
+        elif name in DependencyContainer._singletonFactories:
+            singleton = DependencyContainer._singletonFactories[name]()
+            DependencyContainer._singletons[name] = singleton
+            return singleton
         else:
             content = f"Instance with name {name} not found"
             logger.fatal(content)

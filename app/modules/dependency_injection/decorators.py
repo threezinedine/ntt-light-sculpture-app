@@ -35,7 +35,7 @@ def as_singleton(cls: type[T]) -> type[T]:
 
             arguments.append(DependencyContainer.GetInstance(dependency))
 
-    DependencyContainer.RegisterSingleton(cls.__name__, cls(*arguments))
+    DependencyContainer.RegisterSingleton(cls.__name__, lambda: cls(*arguments))
     return cls
 
 
