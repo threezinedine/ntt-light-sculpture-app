@@ -1,4 +1,6 @@
+from dataclasses import asdict
 import os
+import json
 from utils.logger import logger
 from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
@@ -34,6 +36,12 @@ class StartingWindow(QMainWindow):
                 f'Folder "{applicationAppDataFolder}" does not exist. Creating it...'
             )
             os.makedirs(applicationAppDataFolder)
+
+        applicationFile = os.path.join(applicationAppDataFolder, "application.json")
+        if not os.path.exists(applicationFile):
+            logger.info(f'File "{applicationFile}" does not exist. Creating it...')
+            with open(applicationFile, "w") as f:
+                f.write(json.dumps(asdict(application), indent=4))
 
         self.application = application
 

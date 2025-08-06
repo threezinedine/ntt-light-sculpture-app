@@ -19,4 +19,10 @@ def test_start_window_create_app_data_folder(
     startWindow.show()
     assert startWindow.isVisible()
 
-    assert os.path.exists(os.path.join("C:/Users/jason", "appdata", "LightSculpture"))
+    projectDataFolder = os.path.join("C:/Users/jason", "appdata", "LightSculpture")
+    applicationFile = os.path.join(projectDataFolder, "application.json")
+
+    assert os.path.exists(projectDataFolder)
+    assert os.path.isdir(projectDataFolder)
+    assert os.path.exists(applicationFile)
+    assert os.path.isfile(applicationFile)
