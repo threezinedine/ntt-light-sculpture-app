@@ -42,6 +42,7 @@ def as_singleton(cls: type[T]) -> type[T]:
 def as_transition(cls: type[T]) -> type[T]:
     """
     Used for annotating a class be used as a transition inside the current project.
+    The dependencies are listed before other arguments.
 
     Example:
     ```python
@@ -55,7 +56,7 @@ def as_transition(cls: type[T]) -> type[T]:
         new instance of the `TransitionClass` via the constructor
     """
 
-    def transition_factory(cls: type[T]) -> T:
+    def transition_factory(cls: type[T], *args: Any, **kwargs: Any) -> T:
         arguments: List[Any] = []
         if cls.__name__ in DependencyContainer._dependencies:  # type: ignore
             dependencies = DependencyContainer._dependencies[cls.__name__]  # type: ignore
@@ -63,10 +64,10 @@ def as_transition(cls: type[T]) -> type[T]:
             for dependency in dependencies:
                 arguments.append(DependencyContainer.GetInstance(dependency))
 
-        return cls(*arguments)
+        return cls(*arguments, *args, **kwargs)
 
     DependencyContainer.RegisterTransition(
-        cls.__name__, lambda: transition_factory(cls)
+        cls.__name__, lambda *args, **kwargs: transition_factory(cls, *args, **kwargs)
     )
     return cls
 

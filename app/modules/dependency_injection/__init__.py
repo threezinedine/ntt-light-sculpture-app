@@ -67,7 +67,7 @@ class DependencyContainer:
         DependencyContainer._transitions[name] = factory
 
     @staticmethod
-    def GetInstance(name: str) -> Any:
+    def GetInstance(name: str, *args: Any, **kwargs: Any) -> Any:
         """
         Get the instance from the container. Even if the is singleton or transition,
         the instance will be returned.
@@ -78,7 +78,7 @@ class DependencyContainer:
         if name in DependencyContainer._singletons:
             return DependencyContainer._singletons[name]
         elif name in DependencyContainer._transitions:
-            return DependencyContainer._transitions[name]()
+            return DependencyContainer._transitions[name](*args, **kwargs)
         else:
             content = f"Instance with name {name} not found"
             logger.fatal(content)

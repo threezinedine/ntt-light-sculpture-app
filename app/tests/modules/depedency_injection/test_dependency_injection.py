@@ -246,3 +246,18 @@ def test_register_transition_with_dependency_as_transition() -> None:
 
     assert TransitionClass.count == 3
     assert TransitionClass2.count == 2
+
+
+def test_get_transition_instance_with_arguments() -> None:
+    @as_transition
+    class TransitionClass:
+        count: int = 0
+
+        def __new__(cls, value: int) -> "TransitionClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self, value: int) -> None:
+            self.value = value
+
+    assert DependencyContainer.GetInstance(TransitionClass.__name__, 3).value == 3
