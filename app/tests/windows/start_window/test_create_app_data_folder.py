@@ -28,3 +28,5 @@ def test_start_window_create_app_data_folder(
     assert os.path.isdir(projectDataFolder)
     assert os.path.exists(applicationFile)
     assert os.path.isfile(applicationFile)
+
+    assert startWindow.windowTitle() == "Light Sculpture Studio - v1.0.0"

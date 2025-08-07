@@ -43,12 +43,16 @@ class StartingWindow(QMainWindow):
             with open(applicationFile, "w") as f:
                 f.write(json.dumps(asdict(application), indent=4))
 
-        self.setFixedSize(self.size())
-
         self.application = application
 
         self.ui = Ui_StartingWindow()
         self.ui.setupUi(self)  # type: ignore
+
+        self._setupUI()
+
+    def _setupUI(self) -> None:
+        self.setFixedSize(self.size())
+        self.setWindowTitle(f"Light Sculpture Studio - v{self.application.version}")
 
         self.ui.RecentProjectsLayout.addWidget(
             DependencyContainer.GetInstance(
