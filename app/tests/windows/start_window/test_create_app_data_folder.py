@@ -1,4 +1,6 @@
 import os
+
+from PyQt6.QtWidgets import QLabel
 from constants import APP_DATA_KEY, APPLICATION_DATA_FILE, APPLICATION_DATA_FOLDER
 from pytestqt.qtbot import QtBot
 from modules.dependency_injection import DependencyContainer
@@ -15,8 +17,11 @@ def test_start_window_create_app_data_folder(
     assert os.environ.get(APP_DATA_KEY, None) is not None
 
     from windows.starting_window import StartingWindow
+    from components.recent_projects.container import RecentProjectsContainer
 
-    startWindow = DependencyContainer.GetInstance(StartingWindow.__name__)
+    startWindow: StartingWindow = DependencyContainer.GetInstance(
+        StartingWindow.__name__
+    )
     qtbot.addWidget(startWindow)
     startWindow.show()
     assert startWindow.isVisible()
@@ -30,3 +35,10 @@ def test_start_window_create_app_data_folder(
     assert os.path.isfile(applicationFile)
 
     assert startWindow.windowTitle() == "Light Sculpture Studio - v1.0.0"
+
+    # check the recent projects is empty
+    recentProjects: RecentProjectsContainer = DependencyContainer.GetInstance(
+        RecentProjectsContainer.__name__
+    )
+    hasNoProjectsLabel = recentProjects.findChildren(QLabel)  # type: ignore
+    assert len(hasNoProjectsLabel) == 1

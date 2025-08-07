@@ -123,6 +123,9 @@ def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:
             DependencyContainer._dependencies[cls.__name__] = []  # type: ignore
 
         for class_ in classes:
+            logger.debug(
+                f'Registering dependency: "{class_.__name__}" for "{cls.__name__}"'
+            )
             DependencyContainer._dependencies[cls.__name__].append(class_.__name__)  # type: ignore
 
         return cls

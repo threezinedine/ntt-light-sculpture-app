@@ -4,20 +4,20 @@ import json
 from utils.logger import logger
 from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
-from components.recent_projects.container import RecentProjectsContainer
 from constants import APP_DATA_KEY, APPLICATION_DATA_FILE, APPLICATION_DATA_FOLDER
 from converted_uis.starting_window import Ui_StartingWindow
-from modules.dependency_injection import DependencyContainer
 from modules.dependency_injection.decorators import as_singleton, as_dependency
 from structs.application import Application
+from components.recent_projects.container import RecentProjectsContainer
 
 
 @as_singleton()
-@as_dependency(Application)
+@as_dependency(Application, RecentProjectsContainer)
 class StartingWindow(QMainWindow):
     def __init__(
         self,
         application: Application,
+        recentProjectsContainer: RecentProjectsContainer,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
@@ -48,14 +48,10 @@ class StartingWindow(QMainWindow):
         self.ui = Ui_StartingWindow()
         self.ui.setupUi(self)  # type: ignore
 
-        self._setupUI()
+        self._setupUI(recentProjectsContainer)
 
-    def _setupUI(self) -> None:
+    def _setupUI(self, recentProjectsContainer: RecentProjectsContainer) -> None:
         self.setFixedSize(self.size())
         self.setWindowTitle(f"Light Sculpture Studio - v{self.application.version}")
 
-        self.ui.RecentProjectsLayout.addWidget(
-            DependencyContainer.GetInstance(
-                RecentProjectsContainer.__name__,
-            )
-        )
+        self.ui.RecentProjectsLayout.addWidget(recentProjectsContainer)
