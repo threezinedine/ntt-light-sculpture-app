@@ -1,6 +1,7 @@
 from dataclasses import asdict
 import os
 import json
+from dacite import from_dict
 from utils.logger import logger
 from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
@@ -42,16 +43,20 @@ class StartingWindow(QMainWindow):
             logger.info(f'File "{applicationFile}" does not exist. Creating it...')
             with open(applicationFile, "w") as f:
                 f.write(json.dumps(asdict(application), indent=4))
+        else:
+            with open(applicationFile, "r") as f:
+                application = from_dict(data_class=Application, data=json.load(f))
 
         self.application = application
+        self.recentProjectsContainer = recentProjectsContainer
 
         self.ui = Ui_StartingWindow()
         self.ui.setupUi(self)  # type: ignore
 
-        self._setupUI(recentProjectsContainer)
+        self._setupUI()
 
-    def _setupUI(self, recentProjectsContainer: RecentProjectsContainer) -> None:
+    def _setupUI(self) -> None:
         self.setFixedSize(self.size())
         self.setWindowTitle(f"Light Sculpture Studio - v{self.application.version}")
 
-        self.ui.RecentProjectsLayout.addWidget(recentProjectsContainer)
+        self.ui.RecentProjectsLayout.addWidget(self.recentProjectsContainer)

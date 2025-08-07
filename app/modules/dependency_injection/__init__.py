@@ -94,9 +94,11 @@ class DependencyContainer:
         if name in DependencyContainer._singletons:
             return DependencyContainer._singletons[name]
         elif name in DependencyContainer._transitions:
+            logger.debug(f'Initializing transition with name "{name}"')
             return DependencyContainer._transitions[name](*args, **kwargs)
         elif name in DependencyContainer._singletonFactories:
             # TODO: test initialized with arguments
+            logger.debug(f'Initializing singleton with name "{name}"')
             singleton = DependencyContainer._singletonFactories[name](*args, **kwargs)
             DependencyContainer._singletons[name] = singleton
             return singleton
