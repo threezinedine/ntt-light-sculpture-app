@@ -121,6 +121,15 @@ def test_register_transition_with_same_name_as_singleton(
     fatalMock.assert_called_once()
 
 
+def test_register_transition_with_empty_name(mocker: MockerFixture) -> None:
+    fatalMock = mocker.patch("utils.logger.logger.fatal")
+
+    with pytest.raises(ValueError):
+        DependencyContainer.RegisterTransition("", lambda: DependencyTestClass())
+
+    fatalMock.assert_called_once()
+
+
 def test_register_transition_with_same_name_as_initialized_singleton_factory(
     mocker: MockerFixture,
 ) -> None:

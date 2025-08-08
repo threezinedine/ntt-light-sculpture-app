@@ -71,6 +71,11 @@ class DependencyContainer:
                 can accept any number of arguments. The arguments will be passed to the
                 factory function when the instance is created.
         """
+        if len(name) == 0:
+            content = f"Transition with empty name will not be registered."
+            logger.fatal(content)
+            raise ValueError(content)
+
         if name in DependencyContainer._singletons:
             content = f'Singleton with name "{name}" already exists. The transition will not be registered.'
             logger.fatal(content)
