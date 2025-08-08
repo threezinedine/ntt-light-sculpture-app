@@ -41,9 +41,6 @@ def test_open_existed_app_folder_with_recent_projects(
     qtbot.addWidget(startWindow)
 
     assert startWindow.windowTitle() == "Light Sculpture Studio - v1.0.0"
-    # from modules.event_system.event_system import EventSystem
-
-    # print(EventSystem._callbackMap)  # type: ignore
 
     hasNoRecentProjectsLabel = startWindow.recentProjectsContainer.findChildren(QLabel)  # type: ignore
-    assert len(hasNoRecentProjectsLabel) == 0
+    assert hasNoRecentProjectsLabel[0].isVisible() == False  # type: ignore

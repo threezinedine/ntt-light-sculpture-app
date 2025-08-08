@@ -22,6 +22,7 @@ class RecentProjectsContainer(QWidget):
         super().__init__(parent, flags)
 
         self.application = application
+        print(id(self.application))
 
         self.ui = Ui_RecentProjectsContainer()
         self.ui.setupUi(self)  # type: ignore
@@ -42,7 +43,8 @@ class RecentProjectsContainer(QWidget):
         logger.debug(f"hasNoRecentProjectsLabel: {hasNoRecentProjectsLabel}")
 
         if len(self.application.recentProjectFilePaths.keys()) != 0:
-            hasNoRecentProjectsLabel.setParent(None)  # type: ignore
+            for child in hasNoRecentProjectsLabel:
+                child.setParent(None)  # type: ignore
 
         for (
             projectName,

@@ -47,6 +47,9 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
                         )
 
                     arguments.append(DependencyContainer.GetInstance(dependency))
+
+                    if dependency == "Application":
+                        print("id", id(arguments[-1]))
             return cls(*arguments, *args, **kwargs)
 
         DependencyContainer.RegisterSingleton(name, singleton_factory)

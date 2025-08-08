@@ -15,3 +15,7 @@ class Application:
     recentProjectFilePaths: dict[str, str] = field(
         default_factory=dict
     )  # key: project name, value: project file path
+
+    def Update(self, other: "Application") -> None:
+        self.version.Update(other.version)
+        self.recentProjectFilePaths = other.recentProjectFilePaths

@@ -41,3 +41,4 @@ def test_start_window_create_app_data_folder(
     # check the recent projects is empty
     hasNoProjectsLabel = startWindow.recentProjectsContainer.findChildren(QLabel)  # type: ignore
     assert len(hasNoProjectsLabel) == 1
+    assert hasNoProjectsLabel[0].isVisible() == True  # type: ignore

@@ -51,9 +51,11 @@ class StartingWindow(QMainWindow):
                 f.write(json.dumps(asdict(application), indent=4))
         else:
             with open(applicationFile, "r") as f:
-                application = from_dict(data_class=Application, data=json.load(f))
+                loadedApplication = from_dict(data_class=Application, data=json.load(f))
+                application.Update(loadedApplication)
 
         EventSystem.TriggerEvent(APPLICATION_LOADED_EVENT_NAME)
+        print(id(application))
         self.application = application
         self.recentProjectsContainer = recentProjectsContainer
 
