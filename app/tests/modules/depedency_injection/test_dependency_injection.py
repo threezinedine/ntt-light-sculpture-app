@@ -130,6 +130,23 @@ def test_register_transition_with_empty_name(mocker: MockerFixture) -> None:
     fatalMock.assert_called_once()
 
 
+def test_get_singleton_instance_with_arguments():
+    @as_singleton()
+    class SingletonClass:
+        count: int = 0
+
+        def __new__(cls, value: int) -> "SingletonClass":
+            cls.count += 1
+            return super().__new__(cls)
+
+        def __init__(self, value: int) -> None:
+            self.value = value
+
+    assert DependencyContainer.GetInstance(SingletonClass.__name__, 3).value == 3
+    assert SingletonClass.count == 1
+    assert DependencyContainer.GetInstance(SingletonClass.__name__).value == 3
+
+
 def test_register_transition_with_same_name_as_initialized_singleton_factory(
     mocker: MockerFixture,
 ) -> None:
