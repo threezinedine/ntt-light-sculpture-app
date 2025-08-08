@@ -2,10 +2,16 @@ from dataclasses import asdict
 import os
 import json
 from dacite import from_dict
+from modules.event_system.event_system import EventSystem
 from utils.logger import logger
 from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
-from constants import APP_DATA_KEY, APPLICATION_DATA_FILE, APPLICATION_DATA_FOLDER
+from constants import (
+    APP_DATA_KEY,
+    APPLICATION_DATA_FILE,
+    APPLICATION_DATA_FOLDER,
+    APPLICATION_LOADED_EVENT_NAME,
+)
 from converted_uis.starting_window import Ui_StartingWindow
 from modules.dependency_injection.decorators import as_singleton, as_dependency
 from structs.application import Application
@@ -47,6 +53,7 @@ class StartingWindow(QMainWindow):
             with open(applicationFile, "r") as f:
                 application = from_dict(data_class=Application, data=json.load(f))
 
+        EventSystem.TriggerEvent(APPLICATION_LOADED_EVENT_NAME)
         self.application = application
         self.recentProjectsContainer = recentProjectsContainer
 

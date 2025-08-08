@@ -8,6 +8,7 @@ class RecentProjectsItem(QWidget):
     def __init__(
         self,
         projectName: str,
+        projectFilePath: str,
         parent: Optional["QWidget"] = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
@@ -15,4 +16,5 @@ class RecentProjectsItem(QWidget):
         self.ui = Ui_RecentProjectItem()
         self.ui.setupUi(self)  # type: ignore
 
+        self.projectFilePath = projectFilePath
         self.ui.ProjectNameLabel.setText(projectName)

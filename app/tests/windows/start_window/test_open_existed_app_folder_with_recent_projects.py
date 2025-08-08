@@ -15,7 +15,6 @@ from constants import (
 from modules.dependency_injection import DependencyContainer
 
 
-@pytest.mark.skip(reason="Need event system to test this")
 def test_open_existed_app_folder_with_recent_projects(
     qtbot: QtBot,
     fs: FakeFilesystem,
@@ -42,6 +41,9 @@ def test_open_existed_app_folder_with_recent_projects(
     qtbot.addWidget(startWindow)
 
     assert startWindow.windowTitle() == "Light Sculpture Studio - v1.0.0"
+    # from modules.event_system.event_system import EventSystem
+
+    # print(EventSystem._callbackMap)  # type: ignore
 
     hasNoRecentProjectsLabel = startWindow.recentProjectsContainer.findChildren(QLabel)  # type: ignore
     assert len(hasNoRecentProjectsLabel) == 0

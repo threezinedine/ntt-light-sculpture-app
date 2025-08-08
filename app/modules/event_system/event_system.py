@@ -32,7 +32,7 @@ class EventSystem:
     )  # the stack which is used for checking and avoid the circular dependency trigger, must be empty when the event is triggered, and be cleared after the event is triggered
 
     @staticmethod
-    def RegisteEvent(eventName: str, callback: EventCallback):
+    def RegisterEvent(eventName: str, callback: EventCallback):
         """
         Attach the callback to the current system, whereas if the `eventName` is triggered, the callback will be triggered.
 
@@ -56,12 +56,6 @@ class EventSystem:
             eventName (str): The name of the event to trigger. If the event is not registered, nothing will happen.
                 The warning will be logged.
         """
-        if eventName not in EventSystem._callbackMap:
-            logger.warning(
-                f'Event "{eventName}" is not registered, nothing will happen.'
-            )
-            return
-
         EventSystem._triggeredEventStack.clear()
 
         EventSystem._TriggerEventInternal(eventName, *args, **kwargs)
@@ -78,8 +72,13 @@ class EventSystem:
 
         EventSystem._triggeredEventStack.append(eventName)
 
-        for callback in EventSystem._callbackMap[eventName]:
-            callback(*args, **kwargs)
+        if eventName not in EventSystem._callbackMap:
+            logger.warning(
+                f'Event "{eventName}" is not registered, nothing will happen.'
+            )
+        else:
+            for callback in EventSystem._callbackMap[eventName]:
+                callback(*args, **kwargs)
 
         if eventName not in EventSystem._eventDependencyMap:
             return
@@ -107,3 +106,9 @@ class EventSystem:
                 EventSystem._eventDependencyMap[dependencyEventName] = set()
 
             EventSystem._eventDependencyMap[dependencyEventName].add(eventName)
+
+    @staticmethod
+    def Clear() -> None:
+        EventSystem._callbackMap.clear()
+        EventSystem._eventDependencyMap.clear()
+        EventSystem._triggeredEventStack.clear()

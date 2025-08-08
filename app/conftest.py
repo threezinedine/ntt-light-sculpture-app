@@ -2,6 +2,8 @@
 from typing import Generator
 import warnings
 
+from modules.event_system.event_system import EventSystem
+
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -26,5 +28,7 @@ from modules.dependency_injection import DependencyContainer
 @pytest.fixture(autouse=True)
 def CleanDependencyContainer() -> Generator[None, None, None]:
     DependencyContainer.Clear()
+    EventSystem.Clear()
     yield
     DependencyContainer.Clear()
+    EventSystem.Clear()
