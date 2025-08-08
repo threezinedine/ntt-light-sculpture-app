@@ -37,6 +37,11 @@ class DependencyContainer:
                 name is already in the container, a warning will be logged.
             instance: The instance to be added to the container.
         """
+        if len(name) == 0:
+            content = f"Singleton with empty name will not be registered."
+            logger.fatal(content)
+            raise ValueError(content)
+
         if name in DependencyContainer._transitions:
             content = f'Transition with name "{name}" already exists. The singleton will not be registered.'
             logger.fatal(content)

@@ -1,13 +1,13 @@
 from typing import Generator
 from abc import ABC, abstractmethod
 import pytest
+from pytest_mock import MockerFixture
 from modules.dependency_injection import DependencyContainer
 from modules.dependency_injection.decorators import (
     as_singleton,
     as_transition,
     as_dependency,
 )
-from unittest.mock import MagicMock, patch
 
 
 class DependencyTestClass:
@@ -48,6 +48,14 @@ def test_register_singleton() -> None:
     )
 
 
+def test_register_singleton_with_empty_name(mocker: MockerFixture):
+    mockFatal = mocker.patch("utils.logger.logger.fatal")
+    with pytest.raises(ValueError):
+        DependencyContainer.RegisterSingleton("", DependencyTestClass)
+
+    mockFatal.assert_called_once()
+
+
 def test_register_transition() -> None:
     DependencyContainer.RegisterTransition(
         DependencyTestClass.__name__, lambda: DependencyTestClass()
@@ -61,8 +69,11 @@ def test_register_transition() -> None:
     assert DependencyContainer.GetInstance(DependencyTestClass.__name__).value == 0
 
 
-@patch("utils.logger.logger.warning")
-def test_register_singleton_with_same_name(mockWarning: MagicMock) -> None:
+def test_register_singleton_with_same_name(
+    mocker: MockerFixture,
+) -> None:
+    warningMock = mocker.patch("utils.logger.logger.warning")
+
     DependencyContainer.RegisterSingleton(
         DependencyTestClass.__name__,
         DependencyTestClass(),
@@ -72,11 +83,14 @@ def test_register_singleton_with_same_name(mockWarning: MagicMock) -> None:
         DependencyTestClass(),
     )
 
-    mockWarning.assert_called_once()
+    warningMock.assert_called_once()
 
 
-@patch("utils.logger.logger.warning")
-def test_register_transition_with_same_name(mockWarning: MagicMock) -> None:
+def test_register_transition_with_same_name(
+    mocker: MockerFixture,
+) -> None:
+    warningMock = mocker.patch("utils.logger.logger.warning")
+
     DependencyContainer.RegisterTransition(
         DependencyTestClass.__name__,
         lambda: DependencyTestClass(),
@@ -85,11 +99,15 @@ def test_register_transition_with_same_name(mockWarning: MagicMock) -> None:
         DependencyTestClass.__name__,
         lambda: DependencyTestClass(),
     )
-    mockWarning.assert_called_once()
+
+    warningMock.assert_called_once()
 
 
-@patch("utils.logger.logger.fatal")
-def test_register_transition_with_same_name_as_singleton(mockFatal: MagicMock) -> None:
+def test_register_transition_with_same_name_as_singleton(
+    mocker: MockerFixture,
+) -> None:
+    fatalMock = mocker.patch("utils.logger.logger.fatal")
+
     DependencyContainer.RegisterSingleton(
         DependencyTestClass.__name__,
         DependencyTestClass,
@@ -100,13 +118,14 @@ def test_register_transition_with_same_name_as_singleton(mockFatal: MagicMock) -
             DependencyTestClass.__name__,
             lambda: DependencyTestClass(),
         )
-    mockFatal.assert_called_once()
+    fatalMock.assert_called_once()
 
 
-@patch("utils.logger.logger.fatal")
 def test_register_transition_with_same_name_as_initialized_singleton_factory(
-    mockFatal: MagicMock,
+    mocker: MockerFixture,
 ) -> None:
+    fatalMock = mocker.patch("utils.logger.logger.fatal")
+
     DependencyContainer.RegisterSingleton(
         DependencyTestClass.__name__,
         DependencyTestClass,
@@ -119,15 +138,16 @@ def test_register_transition_with_same_name_as_initialized_singleton_factory(
             DependencyTestClass.__name__,
             lambda: DependencyTestClass(),
         )
-    mockFatal.assert_called_once()
+    fatalMock.assert_called_once()
 
 
-@patch("utils.logger.logger.fatal")
-def test_query_non_existent_instance(mockFatal: MagicMock) -> None:
+def test_query_non_existent_instance(mocker: MockerFixture) -> None:
+    fatalMock = mocker.patch("utils.logger.logger.fatal")
+
     with pytest.raises(ValueError):
         DependencyContainer.GetInstance("NonExistentClass")
 
-    mockFatal.assert_called_once()
+    fatalMock.assert_called_once()
 
 
 def test_register_object_using_decorator() -> None:
@@ -194,8 +214,11 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
     assert DependencyContainer.GetInstance(SingletonClass.__name__).count == 1
 
 
-@patch("utils.logger.logger.warning")
-def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
+def test_register_transition_with_dependency(
+    mocker: MockerFixture,
+) -> None:
+    warningMock = mocker.patch("utils.logger.logger.warning")
+
     @as_transition()
     class TransitionClass:
         count: int = 0
@@ -233,7 +256,7 @@ def test_register_transition_with_dependency(mockWarning: MagicMock) -> None:
         DependencyContainer.GetInstance(SingletonClass.__name__).transition.value == 1
     )
 
-    mockWarning.assert_called_once()  # warning while registering transition as singleton dependency
+    warningMock.assert_called_once()  # warning while registering transition as singleton dependency
 
 
 def test_register_transition_with_dependency_as_transition() -> None:
