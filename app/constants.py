@@ -15,6 +15,7 @@ TEST_APP_DATA_FOLDER = os.path.join(TEST_USER_FOLDER, "appdata")
 TEST_NON_EXISTED_PROJECT_FOLDER = os.path.join(
     TEST_USER_FOLDER, "projects", "non_existed_project"
 )
+TEST_NEW_PROJECT_PATH = "C:/Users/jason/Projects"
 # ==================================================================================
 
 # ================================ EVENTS ==========================================

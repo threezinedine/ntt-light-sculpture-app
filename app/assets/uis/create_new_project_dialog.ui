@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Create New Project</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -62,7 +62,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Project is placed at: </string>
+      <string>Project Path: </string>
      </property>
     </widget>
    </item>

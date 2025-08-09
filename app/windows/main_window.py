@@ -29,7 +29,9 @@ class MainWindow(QMainWindow):
         self._Config()
 
         self.ui = Ui_MainWindow()
-        self.newProjectDialog = NewProjectDialog(self)
+        self.newProjectDialog = NewProjectDialog(
+            self, acceptCallback=self._CreateNewProject
+        )
         self._SetupUI()
 
     def _Config(self) -> None:
@@ -65,10 +67,19 @@ class MainWindow(QMainWindow):
 
         self.ui.centerLayout.addWidget(OpenGlWidget())
 
-        self.ui.newProjectAction.triggered.connect(self._CreateNewProject)
+        self.ui.newProjectAction.triggered.connect(self._OpenCreateNewProjectDialog)
 
-    def _CreateNewProject(self) -> None:
+    def _OpenCreateNewProjectDialog(self) -> None:
         self.newProjectDialog.show()
+
+    def _CreateNewProject(self, projectDirectory: str, projectName: str) -> None:
+        finalProjectDirectory = os.path.normpath(
+            os.path.join(projectDirectory, projectName)
+        )
+
+        print(finalProjectDirectory)
+
+        os.makedirs(finalProjectDirectory)
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:
