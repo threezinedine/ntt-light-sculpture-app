@@ -14,6 +14,7 @@ from utils.application import (
     GetApplicationDataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
+    GetWindowTitle,
 )
 from constants import APP_DATA_KEY, CHANGE_PROJECT_EVENT_NAME
 
@@ -68,4 +69,4 @@ class MainWindowViewModel:
 
     @property
     def WindowTitle(self) -> str:
-        return f"Light Sculpture Studio - {self.project.projectName}"
+        return GetWindowTitle(self.project.projectName)

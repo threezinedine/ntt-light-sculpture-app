@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         Called at the end of the constructor for managing the UI.
         """
         self.ui.setupUi(self)  # type: ignore
+        self.setWindowTitle(self.viewModel.WindowTitle)
         self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
 

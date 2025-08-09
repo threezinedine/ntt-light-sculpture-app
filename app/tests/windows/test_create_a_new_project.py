@@ -12,7 +12,7 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from dacite import from_dict
 
 from modules.dependency_injection import DependencyContainer
-from utils.application import GetProjectDataFolder, GetProjectDataFile
+from utils.application import GetProjectDataFolder, GetProjectDataFile, GetWindowTitle
 
 from .helper import AppDataSetup, FolderDialogSetup
 from constants import TEST_NEW_PROJECT_PATH
@@ -59,6 +59,7 @@ def test_create_a_new_project(
     assert projectPathInput.isReadOnly()
     assert projectNameInput.text() == ""
     assert not projectNameInput.isReadOnly()
+    assert mainWindow.windowTitle() == GetWindowTitle()
 
     # ================================= MODIFY THE PROJECT NAME =================================
     projectNameInput.setText(NEW_PROJECT_NAME)
@@ -140,4 +141,4 @@ def test_create_a_new_project(
     with open(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME), "r") as f:
         assert project.Compare(from_dict(data_class=Project, data=json.loads(f.read())))
 
-    assert mainWindow.windowTitle() == f"Light Sculpture Studio - {NEW_PROJECT_NAME}"
+    assert mainWindow.windowTitle() == GetWindowTitle(NEW_PROJECT_NAME)

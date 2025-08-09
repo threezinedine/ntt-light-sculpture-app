@@ -26,3 +26,10 @@ def GetProjectDataFile(projectDirectory: str, projectName: str) -> str:
             GetProjectDataFolder(projectDirectory, projectName), PROJECT_DATA_FILE
         )
     )
+
+
+def GetWindowTitle(projectName: str | None = None) -> str:
+    if projectName is None or projectName == "":
+        return "Light Sculpture Studio"
+
+    return f"Light Sculpture Studio - {projectName}"
