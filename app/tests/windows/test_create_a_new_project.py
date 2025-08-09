@@ -45,7 +45,7 @@ def test_create_a_new_project(
     assert mainWindow.newProjectDialog.isVisible()
 
     newProjectDialog: NewProjectDialog = mainWindow.newProjectDialog
-    finalProjectLabel: QLabel = newProjectDialog.ui.finalProjectPathLabel
+    projectDirectoryLabel: QLabel = newProjectDialog.ui.projectDirectoryLabel
     projectPathInput: QLineEdit = newProjectDialog.ui.projectPathInput
     projectNameInput: QLineEdit = newProjectDialog.ui.projectNameInput
     projectPathBrowseButton: QPushButton = newProjectDialog.ui.projectPathBrowseButton
@@ -54,7 +54,7 @@ def test_create_a_new_project(
     cancelButton: QPushButton = buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
 
     # ================================= BEGIN CHECK THE PROJECT PATH ==========================
-    assert finalProjectLabel.text().strip() == "Project Path:"
+    assert projectDirectoryLabel.text() == ""
     assert projectPathInput.text() == ""
     assert projectPathInput.isReadOnly()
     assert projectNameInput.text() == ""
@@ -64,7 +64,7 @@ def test_create_a_new_project(
     projectNameInput.setText(NEW_PROJECT_NAME)
 
     assert projectPathInput.text() == ""
-    assert finalProjectLabel.text().strip() == "Project Path:"
+    assert projectDirectoryLabel.text() == ""
     assert not okButton.isEnabled()
     assert cancelButton.isEnabled()
 
@@ -74,7 +74,7 @@ def test_create_a_new_project(
     projectPathBrowseButton.click()
 
     assert projectPathInput.text() == ""
-    assert finalProjectLabel.text() == "Project Path: "
+    assert projectDirectoryLabel.text() == ""
     assert not okButton.isEnabled()
     assert cancelButton.isEnabled()
 
@@ -85,18 +85,16 @@ def test_create_a_new_project(
     assert projectPathInput.text() == TEST_NEW_PROJECT_PATH
     assert okButton.isEnabled()
     assert cancelButton.isEnabled()
-    assert (
-        finalProjectLabel.text()
-        == f"Project Path: {GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)}"
+    assert projectDirectoryLabel.text() == GetProjectDataFolder(
+        TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME
     )
 
     # ================================= MODIFY THE PROJECT NAME =================================
     projectNameInput.setText(NEW_PROJECT_NAME + " 2")
 
     assert projectNameInput.text() == NEW_PROJECT_NAME + " 2"
-    assert (
-        finalProjectLabel.text()
-        == f"Project Path: {GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME + ' 2')}"
+    assert projectDirectoryLabel.text() == GetProjectDataFolder(
+        TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME + " 2"
     )
 
     # ================================= CANNOT CREATE PROJECT IF NAME IS EMPTY ================================
@@ -124,7 +122,7 @@ def test_create_a_new_project(
     assert not okButton.isEnabled()
     assert cancelButton.isEnabled()
 
-    assert finalProjectLabel.text().strip() == "Project Path:"
+    assert projectDirectoryLabel.text() == ""
 
     # ================================= CLICK THE CREATE BUTTON =================================
     projectNameInput.setText(NEW_PROJECT_NAME)

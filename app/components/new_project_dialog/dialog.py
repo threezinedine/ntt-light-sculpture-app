@@ -1,74 +1,60 @@
-import os
-from typing import Callable
-from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QPushButton, QWidget
+from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QWidget
 from PyQt6.QtCore import Qt
+
 from converted_uis.create_new_project_dialog import Ui_CreateNewProjectDialog
-from utils.application import GetProjectDataFolder
+from modules.dependency_injection.decorators import (
+    as_dependency,
+    as_singleton,
+)
+from .viewmodel import NewProjectDialogViewModel
 
 
+@as_singleton()
+@as_dependency(NewProjectDialogViewModel)
 class NewProjectDialog(QDialog):
     def __init__(
         self,
+        viewModel: NewProjectDialogViewModel,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Window,
-        acceptCallback: Callable[[str, str], None] | None = None,
     ) -> None:
         super().__init__(parent, flags)
 
+        self.viewModel = viewModel
+
         self.ui = Ui_CreateNewProjectDialog()
-        self._acceptCallback: Callable[[str, str], None] | None = acceptCallback
         self._SetupUi()
 
     def _SetupUi(self) -> None:
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.projectPathBrowseButton.clicked.connect(self._OpenFolderSearching)
-        self.ui.projectNameInput.textChanged.connect(self._UpdateFinalProjectPath)
-        self.ui.buttonBox.accepted.connect(self._Accept)
-        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        self.ui.projectNameInput.textChanged.connect(self._ProjectNameInputChanged)
+        self.ui.buttonBox.accepted.connect(self.viewModel.Accept)
         self.ui.buttonBox.rejected.connect(self._Cancel)
 
-    def _Accept(self) -> None:
-        if self._acceptCallback is None:
-            return
-
-        self._acceptCallback(
-            self.ui.projectPathInput.text(), self.ui.projectNameInput.text()
-        )
+        self._UpdateOkButtonState()
 
     def _Cancel(self) -> None:
         self.ui.projectPathInput.setText("")
         self.ui.projectNameInput.setText("")
-        self._UpdateFinalProjectPath()
+        self.viewModel.Cancel()
 
-    def _UpdateFinalProjectPath(self) -> None:
-        finalText = f"Project Path: {self._GetFinalProjectDirectory()}"
-        self.ui.finalProjectPathLabel.setText(finalText)
+    def _ProjectNameInputChanged(self) -> None:
+        self.viewModel.ProjectName = self.ui.projectNameInput.text()
+        self.ui.projectDirectoryLabel.setText(self.viewModel.FinalProjectPath)
+        self._UpdateOkButtonState()
 
-        okButton: QPushButton = self.ui.buttonBox.button(
-            QDialogButtonBox.StandardButton.Ok
+    def _UpdateOkButtonState(self) -> None:
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(
+            self.viewModel.CanCreateProject
         )
-
-        if (
-            self.ui.projectPathInput.text() != ""
-            and self.ui.projectNameInput.text() != ""
-            and not os.path.exists(self._GetFinalProjectDirectory())
-        ):
-            okButton.setEnabled(True)
-        else:
-            okButton.setEnabled(False)
 
     def _OpenFolderSearching(self) -> None:
         directory = QFileDialog.getExistingDirectory(self, "Choose Project Folder")
 
         if directory:
             self.ui.projectPathInput.setText(directory)
-            self._UpdateFinalProjectPath()
-
-    def _GetFinalProjectDirectory(self) -> str:
-        if self.ui.projectPathInput.text() == "":
-            return ""
-
-        return GetProjectDataFolder(
-            self.ui.projectPathInput.text(), self.ui.projectNameInput.text()
-        )
+            self.viewModel.ProjectPath = directory
+            self.ui.projectDirectoryLabel.setText(self.viewModel.FinalProjectPath)
+            self._UpdateOkButtonState()
