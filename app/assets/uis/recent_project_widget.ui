@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>64</height>
+    <height>63</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,7 @@ QIcon
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="OpenRecentProjectButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -57,7 +57,7 @@ QIcon
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../assets/icons/folder-open-icon.svg</normaloff>../assets/icons/folder-open-icon.svg</iconset>
+         <normaloff>../icons/folder-open-icon.svg</normaloff>../icons/folder-open-icon.svg</iconset>
        </property>
       </widget>
      </item>

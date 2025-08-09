@@ -1,7 +1,10 @@
 from typing import Optional
 from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtCore import Qt
-from constants import APPLICATION_LOADED_EVENT_NAME
+from constants import (
+    APPLICATION_LOADED_EVENT_NAME,
+    APPLICATION_UPDATED_EVENT_NAME,
+)
 from converted_uis.recent_projects_container import Ui_RecentProjectsContainer
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from modules.event_system.event_system import EventSystem
@@ -26,29 +29,47 @@ class RecentProjectsContainer(QWidget):
         self.ui = Ui_RecentProjectsContainer()
         self.ui.setupUi(self)  # type: ignore
 
+        self.hasNoRecentProjectsLabel: QLabel | None = None
+
         self._setupUI()
 
     def _setupUI(self) -> None:
         logger.debug(self.application.recentProjectFilePaths)
+        hasNoRecentProjectsLabels = self.findChildren(QLabel)  # type: ignore
+        assert len(hasNoRecentProjectsLabels) == 1
+        self.hasNoRecentProjectsLabel = hasNoRecentProjectsLabels[0]  # type: ignore
         self._reloadRecentProjects()
         EventSystem.RegisterEvent(
             APPLICATION_LOADED_EVENT_NAME,
             self._reloadRecentProjects,
         )
+        EventSystem.RegisterEvent(
+            APPLICATION_UPDATED_EVENT_NAME,
+            self._removeRecentProject,
+        )
+
+    def _removeRecentProject(self) -> None:
+        if len(self.application.recentProjectFilePaths.keys()) == 0:
+            if self.hasNoRecentProjectsLabel is not None:
+                self.ui.RecentsProjectLayout.addWidget(self.hasNoRecentProjectsLabel)
+                self.hasNoRecentProjectsLabel.show()
+
+        recentProjectsItems: list[RecentProjectsItem] = self.findChildren(RecentProjectsItem)  # type: ignore
+        for recentProjectsItem in recentProjectsItems:
+            if (
+                recentProjectsItem.projectName
+                not in self.application.recentProjectFilePaths.keys()
+            ):
+                recentProjectsItem.setParent(None)  # type: ignore
+                break
 
     def _reloadRecentProjects(self) -> None:
-        hasNoRecentProjectsLabel = self.findChildren(QLabel)  # type: ignore
-        assert len(hasNoRecentProjectsLabel) == 1
-        logger.debug(f"hasNoRecentProjectsLabel: {hasNoRecentProjectsLabel}")
-
         if len(self.application.recentProjectFilePaths.keys()) != 0:
-            for child in hasNoRecentProjectsLabel:
-                child.setParent(None)  # type: ignore
+            self.hasNoRecentProjectsLabel.setParent(None)  # type: ignore
 
         for (
             projectName,
             projectFilePath,
         ) in self.application.recentProjectFilePaths.items():
-            logger.debug(f"Adding recent project: {projectName} - {projectFilePath}")
             recentProjectsItem = RecentProjectsItem(projectName, projectFilePath)
             self.ui.RecentsProjectLayout.addWidget(recentProjectsItem)

@@ -2,7 +2,7 @@ import logging
 
 # ================= COMMON FORMATTER =================
 formatter = logging.Formatter(
-    "[%(levelname)s] [%(name)s] %(message)s",
+    "[%(levelname)s] [%(name)s] - %(filename)s:%(lineno)d - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 # ====================================================

@@ -11,6 +11,8 @@ from constants import (
     APPLICATION_DATA_FILE,
     APPLICATION_DATA_FOLDER,
     APPLICATION_LOADED_EVENT_NAME,
+    APPLICATION_UPDATED_EVENT_NAME,
+    OPEN_NON_EXISTED_PROJECT_DIR_EVENT_NAME,
 )
 from converted_uis.starting_window import Ui_StartingWindow
 from modules.dependency_injection.decorators import as_singleton, as_dependency
@@ -44,13 +46,15 @@ class StartingWindow(QMainWindow):
             )
             os.makedirs(applicationAppDataFolder)
 
-        applicationFile = os.path.join(applicationAppDataFolder, APPLICATION_DATA_FILE)
-        if not os.path.exists(applicationFile):
-            logger.info(f'File "{applicationFile}" does not exist. Creating it...')
-            with open(applicationFile, "w") as f:
+        self.applicationFile = os.path.join(
+            applicationAppDataFolder, APPLICATION_DATA_FILE
+        )
+        if not os.path.exists(self.applicationFile):
+            logger.info(f'File "{self.applicationFile}" does not exist. Creating it...')
+            with open(self.applicationFile, "w") as f:
                 f.write(json.dumps(asdict(application), indent=4))
         else:
-            with open(applicationFile, "r") as f:
+            with open(self.applicationFile, "r") as f:
                 loadedApplication = from_dict(data_class=Application, data=json.load(f))
                 application.Update(loadedApplication)
 
@@ -63,8 +67,22 @@ class StartingWindow(QMainWindow):
 
         self._setupUI()
 
+        EventSystem.RegisterEvent(
+            OPEN_NON_EXISTED_PROJECT_DIR_EVENT_NAME,
+            self._openNonExistedProjectDir,
+        )
+
     def _setupUI(self) -> None:
         self.setFixedSize(self.size())
         self.setWindowTitle(f"Light Sculpture Studio - v{self.application.version}")
 
         self.ui.RecentProjectsLayout.addWidget(self.recentProjectsContainer)
+
+    def _openNonExistedProjectDir(self, projectName: str) -> None:
+        self.application.recentProjectFilePaths.pop(projectName)
+        self._saveApplication()
+        EventSystem.TriggerEvent(APPLICATION_UPDATED_EVENT_NAME)
+
+    def _saveApplication(self) -> None:
+        with open(self.applicationFile, "w") as f:
+            f.write(json.dumps(asdict(self.application), indent=4))
