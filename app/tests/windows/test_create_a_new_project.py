@@ -12,7 +12,12 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from dacite import from_dict
 
 from modules.dependency_injection import DependencyContainer
-from utils.application import GetProjectDataFolder, GetProjectDataFile, GetWindowTitle
+from utils.application import (
+    GetApplicationDataFile,
+    GetProjectDataFolder,
+    GetProjectDataFile,
+    GetWindowTitle,
+)
 
 from .helper import AppDataSetup, FolderDialogSetup
 from constants import TEST_NEW_PROJECT_PATH
@@ -142,3 +147,13 @@ def test_create_a_new_project(
         assert project.Compare(from_dict(data_class=Project, data=json.loads(f.read())))
 
     assert mainWindow.windowTitle() == GetWindowTitle(NEW_PROJECT_NAME)
+    assert len(mainWindow.recentProjectsActions) == 1
+    assert mainWindow.recentProjectsActions[0].text() == NEW_PROJECT_NAME
+
+    with open(GetApplicationDataFile(), "r") as f:
+        application = from_dict(data_class=Application, data=json.loads(f.read()))
+        assert len(application.recentProjectFilePaths) == 1
+        assert application.recentProjectFilePaths[
+            NEW_PROJECT_NAME
+        ] == GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)
+        assert application.recentProjectNames[0] == NEW_PROJECT_NAME

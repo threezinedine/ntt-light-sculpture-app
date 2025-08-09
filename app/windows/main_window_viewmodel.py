@@ -14,7 +14,11 @@ from utils.application import (
     GetProjectDataFolder,
     GetWindowTitle,
 )
-from constants import APP_DATA_KEY, CHANGE_PROJECT_EVENT_NAME
+from constants import (
+    APP_DATA_KEY,
+    CHANGE_PROJECT_EVENT_NAME,
+    RECENT_PROJECTS_EVENT_NAME,
+)
 
 
 @as_singleton()
@@ -73,6 +77,14 @@ class MainWindowViewModel:
             f.write(self.project.ToJson())
 
         EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+        self.application.recentProjectFilePaths[projectName] = GetProjectDataFolder(
+            projectDirectory, projectName
+        )
+        self.application.recentProjectNames.append(projectName)
+        with open(GetApplicationDataFile(), "w") as f:
+            f.write(self.application.ToJson())
+
+        EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
 
     def OpenProject(self, projectFile: str) -> bool:
         with open(projectFile, "r") as f:

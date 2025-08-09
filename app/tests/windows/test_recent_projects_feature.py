@@ -24,6 +24,7 @@ def test_recent_projects_feature(
     application.recentProjectFilePaths[TEST_NEW_PROJECT_NAME] = GetProjectDataFile(
         TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME
     )
+    application.recentProjectNames.append(TEST_NEW_PROJECT_NAME)
     appDataSetup.SetupApplicationData(application)
 
     mainWindow: MainWindow = DependencyContainer.GetInstance(MainWindow.__name__)

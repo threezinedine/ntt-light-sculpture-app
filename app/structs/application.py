@@ -14,9 +14,8 @@ class Application(StructBase):
     """
 
     version: Version = field(default_factory=Version)
-    recentProjectFilePaths: dict[str, str] = field(
-        default_factory=dict
-    )  # key: project name, value: project file path
+    recentProjectNames: list[str] = field(default_factory=list)
+    recentProjectFilePaths: dict[str, str] = field(default_factory=dict)
 
     def Update(self, other: "StructBase") -> None:
         if not isinstance(other, Application):
@@ -32,11 +31,18 @@ class Application(StructBase):
         if not self.version.Compare(other.version):
             return False
 
-        for key, value in self.recentProjectFilePaths.items():
-            if key not in other.recentProjectFilePaths:
+        for projectName in self.recentProjectNames:
+            if projectName not in other.recentProjectNames:
                 return False
 
-            if other.recentProjectFilePaths[key] != value:
+        return True
+
+    def _Valide(self, loaded: "StructBase") -> bool:
+        if not isinstance(loaded, Application):
+            return False
+
+        for projectName in loaded.recentProjectNames:
+            if projectName not in loaded.recentProjectFilePaths:
                 return False
 
         return True
