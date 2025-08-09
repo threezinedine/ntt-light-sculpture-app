@@ -1,9 +1,12 @@
 from datetime import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+from modules.dependency_injection.decorators import as_singleton
 
 from .struct_base import StructBase
 
 
+@as_singleton()
 @dataclass
 class Project(StructBase):
     """
@@ -14,9 +17,9 @@ class Project(StructBase):
     The project file will be saved in the directory of the project.
     """
 
-    projectName: str
-    createdAt: datetime
-    lastEditAt: datetime
+    projectName: str = field(default="")
+    createdAt: int = field(default=0)
+    lastEditAt: int = field(default=0)
 
     def Update(self, other: "StructBase") -> None:
         if not isinstance(other, Project):
@@ -25,3 +28,24 @@ class Project(StructBase):
         self.projectName = other.projectName
         self.createdAt = other.createdAt
         self.lastEditAt = other.lastEditAt
+
+    def Compare(self, other: "StructBase") -> bool:
+        if not isinstance(other, Project):
+            raise ValueError("other is not a Project")
+
+        if self.projectName != other.projectName:
+            return False
+
+        return True
+
+    def GetCreatedAt(self) -> datetime:
+        return datetime.fromtimestamp(self.createdAt)
+
+    def GetLastEditAt(self) -> datetime:
+        return datetime.fromtimestamp(self.lastEditAt)
+
+    def SetCreatedAt(self, createdAt: datetime) -> None:
+        self.createdAt = int(createdAt.timestamp())
+
+    def SetLastEditAt(self, lastEditAt: datetime) -> None:
+        self.lastEditAt = int(lastEditAt.timestamp())

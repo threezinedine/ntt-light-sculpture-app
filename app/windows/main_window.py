@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from datetime import datetime
 import os
 import json
 from PyQt6.QtGui import QKeyEvent
@@ -9,23 +10,30 @@ from converted_uis.main_window import Ui_MainWindow
 from components.openg_widget import OpenGlWidget
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from structs.application import Application
+from structs.project import Project
 from utils.logger import logger
-from utils.application import GetApplicationDataFolder, GetApplicationDataFile
+from utils.application import (
+    GetApplicationDataFolder,
+    GetApplicationDataFile,
+    GetProjectDataFile,
+)
 from components.new_project_dialog.dialog import NewProjectDialog
 
 
 @as_singleton()
-@as_dependency(Application)
+@as_dependency(Application, Project)
 class MainWindow(QMainWindow):
     def __init__(
         self,
         application: Application,
+        project: Project,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
         super().__init__(parent, flags)
 
         self.application = application
+        self.project = project
         self._Config()
 
         self.ui = Ui_MainWindow()
@@ -77,9 +85,14 @@ class MainWindow(QMainWindow):
             os.path.join(projectDirectory, projectName)
         )
 
-        print(finalProjectDirectory)
-
         os.makedirs(finalProjectDirectory)
+
+        projectDataFile = GetProjectDataFile(projectDirectory, projectName)
+        self.project.projectName = projectName
+        self.project.SetCreatedAt(datetime.now())
+        self.project.SetLastEditAt(datetime.now())
+        with open(projectDataFile, "w") as f:
+            f.write(json.dumps(asdict(self.project)))
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:

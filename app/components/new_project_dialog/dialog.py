@@ -3,6 +3,7 @@ from typing import Callable
 from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QPushButton, QWidget
 from PyQt6.QtCore import Qt
 from converted_uis.create_new_project_dialog import Ui_CreateNewProjectDialog
+from utils.application import GetProjectDataFolder
 
 
 class NewProjectDialog(QDialog):
@@ -51,6 +52,7 @@ class NewProjectDialog(QDialog):
         if (
             self.ui.projectPathInput.text() != ""
             and self.ui.projectNameInput.text() != ""
+            and not os.path.exists(self._GetFinalProjectDirectory())
         ):
             okButton.setEnabled(True)
         else:
@@ -67,8 +69,6 @@ class NewProjectDialog(QDialog):
         if self.ui.projectPathInput.text() == "":
             return ""
 
-        return os.path.normpath(
-            os.path.join(
-                self.ui.projectPathInput.text(), self.ui.projectNameInput.text()
-            )
+        return GetProjectDataFolder(
+            self.ui.projectPathInput.text(), self.ui.projectNameInput.text()
         )

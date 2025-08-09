@@ -1,7 +1,7 @@
+import json
 import os
 from PyQt6.QtWidgets import (
     QDialogButtonBox,
-    QFileDialog,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -9,10 +9,12 @@ from PyQt6.QtWidgets import (
 from pytest import MonkeyPatch
 from pytestqt.qtbot import QtBot
 from pyfakefs.fake_filesystem import FakeFilesystem
+from dacite import from_dict
 
 from modules.dependency_injection import DependencyContainer
+from utils.application import GetProjectDataFolder, GetProjectDataFile
 
-from .helper import AppDataSetup
+from .helper import AppDataSetup, FolderDialogSetup
 from constants import TEST_NEW_PROJECT_PATH
 
 
@@ -21,12 +23,16 @@ def test_create_a_new_project(
     appDataSetup: AppDataSetup,
     monkeypatch: MonkeyPatch,
     fs: FakeFilesystem,
+    folderDialogSetup: FolderDialogSetup,
 ):
     from windows.main_window import MainWindow
     from structs.application import Application
+    from structs.project import Project
     from components.new_project_dialog.dialog import NewProjectDialog
 
     NEW_PROJECT_NAME = "Test Project"
+    EXISTED_FOLDER = os.path.join(TEST_NEW_PROJECT_PATH, "Existed Folder")
+    fs.create_dir(os.path.join(EXISTED_FOLDER, NEW_PROJECT_NAME))  # type: ignore
 
     appDataSetup.SetupApplicationData(Application())
 
@@ -63,11 +69,7 @@ def test_create_a_new_project(
     assert cancelButton.isEnabled()
 
     # ================================= NOT SELECT THE FOLDER =================================
-    monkeypatch.setattr(
-        QFileDialog,
-        "getExistingDirectory",
-        lambda *args, **kwargs: None,  # type: ignore
-    )
+    folderDialogSetup.SetOutput(None)
 
     projectPathBrowseButton.click()
 
@@ -77,11 +79,7 @@ def test_create_a_new_project(
     assert cancelButton.isEnabled()
 
     # ================================= SELECT THE FOLDER =================================
-    monkeypatch.setattr(
-        QFileDialog,
-        "getExistingDirectory",
-        lambda *args, **kwargs: TEST_NEW_PROJECT_PATH,  # type: ignore
-    )
+    folderDialogSetup.SetOutput(TEST_NEW_PROJECT_PATH)
     projectPathBrowseButton.click()
 
     assert projectPathInput.text() == TEST_NEW_PROJECT_PATH
@@ -89,7 +87,7 @@ def test_create_a_new_project(
     assert cancelButton.isEnabled()
     assert (
         finalProjectLabel.text()
-        == f"Project Path: {os.path.normpath(os.path.join(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))}"
+        == f"Project Path: {GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)}"
     )
 
     # ================================= MODIFY THE PROJECT NAME =================================
@@ -98,11 +96,20 @@ def test_create_a_new_project(
     assert projectNameInput.text() == NEW_PROJECT_NAME + " 2"
     assert (
         finalProjectLabel.text()
-        == f"Project Path: {os.path.normpath(os.path.join(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME + ' 2'))}"
+        == f"Project Path: {GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME + ' 2')}"
     )
 
     # ================================= CANNOT CREATE PROJECT IF NAME IS EMPTY ================================
     projectNameInput.setText("")
+    assert not okButton.isEnabled()
+    assert cancelButton.isEnabled()
+
+    # ================================= CANNOT CREATE PROJECT IF FOLDER IS EXISTED ================================
+    projectNameInput.setText(NEW_PROJECT_NAME)
+
+    folderDialogSetup.SetOutput(EXISTED_FOLDER)
+    projectPathBrowseButton.click()
+
     assert not okButton.isEnabled()
     assert cancelButton.isEnabled()
 
@@ -122,10 +129,15 @@ def test_create_a_new_project(
     # ================================= CLICK THE CREATE BUTTON =================================
     projectNameInput.setText(NEW_PROJECT_NAME)
     projectPathBrowseButton.click()
+
+    folderDialogSetup.SetOutput(TEST_NEW_PROJECT_PATH)
+    projectPathBrowseButton.click()
+
     okButton.click()
 
-    projectFolder = os.path.normpath(
-        os.path.join(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)
-    )
+    project = Project(projectName=NEW_PROJECT_NAME)
 
-    assert fs.exists(projectFolder)  # type: ignore
+    assert fs.exists(GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))  # type: ignore
+    assert fs.exists(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))  # type: ignore
+    with open(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME), "r") as f:
+        assert project.Compare(from_dict(data_class=Project, data=json.loads(f.read())))

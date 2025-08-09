@@ -9,6 +9,10 @@ APPLICATION_DATA_FOLDER = "LightSculpture"
 APPLICATION_DATA_FILE = "application.json"
 # ==================================================================================
 
+# ================================ PROJECT DATA ================================
+PROJECT_DATA_FILE = "project.json"
+# ==================================================================================
+
 # ================================ TEST CONSTANTS ==================================
 TEST_USER_FOLDER = "C:/Users/jason"
 TEST_APP_DATA_FOLDER = os.path.join(TEST_USER_FOLDER, "appdata")
