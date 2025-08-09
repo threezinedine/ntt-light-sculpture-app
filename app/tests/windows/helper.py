@@ -1,6 +1,4 @@
 import os
-import json
-from dataclasses import asdict
 from typing import Generator, Any
 from PyQt6.QtWidgets import QFileDialog
 import pytest
@@ -13,7 +11,7 @@ from utils.application import GetApplicationDataFile, GetApplicationDataFolder
 class AppDataSetup:
     def SetupApplicationData(self, application: Any) -> None:
         with open(GetApplicationDataFile(), "w") as f:
-            f.write(json.dumps(asdict(application)))
+            f.write(application.ToJson())
 
 
 @pytest.fixture()
@@ -41,3 +39,22 @@ def folderDialogSetup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> Generator[FolderDialogSetup, None, None]:
     yield FolderDialogSetup(monkeypatch)
+
+
+class FileDialogSetup:
+    def __init__(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        self._monkeypatch = monkeypatch
+
+    def SetOutput(self, output: str | None) -> None:
+        self._monkeypatch.setattr(
+            QFileDialog,
+            "getOpenFileName",
+            lambda *args, **kwargs: output,  # type: ignore
+        )
+
+
+@pytest.fixture()
+def fileDialogSetup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[FileDialogSetup, None, None]:
+    yield FileDialogSetup(monkeypatch)

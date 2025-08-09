@@ -1,7 +1,5 @@
 import os
-import json
 from datetime import datetime
-from dataclasses import asdict
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from modules.event_system.event_system import EventSystem
@@ -31,8 +29,6 @@ class MainWindowViewModel:
         self.application = application
         self.project = project
         self.newProjectDialogViewModel = newProjectDialogViewModel
-
-        logger.debug(f"Setting accept callback: {self.CreateNewProject}")
         self.newProjectDialogViewModel.SetAcceptCallback(self.CreateNewProject)
 
     def Config(self) -> None:
@@ -52,7 +48,7 @@ class MainWindowViewModel:
         applicationJsonFile = GetApplicationDataFile()
         if not os.path.exists(applicationJsonFile):
             with open(applicationJsonFile, "w") as f:
-                f.write(json.dumps(asdict(self.application)))
+                f.write(self.application.ToJson())
                 logger.info(f"Application data file created: {applicationJsonFile}")
 
     def CreateNewProject(self, projectDirectory: str, projectName: str) -> None:
@@ -63,9 +59,18 @@ class MainWindowViewModel:
         self.project.SetCreatedAt(datetime.now())
         self.project.SetLastEditAt(datetime.now())
         with open(projectDataFile, "w") as f:
-            f.write(json.dumps(asdict(self.project)))
+            f.write(self.project.ToJson())
 
         EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+
+    def OpenProject(self, projectFile: str) -> bool:
+        with open(projectFile, "r") as f:
+            valid = self.project.FromJson(f.read())
+            if not valid:
+                return False
+
+        EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+        return True
 
     @property
     def WindowTitle(self) -> str:

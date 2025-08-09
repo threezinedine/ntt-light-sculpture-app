@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QMainWindow, QWidget
+from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtCore import Qt
 
 from components.new_project_dialog.dialog import NewProjectDialog
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.viewModel.WindowTitle)
         self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
+        self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
 
         EventSystem.RegisterEvent(
             CHANGE_PROJECT_EVENT_NAME, self._ChangeProjectCallback
@@ -48,6 +49,26 @@ class MainWindow(QMainWindow):
 
     def _ChangeProjectCallback(self) -> None:
         self.setWindowTitle(self.viewModel.WindowTitle)
+
+    def _OpenProjectCallback(self) -> None:
+        options = QFileDialog.Option.ReadOnly
+
+        projectFile = QFileDialog.getOpenFileName(
+            self,
+            "Open Project",
+            "",
+            "Project Files (*.json)",
+            options=options,
+        )
+
+        if projectFile:
+            validate = self.viewModel.OpenProject(projectFile)  # type: ignore
+            if not validate:
+                QMessageBox.information(
+                    self,
+                    "Open Project",
+                    "Failed to open project",
+                )
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:
