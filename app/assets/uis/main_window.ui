@@ -34,7 +34,7 @@
      <string>File</string>
     </property>
     <addaction name="newProjectAction"/>
-    <addaction name="actionOpen"/>
+    <addaction name="openProjectAction"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -68,9 +68,12 @@
     <string>Ctrl+Shift+N</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="openProjectAction">
    <property name="text">
-    <string>Open</string>
+    <string>Open Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
  </widget>
