@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 
+from .struct_base import StructBase
+
 
 @dataclass
-class Version:
+class Version(StructBase):
     """
     Contain the version of the current application.
     """
@@ -14,7 +16,10 @@ class Version:
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}"
 
-    def Update(self, other: "Version") -> None:
+    def Update(self, other: "StructBase") -> None:
+        if not isinstance(other, Version):
+            raise ValueError("other is not a Version")
+
         self.major = other.major
         self.minor = other.minor
         self.patch = other.patch
