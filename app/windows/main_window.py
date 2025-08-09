@@ -85,8 +85,13 @@ class MainWindow(QMainWindow):
         else:
             self.ui.noProjectsAction.setVisible(False)
 
-        for projectName, _ in recentProjects.items():
+        for projectName, projectFolder in recentProjects.items():
+
+            def OpenProject() -> None:
+                self.viewModel.OpenProject(projectFolder)
+
             action = QAction(projectName, self.ui.recentProjectsMenu)
+            action.triggered.connect(OpenProject)
             self.recentProjectsActions.append(action)
             self.ui.recentProjectsMenu.addAction(action)
 
