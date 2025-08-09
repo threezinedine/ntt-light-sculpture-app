@@ -55,7 +55,6 @@ class StartingWindow(QMainWindow):
                 application.Update(loadedApplication)
 
         EventSystem.TriggerEvent(APPLICATION_LOADED_EVENT_NAME)
-        print(id(application))
         self.application = application
         self.recentProjectsContainer = recentProjectsContainer
 

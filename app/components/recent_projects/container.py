@@ -22,7 +22,6 @@ class RecentProjectsContainer(QWidget):
         super().__init__(parent, flags)
 
         self.application = application
-        print(id(self.application))
 
         self.ui = Ui_RecentProjectsContainer()
         self.ui.setupUi(self)  # type: ignore

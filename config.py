@@ -17,7 +17,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "temp"))
 
 APP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "app"))
-UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "uis"))
+UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "assets", "uis"))
 CONVERTED_UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "converted_uis"))
 ENGINE_BINDING_DIR = os.path.normpath(os.path.join(APP_DIR, "Engine"))
 
@@ -290,7 +290,7 @@ def create_folder_if_not_exists(
             exit(1)
 
 
-def convert_ui_files() -> None:
+def convert_ui_files(force: bool = False) -> None:
     logger.info("Converting the ui files...")
 
     create_folder_if_not_exists(CONVERTED_UIS_DIR, APP_DIR)
@@ -313,7 +313,7 @@ def convert_ui_files() -> None:
         if file.endswith(".ui")
     ]
     for ui_file in ui_files:
-        if not check_a_file_is_modified(ui_file):
+        if not check_a_file_is_modified(ui_file) and not force:
             continue
 
         try:
@@ -716,6 +716,12 @@ def main():
         action="store_true",
         help="Generate the build system for the release mode",
     )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force the autogen to run even if no header is modified",
+    )
 
     subparsers = parser.add_subparsers(dest="action", help="The action to perform")
 
@@ -748,14 +754,7 @@ def main():
         default="all",
     )
 
-    autogen_parser = subparsers.add_parser("autogen", help="Autogen related actions")
-    autogen_parser.add_argument(
-        "-f",
-        "--force",
-        action="store_true",
-        help="Force the autogen to run even if no header is modified",
-    )
-
+    subparsers.add_parser("autogen", help="Autogen related actions")
     args = parser.parse_args()
 
     if args.action == "config":
@@ -765,17 +764,17 @@ def main():
         open_designer()
     elif args.action == "convert":
         if args.type == "ui":
-            convert_ui_files()
+            convert_ui_files(force=args.force)
         elif args.type == "cpp":
-            run_autogen()
+            run_autogen(force=args.force)
         elif args.type == "all":
-            convert_ui_files()
-            run_autogen()
+            convert_ui_files(force=args.force)
+            run_autogen(force=args.force)
     elif args.action == "package":
         install_dependencies(args.project, args.package)
     elif args.action == "run":
-        convert_ui_files()
-        run_autogen()
+        convert_ui_files(force=args.force)
+        run_autogen(force=args.force)
         generator_if_not_exists(release=args.release)
         build_engine(release=args.release)
         run_application()
@@ -797,11 +796,11 @@ def main():
             generate_build_system(release=args.release)
         elif args.engine_action == "build":
             generator_if_not_exists(release=args.release)
-            run_autogen()
+            run_autogen(force=args.force)
             build_engine(release=args.release)
         elif args.engine_action == "install":
             generator_if_not_exists(release=True)
-            run_autogen()
+            run_autogen(force=args.force)
             build_engine(release=True)
             install_engine(release=True)
     elif args.action == "autogen":
