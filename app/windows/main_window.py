@@ -11,6 +11,7 @@ from modules.dependency_injection.decorators import as_dependency, as_singleton
 from structs.application import Application
 from utils.logger import logger
 from utils.application import GetApplicationDataFolder, GetApplicationDataFile
+from components.new_project_dialog.dialog import NewProjectDialog
 
 
 @as_singleton()
@@ -28,6 +29,7 @@ class MainWindow(QMainWindow):
         self._Config()
 
         self.ui = Ui_MainWindow()
+        self.newProjectDialog = NewProjectDialog(self)
         self._SetupUI()
 
     def _Config(self) -> None:
@@ -62,6 +64,11 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.centerLayout.addWidget(OpenGlWidget())
+
+        self.ui.newProjectAction.triggered.connect(self._CreateNewProject)
+
+    def _CreateNewProject(self) -> None:
+        self.newProjectDialog.show()
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:
