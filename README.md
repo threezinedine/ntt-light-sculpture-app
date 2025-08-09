@@ -36,6 +36,7 @@ After that, you can run `config.py` to setup and build the project.
 python config.py config # to configure the project
 python config.py run # to run the application
 python config.py test all # to run all the tests (or autogen, engine, app for each subproject)
+python config.py install # to install the application -> bin/LightSculpture.exe
 ```
 
 ## Examples
