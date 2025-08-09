@@ -26,4 +26,5 @@ TEST_NEW_PROJECT_PATH = "C:/Users/jason/Projects"
 APPLICATION_LOADED_EVENT_NAME = "application_loaded"
 OPEN_NON_EXISTED_PROJECT_DIR_EVENT_NAME = "open_non_existed_project_dir"
 APPLICATION_UPDATED_EVENT_NAME = "application_updated"
+CHANGE_PROJECT_EVENT_NAME = "change_project"
 # ==================================================================================

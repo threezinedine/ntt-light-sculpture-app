@@ -3,10 +3,12 @@ from PyQt6.QtWidgets import QMainWindow, QWidget
 from PyQt6.QtCore import Qt
 
 from components.new_project_dialog.dialog import NewProjectDialog
+from constants import CHANGE_PROJECT_EVENT_NAME
 from converted_uis.main_window import Ui_MainWindow
 from components.openg_widget import OpenGlWidget
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from .main_window_viewmodel import MainWindowViewModel
+from modules.event_system.event_system import EventSystem
 
 
 @as_singleton()
@@ -38,6 +40,13 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)  # type: ignore
         self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
+
+        EventSystem.RegisterEvent(
+            CHANGE_PROJECT_EVENT_NAME, self._ChangeProjectCallback
+        )
+
+    def _ChangeProjectCallback(self) -> None:
+        self.setWindowTitle(self.viewModel.WindowTitle)
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:

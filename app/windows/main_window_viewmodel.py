@@ -4,6 +4,7 @@ from datetime import datetime
 from dataclasses import asdict
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
 from modules.dependency_injection.decorators import as_dependency, as_singleton
+from modules.event_system.event_system import EventSystem
 from structs.application import Application
 from structs.project import Project
 
@@ -14,7 +15,7 @@ from utils.application import (
     GetProjectDataFile,
     GetProjectDataFolder,
 )
-from constants import APP_DATA_KEY
+from constants import APP_DATA_KEY, CHANGE_PROJECT_EVENT_NAME
 
 
 @as_singleton()
@@ -62,3 +63,9 @@ class MainWindowViewModel:
         self.project.SetLastEditAt(datetime.now())
         with open(projectDataFile, "w") as f:
             f.write(json.dumps(asdict(self.project)))
+
+        EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+
+    @property
+    def WindowTitle(self) -> str:
+        return f"Light Sculpture Studio - {self.project.projectName}"

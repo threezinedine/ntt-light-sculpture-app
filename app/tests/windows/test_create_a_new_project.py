@@ -139,3 +139,5 @@ def test_create_a_new_project(
     assert fs.exists(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))  # type: ignore
     with open(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME), "r") as f:
         assert project.Compare(from_dict(data_class=Project, data=json.loads(f.read())))
+
+    assert mainWindow.windowTitle() == f"Light Sculpture Studio - {NEW_PROJECT_NAME}"
