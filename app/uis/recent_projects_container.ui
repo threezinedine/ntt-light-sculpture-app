@@ -40,6 +40,9 @@
     </widget>
    </item>
    <item>
+    <layout class="QVBoxLayout" name="RecentsProjectLayout"/>
+   </item>
+   <item>
     <spacer name="spacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

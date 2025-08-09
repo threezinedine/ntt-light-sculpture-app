@@ -52,4 +52,4 @@ class RecentProjectsContainer(QWidget):
         ) in self.application.recentProjectFilePaths.items():
             logger.debug(f"Adding recent project: {projectName} - {projectFilePath}")
             recentProjectsItem = RecentProjectsItem(projectName, projectFilePath)
-            self.ui.verticalLayout.addWidget(recentProjectsItem)
+            self.ui.RecentsProjectLayout.addWidget(recentProjectsItem)
