@@ -1,11 +1,17 @@
 import os
+from datetime import datetime
 from typing import Generator, Any
 from PyQt6.QtWidgets import QFileDialog
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
 
 from constants import APP_DATA_KEY, TEST_APP_DATA_FOLDER
-from utils.application import GetApplicationDataFile, GetApplicationDataFolder
+from utils.application import (
+    GetApplicationDataFile,
+    GetApplicationDataFolder,
+    GetProjectDataFile,
+    GetProjectDataFolder,
+)
 
 
 class AppDataSetup:
@@ -20,6 +26,29 @@ def appDataSetup(fs: FakeFilesystem) -> Generator[AppDataSetup, None, None]:
     fs.create_dir(GetApplicationDataFolder())  # type: ignore
 
     yield AppDataSetup()
+
+
+class ProjectSetup:
+    def __init__(self, fs: FakeFilesystem) -> None:
+        self._fs = fs
+
+    def SetupProjectData(self, projectDirectory: str, projectName: str) -> None:
+        from structs.project import Project
+
+        project = Project()
+        project.projectName = projectName
+        project.SetCreatedAt(datetime.now())
+        project.SetLastEditAt(datetime.now())
+
+        self._fs.create_dir(GetProjectDataFolder(projectDirectory, projectName))  # type: ignore
+
+        with open(GetProjectDataFile(projectDirectory, projectName), "w") as f:
+            f.write(project.ToJson())
+
+
+@pytest.fixture()
+def projectSetup(fs: FakeFilesystem) -> Generator[ProjectSetup, None, None]:
+    yield ProjectSetup(fs)
 
 
 class FolderDialogSetup:

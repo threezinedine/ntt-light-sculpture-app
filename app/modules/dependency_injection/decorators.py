@@ -32,8 +32,6 @@ def as_singleton(annotation: Optional[type[V]] = None) -> Callable[[type[T]], ty
                 )
             name = annotation.__name__
 
-        logger.debug(f'Registering singleton: "{name}"')
-
         def singleton_factory(*args: Any, **kwargs: Any) -> Any:
             arguments: List[Any] = []
 
@@ -124,9 +122,6 @@ def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:
             DependencyContainer._dependencies[cls.__name__] = []  # type: ignore
 
         for class_ in classes:
-            logger.debug(
-                f'Registering dependency: "{class_.__name__}" for "{cls.__name__}"'
-            )
             DependencyContainer._dependencies[cls.__name__].append(class_.__name__)  # type: ignore
 
         return cls

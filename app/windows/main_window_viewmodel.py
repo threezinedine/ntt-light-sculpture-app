@@ -50,6 +50,17 @@ class MainWindowViewModel:
             with open(applicationJsonFile, "w") as f:
                 f.write(self.application.ToJson())
                 logger.info(f"Application data file created: {applicationJsonFile}")
+        else:
+            with open(applicationJsonFile, "r") as f:
+                validate = self.application.FromJson(f.read())
+
+                if not validate:
+                    logger.warning(
+                        f"Application data file is invalid: {applicationJsonFile}"
+                    )
+                    self.application = Application()
+                    with open(applicationJsonFile, "w") as f:
+                        f.write(self.application.ToJson())
 
     def CreateNewProject(self, projectDirectory: str, projectName: str) -> None:
         os.makedirs(GetProjectDataFolder(projectDirectory, projectName))
@@ -75,3 +86,7 @@ class MainWindowViewModel:
     @property
     def WindowTitle(self) -> str:
         return GetWindowTitle(self.project.projectName)
+
+    @property
+    def RecentProjects(self) -> dict[str, str]:
+        return self.application.recentProjectFilePaths

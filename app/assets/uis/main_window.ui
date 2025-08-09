@@ -33,8 +33,16 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="recentProjectsMenu">
+     <property name="title">
+      <string>Recent Projects</string>
+     </property>
+     <addaction name="noProjectsAction"/>
+    </widget>
     <addaction name="newProjectAction"/>
     <addaction name="openProjectAction"/>
+    <addaction name="separator"/>
+    <addaction name="recentProjectsMenu"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -74,6 +82,23 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="noProjectsAction">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>No Projects</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

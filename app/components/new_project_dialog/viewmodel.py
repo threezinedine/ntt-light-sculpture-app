@@ -4,8 +4,6 @@ from modules.dependency_injection.decorators import as_singleton
 from structs.project import Project
 from utils.application import GetProjectDataFolder
 
-from utils.logger import logger
-
 
 @as_singleton()
 class NewProjectDialogViewModel:
@@ -17,16 +15,12 @@ class NewProjectDialogViewModel:
         self._projectName: str = ""
 
     def SetAcceptCallback(self, callback: Callable[[str, str], None] | None) -> None:
-        logger.debug(f"Setting accept callback: {callback}")
         self._acceptCallback = callback
 
     def Accept(self) -> None:
-        logger.debug(f"Accepting project: {self._projectPath}, {self._projectName}")
-
         if self._acceptCallback is None:
             return
 
-        logger.debug(f"Accepting project: {self._projectPath}, {self._projectName}")
         self._acceptCallback(self._projectPath, self._projectName)
 
     def Cancel(self) -> None:

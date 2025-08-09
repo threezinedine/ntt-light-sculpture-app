@@ -23,7 +23,12 @@ def qapp_cls() -> type[LighSculptureApplication]:
 
 
 from modules.dependency_injection import DependencyContainer
-from tests.windows.helper import appDataSetup, folderDialogSetup, fileDialogSetup  # type: ignore
+from tests.windows.helper import (
+    appDataSetup,  # type: ignore
+    folderDialogSetup,  # type: ignore
+    fileDialogSetup,  # type: ignore
+    projectSetup,  # type: ignore
+)
 
 
 @pytest.fixture(autouse=True)

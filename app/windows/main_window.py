@@ -3,12 +3,13 @@ from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtCore import Qt
 
 from components.new_project_dialog.dialog import NewProjectDialog
-from constants import CHANGE_PROJECT_EVENT_NAME
+from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
 from converted_uis.main_window import Ui_MainWindow
 from components.openg_widget import OpenGlWidget
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
+from utils.logger import logger
 
 
 @as_singleton()
@@ -42,9 +43,14 @@ class MainWindow(QMainWindow):
         self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
         self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
+        self._RecentProjectsCallback()
 
         EventSystem.RegisterEvent(
             CHANGE_PROJECT_EVENT_NAME, self._ChangeProjectCallback
+        )
+
+        EventSystem.RegisterEvent(
+            RECENT_PROJECTS_EVENT_NAME, self._RecentProjectsCallback
         )
 
     def _ChangeProjectCallback(self) -> None:
@@ -69,6 +75,16 @@ class MainWindow(QMainWindow):
                     "Open Project",
                     "Failed to open project",
                 )
+
+    def _RecentProjectsCallback(self) -> None:
+        recentProjects = self.viewModel.RecentProjects
+        logger.debug(f"Recent projects: {recentProjects}")
+
+        if len(recentProjects) == 0:
+            self.ui.noProjectsAction.setVisible(True)
+            return
+        else:
+            self.ui.noProjectsAction.setVisible(False)
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:
