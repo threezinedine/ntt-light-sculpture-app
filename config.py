@@ -17,9 +17,14 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "temp"))
 
 APP_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "app"))
-UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "assets", "uis"))
+APP_ASSETS_DIR = os.path.normpath(os.path.join(APP_DIR, "assets"))
+UIS_DIR = os.path.normpath(os.path.join(APP_ASSETS_DIR, "uis"))
 CONVERTED_UIS_DIR = os.path.normpath(os.path.join(APP_DIR, "converted_uis"))
 ENGINE_BINDING_DIR = os.path.normpath(os.path.join(APP_DIR, "Engine"))
+APP_BINARY_DIR = os.path.normpath(
+    os.path.join(APP_DIR, "bin")
+)  # the output directory for the application
+APP_WORK_PATH_TEMP_DIR = os.path.normpath(os.path.join(APP_DIR, "temp"))
 
 ENGINE_DIR = os.path.normpath(os.path.join(PROJECT_DIR, "engine"))
 ENGINE_BUILD_DIR = os.path.normpath(os.path.join(ENGINE_DIR, "build"))
@@ -696,6 +701,59 @@ def install_dependencies(project: str, package: str) -> None:
         exit(1)
 
 
+def get_all_hidden_import_files() -> List[str]:
+    all_hidden_import_files: List[str] = []
+    for file in os.listdir(ENGINE_BINDING_DIR):
+        if file.endswith(".pyd"):
+            all_hidden_import_files.append(os.path.join(ENGINE_BINDING_DIR, file))
+    return all_hidden_import_files
+
+
+def install_application() -> None:
+    create_folder_if_not_exists(APP_BINARY_DIR, APP_DIR)
+    generate_build_system(release=True)
+    build_engine(release=True)
+    run_autogen(force=True)
+    convert_ui_files(force=True)
+
+    pyinstaller_exe_path = os.path.normpath(
+        os.path.join(get_script_dir(APP_DIR), "pyinstaller.exe")
+    )
+    dist_file = os.path.normpath(os.path.join(APP_DIR, "dist", "application.exe"))
+    target_file = os.path.normpath(
+        os.path.join(APP_BINARY_DIR, "LightSculptureStudio.exe")
+    )
+    all_hidden_import_files = get_all_hidden_import_files()
+    if len(all_hidden_import_files) != 1:
+        logger.error(
+            f"The number of hidden import files is not 1, it is {len(all_hidden_import_files)}"
+        )
+        exit(1)
+
+    try:
+        logger.info("Installing the application...")
+        subprocess.run(
+            [
+                pyinstaller_exe_path,
+                "--onefile",
+                "--noconsole",
+                "--add-binary",
+                f"{all_hidden_import_files[0]};.",
+                "--hidden-import",
+                os.path.splitext(all_hidden_import_files[0][-1])[0],
+                os.path.join(APP_DIR, "application.py"),
+            ],
+            cwd=APP_DIR,
+            check=True,
+            shell=True,
+        )
+        shutil.copy(dist_file, target_file)
+        logger.info(f"The application has been installed successfully.")
+    except Exception as e:
+        logger.error(f"Error while installing the application: {e}")
+        exit(1)
+
+
 def main():
     # ================== CONFIG RELATED SETTINGS =====================
     has_run_config = False
@@ -728,6 +786,7 @@ def main():
     subparsers.add_parser("config", help="Run the configuration")
     subparsers.add_parser("designer", help="Open the designer")
     subparsers.add_parser("run", help="Run the application")
+    subparsers.add_parser("install", help="Create .exe file for the application")
 
     deploy_parser = subparsers.add_parser("package", help="Install the dependencies")
     deploy_parser.add_argument(
@@ -772,6 +831,8 @@ def main():
             run_autogen(force=args.force)
     elif args.action == "package":
         install_dependencies(args.project, args.package)
+    elif args.action == "install":
+        install_application()
     elif args.action == "run":
         convert_ui_files(force=args.force)
         run_autogen(force=args.force)

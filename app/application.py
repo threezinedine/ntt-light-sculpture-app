@@ -5,11 +5,6 @@ from PyQt6.QtWidgets import QApplication
 from modules.dependency_injection import DependencyContainer
 from utils.logger import engineLogger, logger
 
-print(os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine"))
-sys.path.append(
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "Engine")
-)
-
 from Engine import Logging, LogLevel, EngineLogRecord, Engine
 
 # ignore the deprecation warning
@@ -62,4 +57,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)
+        input()
