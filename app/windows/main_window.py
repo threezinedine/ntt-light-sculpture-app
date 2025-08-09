@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtGui import QAction, QKeyEvent
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtCore import Qt
 
@@ -9,7 +9,6 @@ from components.openg_widget import OpenGlWidget
 from modules.dependency_injection.decorators import as_dependency, as_singleton
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
-from utils.logger import logger
 
 
 @as_singleton()
@@ -31,6 +30,7 @@ class MainWindow(QMainWindow):
         self.viewModel.Config()
 
         self.ui = Ui_MainWindow()
+        self.recentProjectsActions: list[QAction] = []
         self.newProjectDialog = newProjectDialog
         self._SetupUI()
 
@@ -78,13 +78,17 @@ class MainWindow(QMainWindow):
 
     def _RecentProjectsCallback(self) -> None:
         recentProjects = self.viewModel.RecentProjects
-        logger.debug(f"Recent projects: {recentProjects}")
 
         if len(recentProjects) == 0:
             self.ui.noProjectsAction.setVisible(True)
             return
         else:
             self.ui.noProjectsAction.setVisible(False)
+
+        for projectName, _ in recentProjects.items():
+            action = QAction(projectName, self.ui.recentProjectsMenu)
+            self.recentProjectsActions.append(action)
+            self.ui.recentProjectsMenu.addAction(action)
 
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         if a0.key() == Qt.Key.Key_Escape:

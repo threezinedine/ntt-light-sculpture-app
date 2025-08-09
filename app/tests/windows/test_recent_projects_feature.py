@@ -31,6 +31,8 @@ def test_recent_projects_feature(
     mainWindow.showMaximized()
 
     noProjectAction: QAction = mainWindow.ui.noProjectsAction
+    recentProjectsActions: list[QAction] = mainWindow.recentProjectsActions
 
     # ================================= Test No Project =================================
     assert not noProjectAction.isVisible()
+    assert len(recentProjectsActions) == 1
