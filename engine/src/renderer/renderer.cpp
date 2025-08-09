@@ -88,15 +88,15 @@ namespace NTT_NS
     void Renderer::Render()
     {
         // Before render
-        glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render
-        glUseProgram(m_shaderProgram);
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
-        glUseProgram(0);
+        // glUseProgram(m_shaderProgram);
+        // glBindVertexArray(m_VAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glBindVertexArray(0);
+        // glUseProgram(0);
 
         // After render
     }

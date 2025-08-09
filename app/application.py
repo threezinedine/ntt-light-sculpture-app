@@ -48,10 +48,10 @@ class LighSculptureApplication(QApplication):
 def main() -> None:
     app = LighSculptureApplication(sys.argv)
 
-    from windows.starting_window import StartingWindow
+    from windows.main_window import MainWindow
 
-    window = DependencyContainer.GetInstance(StartingWindow.__name__)
-    window.show()
+    window = DependencyContainer.GetInstance(MainWindow.__name__)
+    window.showMaximized()
 
     sys.exit(app.exec())
 

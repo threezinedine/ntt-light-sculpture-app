@@ -24,3 +24,19 @@ class Application(StructBase):
 
         self.version.Update(other.version)
         self.recentProjectFilePaths = other.recentProjectFilePaths
+
+    def Compare(self, other: "StructBase") -> bool:
+        if not isinstance(other, Application):
+            raise ValueError("other is not a Application")
+
+        if not self.version.Compare(other.version):
+            return False
+
+        for key, value in self.recentProjectFilePaths.items():
+            if key not in other.recentProjectFilePaths:
+                return False
+
+            if other.recentProjectFilePaths[key] != value:
+                return False
+
+        return True

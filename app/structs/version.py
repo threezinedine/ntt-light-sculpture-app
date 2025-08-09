@@ -23,3 +23,13 @@ class Version(StructBase):
         self.major = other.major
         self.minor = other.minor
         self.patch = other.patch
+
+    def Compare(self, other: "StructBase") -> bool:
+        if not isinstance(other, Version):
+            raise ValueError("other is not a Version")
+
+        return (
+            self.major == other.major
+            and self.minor == other.minor
+            and self.patch == other.patch
+        )
