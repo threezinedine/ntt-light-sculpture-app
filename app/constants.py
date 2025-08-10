@@ -22,6 +22,7 @@ TEST_NON_EXISTED_PROJECT_FOLDER = os.path.join(
 TEST_NEW_PROJECT_PATH = "C:/Users/jason/Projects"
 TEST_NEW_PROJECT_NAME = "Test Project"
 TEST_NEW_PROJECT_NAME_2 = "Testing"
+TEST_NEW_PROJECT_NAME_3 = "Testing 2"
 TEST_PROJECT_FILE_ERROR_FOLDER = "C:/Users/jason/Errors"
 TEST_PROJECT_FILE_ERROR_PROJECT_NAME = "Error Project"
 # ==================================================================================

@@ -79,7 +79,7 @@ class MainWindowViewModel:
         self.application.recentProjectFilePaths[projectName] = GetProjectDataFolder(
             projectDirectory, projectName
         )
-        self.application.recentProjectNames.append(projectName)
+        self.application.recentProjectNames.insert(0, projectName)
         with open(GetApplicationDataFile(), "w") as f:
             f.write(self.application.ToJson())
 

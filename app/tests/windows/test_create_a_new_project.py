@@ -1,5 +1,4 @@
 import json
-import os
 from PyQt6.QtWidgets import (
     QDialogButtonBox,
     QLabel,
@@ -17,7 +16,12 @@ from utils.application import (
 )
 
 from .helper import FolderDialogSetup, FixtureBuilder
-from constants import TEST_NEW_PROJECT_PATH
+from constants import (
+    TEST_NEW_PROJECT_NAME,
+    TEST_NEW_PROJECT_NAME_2,
+    TEST_NEW_PROJECT_NAME_3,
+    TEST_NEW_PROJECT_PATH,
+)
 from windows.main_window import MainWindow
 from structs.application import Application
 from structs.project import Project
@@ -148,3 +152,32 @@ def test_create_a_new_project(
             NEW_PROJECT_NAME
         ] == GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)
         assert application.recentProjectNames[0] == NEW_PROJECT_NAME
+
+
+def test_create_a_new_project_and_it_the_most_recent_project(
+    fixtureBuilder: FixtureBuilder,
+    folderDialogSetup: FolderDialogSetup,
+):
+    mainWindow = (
+        fixtureBuilder.UseAppDataApplication()
+        .AddAppDataFolder()
+        .AddAppDataFile()
+        .AddProject(TEST_NEW_PROJECT_NAME)
+        .AddProject(TEST_NEW_PROJECT_NAME_2)
+        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+        .Build()
+    )
+
+    mainWindow.ui.newProjectAction.trigger()
+
+    mainWindow.newProjectDialog.ui.projectNameInput.setText(TEST_NEW_PROJECT_NAME_3)
+    folderDialogSetup.SetOutput(TEST_NEW_PROJECT_PATH)
+    mainWindow.newProjectDialog.ui.projectPathBrowseButton.click()
+    mainWindow.newProjectDialog.ui.buttonBox.button(
+        QDialogButtonBox.StandardButton.Ok
+    ).click()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_3)
+    assert len(mainWindow.recentProjectsActions) == 3
+    assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_3
