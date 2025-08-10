@@ -22,7 +22,6 @@ def as_singleton(cls: type[T], annotation: type[V] | None = None) -> None:
     For now other class which is used `as_transition` or `as_singleton` can retrieve the
         global instance of the `SingletonClass` via the constructor
     """
-    logger.debug(f"Registering singleton: {cls.__name__}")
 
     def create_singleton(cls: type[T]) -> None:
         name = cls.__name__
@@ -72,7 +71,6 @@ def as_transition(cls: type[T], annotation: type[V] | None = None) -> None:
     For now other class which is used `as_transition` or `as_singleton` can retrieve the
         new instance of the `TransitionClass` via the constructor
     """
-    logger.debug(f"Registering transition: {cls.__name__}")
 
     def create_transition(cls: type[T]) -> None:
         name = cls.__name__
@@ -119,10 +117,8 @@ def as_dependency(*classes: ...) -> Callable[[Type[T]], Type[T]]:
     as_transition(TransitionClass)
     ```
     """
-    logger.debug(f"Registering dependency: {classes}")
 
     def dependency_decorator(cls: Type[T]) -> Type[T]:
-        logger.debug(f"Registering dependency: {classes} for {cls.__name__}")
         if cls.__name__ not in DependencyContainer._dependencies:  # type: ignore
             DependencyContainer._dependencies[cls.__name__] = []  # type: ignore
 

@@ -91,7 +91,17 @@ class MainWindowViewModel:
             if not valid:
                 return False
 
+        if self.project.projectName in self.application.recentProjectNames:
+            self.application.recentProjectNames.remove(self.project.projectName)
+
+        self.application.recentProjectNames.insert(0, self.project.projectName)
+        self.application.recentProjectFilePaths[self.project.projectName] = projectFile
+
+        with open(GetApplicationDataFile(), "w") as f:
+            f.write(self.application.ToJson())
+
         EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+        EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
         return True
 
     @property
@@ -99,5 +109,8 @@ class MainWindowViewModel:
         return GetWindowTitle(self.project.projectName)
 
     @property
-    def RecentProjects(self) -> dict[str, str]:
-        return self.application.recentProjectFilePaths
+    def RecentProjects(self) -> list[tuple[str, str]]:
+        return [
+            (name, self.application.recentProjectFilePaths[name])
+            for name in self.application.recentProjectNames
+        ]

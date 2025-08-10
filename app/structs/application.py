@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from copy import deepcopy
 
 from .struct_base import StructBase
 from .version import Version
@@ -20,7 +21,8 @@ class Application(StructBase):
             raise ValueError("other is not a Application")
 
         self.version.Update(other.version)
-        self.recentProjectFilePaths = other.recentProjectFilePaths
+        self.recentProjectFilePaths = deepcopy(other.recentProjectFilePaths)
+        self.recentProjectNames = deepcopy(other.recentProjectNames)
 
     def Compare(self, other: "StructBase") -> bool:
         if not isinstance(other, Application):

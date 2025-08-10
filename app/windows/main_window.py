@@ -1,6 +1,7 @@
 from PyQt6.QtGui import QAction, QKeyEvent
 from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtCore import Qt
+from functools import partial
 
 from components.new_project_dialog.dialog import NewProjectDialog
 from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
@@ -78,19 +79,26 @@ class MainWindow(QMainWindow):
     def _RecentProjectsCallback(self) -> None:
         recentProjects = self.viewModel.RecentProjects
 
+        for action in self.recentProjectsActions:
+            action.setParent(None)  # type: ignore
+            action.deleteLater()  # type: ignore
+
+        self.recentProjectsActions.clear()
+
         if len(recentProjects) == 0:
             self.ui.noProjectsAction.setVisible(True)
             return
         else:
             self.ui.noProjectsAction.setVisible(False)
 
-        for projectName, projectFolder in recentProjects.items():
+        print("Recent projects", recentProjects)
+        assert len(self.recentProjectsActions) == 0
 
-            def OpenProject() -> None:
-                self.viewModel.OpenProject(projectFolder)
-
+        for projectName, projectFolder in recentProjects:
             action = QAction(projectName, self.ui.recentProjectsMenu)
-            action.triggered.connect(OpenProject)
+            action.triggered.connect(
+                partial(self.viewModel.OpenProject, projectFolder)  # type: ignore
+            )
             self.recentProjectsActions.append(action)
             self.ui.recentProjectsMenu.addAction(action)
 

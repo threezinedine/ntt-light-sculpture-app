@@ -10,12 +10,23 @@ from structs.project import Project
 
 from constants import (
     TEST_NEW_PROJECT_NAME,
+    TEST_NEW_PROJECT_NAME_2,
     TEST_NEW_PROJECT_PATH,
     TEST_PROJECT_FILE_ERROR_FOLDER,
     TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
 )
-from tests.windows.helper import AppDataSetup, FileDialogSetup, MainWindowBuilder
-from utils.application import GetProjectDataFile, GetProjectDataFolder, GetWindowTitle
+from tests.windows.helper import (
+    AppDataSetup,
+    FileDialogSetup,
+    MainWindowBuilder,
+    ProjectSetup,
+)
+from utils.application import (
+    GetApplicationDataFile,
+    GetProjectDataFile,
+    GetProjectDataFolder,
+    GetWindowTitle,
+)
 
 
 def test_open_project(
@@ -80,3 +91,73 @@ def test_open_project(
     mainWindow.ui.openProjectAction.trigger()
 
     assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)
+
+
+def test_open_project_with_current_recent_project(
+    fs: FakeFilesystem,
+    appDataSetup: AppDataSetup,
+    projectSetup: ProjectSetup,
+    mainWindowBuilder: MainWindowBuilder,
+    fileDialogSetup: FileDialogSetup,
+):
+    appDataSetup.SetupApplicationData(Application())
+
+    projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME)
+    projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME_2)
+
+    mainWindow = mainWindowBuilder.Build()
+
+    fileDialogSetup.SetOutput(
+        GetProjectDataFile(
+            TEST_NEW_PROJECT_PATH,
+            TEST_NEW_PROJECT_NAME,
+        )
+    )
+    mainWindow.ui.openProjectAction.trigger()
+
+    # ================================= Load test project =================================
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)
+    with open(GetApplicationDataFile(), "r") as f:
+        application = Application()
+        application.FromJson(f.read())
+
+        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME]
+        assert application.recentProjectFilePaths == {
+            TEST_NEW_PROJECT_NAME: GetProjectDataFile(
+                TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME
+            )
+        }
+
+    # ================================= Load test project using recent projects =================================
+    assert len(mainWindow.recentProjectsActions) == 1
+    mainWindow.recentProjectsActions[0].trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)
+
+    # ================================= Load test project using recent projects =================================
+    assert len(mainWindow.recentProjectsActions) == 1
+    mainWindow.recentProjectsActions[0].trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)
+    assert len(mainWindow.recentProjectsActions) == 1
+
+    # ================================= Open another project =================================
+    fileDialogSetup.SetOutput(
+        GetProjectDataFile(
+            TEST_NEW_PROJECT_PATH,
+            TEST_NEW_PROJECT_NAME_2,
+        )
+    )
+    mainWindow.ui.openProjectAction.trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+    assert len(mainWindow.recentProjectsActions) == 2
+    assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
+
+    # ================================= Choose project 2 again =================================
+    print("Choose project 2 again")
+    mainWindow.recentProjectsActions[0].trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+    assert len(mainWindow.recentProjectsActions) == 2
+    assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2

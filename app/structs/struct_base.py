@@ -69,4 +69,4 @@ class StructBase(ABC):
         Returns:
             The json string of the dataclass instance.
         """
-        return json.dumps(asdict(self))  # type: ignore
+        return json.dumps(asdict(self), indent=4)  # type: ignore
