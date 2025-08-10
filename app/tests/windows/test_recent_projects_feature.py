@@ -66,6 +66,16 @@ def test_only_has_maximum_5_recent_projects(
 
     assert len(mainWindow.recentProjectsActions) == MAX_NUMBER_OF_RECENT_PROJECTS
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME
+    with open(GetApplicationDataFile(), "r") as f:
+        application = Application()
+        application.FromJson(f.read())
+        assert application.recentProjectNames == [
+            TEST_NEW_PROJECT_NAME,
+            TEST_NEW_PROJECT_NAME_2,
+            TEST_NEW_PROJECT_NAME_3,
+            TEST_NEW_PROJECT_NAME_4,
+            TEST_NEW_PROJECT_NAME_5,
+        ]
 
     # ===================== Open project on the list ================================
     mainWindow.recentProjectsActions[3].trigger()  # PROJECT 4
