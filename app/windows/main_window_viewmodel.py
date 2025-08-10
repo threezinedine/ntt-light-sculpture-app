@@ -17,6 +17,7 @@ from utils.application import (
 from constants import (
     APP_DATA_KEY,
     CHANGE_PROJECT_EVENT_NAME,
+    MAX_NUMBER_OF_RECENT_PROJECTS,
     RECENT_PROJECTS_EVENT_NAME,
 )
 
@@ -95,6 +96,11 @@ class MainWindowViewModel:
             self.application.recentProjectNames.remove(self.project.projectName)
 
         self.application.recentProjectNames.insert(0, self.project.projectName)
+
+        if len(self.application.recentProjectNames) > MAX_NUMBER_OF_RECENT_PROJECTS:
+            removedProjectNames = self.application.recentProjectNames.pop()
+            del self.application.recentProjectFilePaths[removedProjectNames]
+
         self.application.recentProjectFilePaths[self.project.projectName] = projectFile
 
         with open(GetApplicationDataFile(), "w") as f:

@@ -1,5 +1,9 @@
 import os
 
+# ================================ CONSTANTS =======================================
+MAX_NUMBER_OF_RECENT_PROJECTS = 5
+# ==================================================================================
+
 # ================================ ENVIRONMENT VARIABLES ===========================
 APP_DATA_KEY = "APPDATA"
 # ==================================================================================
@@ -23,6 +27,13 @@ TEST_NEW_PROJECT_PATH = "C:/Users/jason/Projects"
 TEST_NEW_PROJECT_NAME = "Test Project"
 TEST_NEW_PROJECT_NAME_2 = "Testing"
 TEST_NEW_PROJECT_NAME_3 = "Testing 2"
+TEST_NEW_PROJECT_NAME_4 = "Testing 3"
+TEST_NEW_PROJECT_NAME_5 = "Testing 4"
+TEST_NEW_PROJECT_NAME_6 = "Testing 5"
+TEST_NEW_PROJECT_NAME_7 = "Testing 6"
+TEST_NEW_PROJECT_NAME_8 = "Testing 7"
+TEST_NEW_PROJECT_NAME_9 = "Testing 8"
+TEST_NEW_PROJECT_NAME_10 = "Testing 9"
 TEST_PROJECT_FILE_ERROR_FOLDER = "C:/Users/jason/Errors"
 TEST_PROJECT_FILE_ERROR_PROJECT_NAME = "Error Project"
 # ==================================================================================

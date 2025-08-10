@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from copy import deepcopy
 
+from constants import MAX_NUMBER_OF_RECENT_PROJECTS
+
 from .struct_base import StructBase
 from .version import Version
 
@@ -37,9 +39,21 @@ class Application(StructBase):
 
         return True
 
-    def _Valide(self, loaded: "StructBase") -> bool:
+    def _Validate(self, loaded: "StructBase") -> bool:
         if not isinstance(loaded, Application):
             return False
+
+        if len(loaded.recentProjectNames) > MAX_NUMBER_OF_RECENT_PROJECTS:
+            removedProjectNames = loaded.recentProjectNames[
+                MAX_NUMBER_OF_RECENT_PROJECTS:
+            ]
+
+            for projectName in removedProjectNames:
+                del loaded.recentProjectFilePaths[projectName]
+
+            loaded.recentProjectNames = loaded.recentProjectNames[
+                :MAX_NUMBER_OF_RECENT_PROJECTS
+            ]
 
         for projectName in loaded.recentProjectNames:
             if projectName not in loaded.recentProjectFilePaths:
