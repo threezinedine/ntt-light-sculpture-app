@@ -1,10 +1,8 @@
-from pyfakefs.fake_filesystem import FakeFilesystem
 from datetime import datetime
+from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest  # type: ignore
 from pytest_mock import MockerFixture
-from pytestqt.qtbot import QtBot
 
-from windows.main_window import MainWindow
 from structs.application import Application
 from structs.project import Project
 
@@ -16,10 +14,8 @@ from constants import (
     TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
 )
 from tests.windows.helper import (
-    AppDataSetup,
     FileDialogSetup,
-    MainWindowBuilder,
-    ProjectSetup,
+    FixtureBuilder,
 )
 from utils.application import (
     GetApplicationDataFile,
@@ -30,16 +26,17 @@ from utils.application import (
 
 
 def test_open_project(
-    fs: FakeFilesystem,
-    qtbot: QtBot,
-    appDataSetup: AppDataSetup,
+    fixtureBuilder: FixtureBuilder,
     fileDialogSetup: FileDialogSetup,
     mocker: MockerFixture,
-    mainWindowBuilder: MainWindowBuilder,
+    fs: FakeFilesystem,
 ):
-    appDataSetup.SetupApplicationData(Application())
-
-    mainWindow: MainWindow = mainWindowBuilder.Build()
+    mainWindow = (
+        fixtureBuilder.UseAppDataApplication()
+        .AddAppDataFolder()
+        .AddAppDataFile()
+        .Build()
+    )
 
     # ================================= SYSTEM HEALTH CHECK =================================
     assert mainWindow.windowTitle() == GetWindowTitle()
@@ -94,18 +91,17 @@ def test_open_project(
 
 
 def test_open_project_with_current_recent_project(
-    fs: FakeFilesystem,
-    appDataSetup: AppDataSetup,
-    projectSetup: ProjectSetup,
-    mainWindowBuilder: MainWindowBuilder,
+    fixtureBuilder: FixtureBuilder,
     fileDialogSetup: FileDialogSetup,
 ):
-    appDataSetup.SetupApplicationData(Application())
-
-    projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME)
-    projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME_2)
-
-    mainWindow = mainWindowBuilder.Build()
+    mainWindow = (
+        fixtureBuilder.UseAppDataApplication()
+        .AddAppDataFolder()
+        .AddAppDataFile()
+        .AddProject(TEST_NEW_PROJECT_NAME)
+        .AddProject(TEST_NEW_PROJECT_NAME_2)
+        .Build()
+    )
 
     fileDialogSetup.SetOutput(
         GetProjectDataFile(

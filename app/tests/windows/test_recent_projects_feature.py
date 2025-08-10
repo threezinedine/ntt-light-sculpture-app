@@ -1,32 +1,22 @@
 from PyQt6.QtGui import QAction
 import pytest  # type: ignore
-from pytestqt.qtbot import QtBot
-from pyfakefs.fake_filesystem import FakeFilesystem
 
-from constants import TEST_NEW_PROJECT_NAME, TEST_NEW_PROJECT_PATH
-from tests.windows.helper import AppDataSetup, MainWindowBuilder, ProjectSetup
-from utils.application import GetProjectDataFile, GetWindowTitle
-from windows.main_window import MainWindow
-from structs.application import Application
+from constants import TEST_NEW_PROJECT_NAME
+from tests.windows.helper import FixtureBuilder
+from utils.application import GetWindowTitle
 
 
 def test_recent_projects_feature(
-    qtbot: QtBot,
-    fs: FakeFilesystem,
-    appDataSetup: AppDataSetup,
-    projectSetup: ProjectSetup,
-    mainWindowBuilder: MainWindowBuilder,
+    fixtureBuilder: FixtureBuilder,
 ):
-    projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME)
-
-    application = Application()
-    application.recentProjectFilePaths[TEST_NEW_PROJECT_NAME] = GetProjectDataFile(
-        TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME
+    mainWindow = (
+        fixtureBuilder.UseAppDataApplication()
+        .AddAppDataFolder()
+        .AddAppDataFile()
+        .AddProject(TEST_NEW_PROJECT_NAME)
+        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        .Build()
     )
-    application.recentProjectNames.append(TEST_NEW_PROJECT_NAME)
-    appDataSetup.SetupApplicationData(application)
-
-    mainWindow: MainWindow = mainWindowBuilder.Build()
 
     noProjectAction: QAction = mainWindow.ui.noProjectsAction
     recentProjectsActions: list[QAction] = mainWindow.recentProjectsActions

@@ -6,10 +6,8 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
 )
-from pytest import MonkeyPatch
-from pytestqt.qtbot import QtBot
-from pyfakefs.fake_filesystem import FakeFilesystem
 from dacite import from_dict
+from pyfakefs.fake_filesystem import FakeFilesystem
 
 from utils.application import (
     GetApplicationDataFile,
@@ -18,7 +16,7 @@ from utils.application import (
     GetWindowTitle,
 )
 
-from .helper import AppDataSetup, FolderDialogSetup, MainWindowBuilder
+from .helper import FolderDialogSetup, FixtureBuilder
 from constants import TEST_NEW_PROJECT_PATH
 from windows.main_window import MainWindow
 from structs.application import Application
@@ -27,20 +25,16 @@ from components.new_project_dialog.dialog import NewProjectDialog
 
 
 def test_create_a_new_project(
-    qtbot: QtBot,
-    appDataSetup: AppDataSetup,
-    monkeypatch: MonkeyPatch,
-    fs: FakeFilesystem,
+    fixtureBuilder: FixtureBuilder,
     folderDialogSetup: FolderDialogSetup,
-    mainWindowBuilder: MainWindowBuilder,
+    fs: FakeFilesystem,
 ):
     NEW_PROJECT_NAME = "Test Project"
-    EXISTED_FOLDER = os.path.join(TEST_NEW_PROJECT_PATH, "Existed Folder")
-    fs.create_dir(os.path.join(EXISTED_FOLDER, NEW_PROJECT_NAME))  # type: ignore
+    EXSITED_PROJECT_NAME = "Existed Project"
 
-    appDataSetup.SetupApplicationData(Application())
-
-    mainWindow: MainWindow = mainWindowBuilder.Build()
+    mainWindow: MainWindow = (
+        fixtureBuilder.UseAppDataApplication().AddProject(EXSITED_PROJECT_NAME).Build()
+    )
 
     mainWindow.ui.newProjectAction.trigger()
 
@@ -106,9 +100,9 @@ def test_create_a_new_project(
     assert cancelButton.isEnabled()
 
     # ================================= CANNOT CREATE PROJECT IF FOLDER IS EXISTED ================================
-    projectNameInput.setText(NEW_PROJECT_NAME)
+    projectNameInput.setText(EXSITED_PROJECT_NAME)
 
-    folderDialogSetup.SetOutput(EXISTED_FOLDER)
+    folderDialogSetup.SetOutput(TEST_NEW_PROJECT_PATH)
     projectPathBrowseButton.click()
 
     assert not okButton.isEnabled()
