@@ -14,8 +14,10 @@ from constants import (
     TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
 )
 from tests.windows.helper import (
+    ApplicationBuilder,
     FileDialogSetup,
     FixtureBuilder,
+    ProjectBuilder,
 )
 from utils.application import (
     GetApplicationDataFile,
@@ -31,12 +33,9 @@ def test_open_project(
     mocker: MockerFixture,
     fs: FakeFilesystem,
 ):
-    mainWindow = (
-        fixtureBuilder.UseAppDataApplication()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .Build()
-    )
+    mainWindow = fixtureBuilder.AddApplication(
+        ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
+    ).Build()
 
     # ================================= SYSTEM HEALTH CHECK =================================
     assert mainWindow.windowTitle() == GetWindowTitle()
@@ -95,11 +94,11 @@ def test_open_project_with_current_recent_project(
     fileDialogSetup: FileDialogSetup,
 ):
     mainWindow = (
-        fixtureBuilder.UseAppDataApplication()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddProject(TEST_NEW_PROJECT_NAME)
-        .AddProject(TEST_NEW_PROJECT_NAME_2)
+        fixtureBuilder.AddApplication(
+            ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
+        )
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .Build()
     )
 

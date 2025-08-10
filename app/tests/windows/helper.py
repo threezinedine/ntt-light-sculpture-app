@@ -87,59 +87,118 @@ def mainWindowBuilder(
 class ProjectBuilder:
     def __init__(
         self,
-        fs: FakeFilesystem,
-        qtBot: QtBot,
     ) -> None:
-        self._fs = fs
-        self._qtBot = qtBot
+        self._project = Project()
 
-        self.projectDirectory = ""
-        self.projectName = ""
-
-    def SetProjectDirectory(self, projectDirectory: str) -> Self:
-        self._projectDirectory = projectDirectory
+    def Name(self, projectName: str) -> Self:
+        self._project.projectName = projectName
         return self
 
-    def SetProjectName(self, projectName: str) -> Self:
-        self._projectName = projectName
-        return self
+    def Build(self, fs: FakeFilesystem) -> None:
+        projectFolder = GetProjectDataFolder(
+            TEST_NEW_PROJECT_PATH,
+            self._project.projectName,
+        )
+        assert not fs.exists(projectFolder), f"Project folder {projectFolder} already exists"  # type: ignore
+        fs.create_dir(projectFolder)  # type: ignore
 
-    def Build(self) -> Project:
-        project = Project()
-        project.projectName = self._projectName
-        project.SetCreatedAt(datetime.now())
-        project.SetLastEditAt(datetime.now())
-        return project
+        self._project.SetCreatedAt(datetime.now())
+        self._project.SetLastEditAt(datetime.now())
+
+        projectFile = GetProjectDataFile(
+            TEST_NEW_PROJECT_PATH,
+            self._project.projectName,
+        )
+        assert not fs.exists(projectFile), f"Project file {projectFile} already exists"  # type: ignore
+        with open(projectFile, "w") as f:
+            f.write(self._project.ToJson())
 
 
 class ApplicationBuilder:
     def __init__(
         self,
-        fs: FakeFilesystem,
-        qtBot: QtBot,
     ) -> None:
-        self._fs = fs
-        self._qtBot = qtBot
-
-        self.appDataFolder = ""
-
-    def RemoveAppDataFolderVariable(self) -> Self:
-        os.environ.pop(APP_DATA_KEY)
-        return self
-
-    def CreateAppDataFolder(self) -> Self:
-        assert os.environ.get(APP_DATA_KEY) is not None
         os.environ[APP_DATA_KEY] = TEST_APP_DATA_FOLDER
-        self._fs.create_dir(GetApplicationDataFolder())  # type: ignore
+
+        self._appDataFileShouldBeError = False
+        self._createAppDataFolder = False
+        self._saveErrorAppDataFile = False
+        self._application: Application | None = None
+
+    def NotUseAppDataEnvironmentVariable(self) -> Self:
+        if APP_DATA_KEY in os.environ:
+            os.environ.pop(APP_DATA_KEY)
         return self
 
-    def CreateAppDataFile(self) -> Self:
-        assert self._fs.exists(GetApplicationDataFolder())  # type: ignore
+    def AddAppDataFolder(self) -> Self:
+        assert (
+            self._application is None
+        ), "This method must be called before adding an application"
+        self._createAppDataFolder = True
+        return self
+
+    def AddErrorAppDataFile(self) -> Self:
+        assert self._application is not None, "Cannot be used with add app data file"
+        assert self._createAppDataFolder, "AppData folder must be created first"
+        self._appDataFileShouldBeError = True
+        return self
+
+    def AddAppDataFile(self) -> Self:
+        assert self._application is None, "Application already exists"
+        assert self._createAppDataFolder, "AppData folder must be created first"
+        assert (
+            not self._appDataFileShouldBeError
+        ), "Cannot be used with add error app data file"
+        self._application = Application()
+        return self
+
+    def Version(self, major: int, minor: int, patch: int) -> Self:
+        assert self._application is not None, "Application must be created first"
+        self._application.version.major = major
+        self._application.version.minor = minor
+        self._application.version.patch = patch
+        return self
+
+    def AddRecentProject(self, projectName: str) -> Self:
+        assert self._application is not None, "Application must be created first"
+        projectFile = GetProjectDataFile(
+            TEST_NEW_PROJECT_PATH,
+            projectName,
+        )
+        self._application.recentProjectNames.append(projectName)
+        self._application.recentProjectFilePaths[projectName] = projectFile
+        return self
+
+    def Build(self, fs: FakeFilesystem) -> None:
+        if os.environ.get(APP_DATA_KEY) is None:
+            return
+
+        assert not fs.exists(GetApplicationDataFolder()), "AppData folder already exists"  # type: ignore
+
+        if not self._createAppDataFolder:
+            return
+
+        fs.create_dir(GetApplicationDataFolder())  # type: ignore
+
+        if self._appDataFileShouldBeError:
+            with open(GetApplicationDataFile(), "w") as f:
+                f.write('"Error": ')
+            return
+
+        if self._application is None:
+            return
+
+        assert not fs.exists(GetApplicationDataFile()), "AppData file already exists"  # type: ignore
+
+        for projectName in self._application.recentProjectNames:
+            projectFile = GetProjectDataFile(
+                TEST_NEW_PROJECT_PATH,
+                projectName,
+            )
+            assert fs.exists(projectFile), f"Project file {projectFile} does not exist"  # type: ignore
 
         with open(GetApplicationDataFile(), "w") as f:
-            f.write(Application().ToJson())
-
-        return self
+            f.write(self._application.ToJson())
 
 
 class FixtureBuilder:
@@ -151,102 +210,29 @@ class FixtureBuilder:
         self._fs = fs
         self._qtBot = qtBot
 
-        self._fs.reset()
-        if os.environ.get(APP_DATA_KEY) is not None:
-            os.environ.pop(APP_DATA_KEY)
+        self._projectBuilders: list[ProjectBuilder] = []
+        self._applicationBuilder: ApplicationBuilder | None = None
 
-        self._appDataShouldBeError = False
-        self._application: Application | None = None
-        self._recentProjects: list[str] = []
-        self._projects: dict[str, Project] = {}
-
-    def UseAppDataApplication(self) -> Self:
-        os.environ[APP_DATA_KEY] = TEST_APP_DATA_FOLDER
+    def AddApplication(self, builder: ApplicationBuilder) -> Self:
+        assert self._applicationBuilder is None, "Application already exists"
+        self._applicationBuilder = builder
         return self
 
-    def AddAppDataFolder(self) -> Self:
-        assert (
-            os.environ.get(APP_DATA_KEY) is not None
-        ), "AppData folder must be created first"
-        assert not self._fs.exists(GetApplicationDataFolder()), "AppData folder already exists"  # type: ignore
-        self._appdataDirectory = GetApplicationDataFolder()
-        self._fs.create_dir(self._appdataDirectory)  # type: ignore
-        return self
-
-    def AddAppDataFile(self) -> Self:
-        assert self._fs.exists(GetApplicationDataFolder()), "AppData folder must be created first"  # type: ignore
-        self._application = Application()
-        return self
-
-    def AddErrorAppDataFile(self) -> Self:
-        self._appDataShouldBeError = True
-        return self
-
-    def AddRecentProject(self, projectName: str) -> Self:
-        assert projectName in self._projects, f"Project {projectName} does not exist"
-
-        self._recentProjects.append(projectName)
-
-        return self
-
-    def AddProject(self, projectName: str) -> Self:
-        assert (
-            projectName not in self._projects
-        ), f"Project {projectName} already exists"
-
-        project = Project()
-        project.projectName = projectName
-        project.SetCreatedAt(datetime.now())
-        project.SetLastEditAt(datetime.now())
-        self._projects[projectName] = project
-
+    def AddProject(self, builder: ProjectBuilder) -> Self:
+        self._projectBuilders.append(builder)
         return self
 
     def Build(self) -> MainWindow:
         # ================ PROJECTS CONFIGURE ===========================
-        for project in self._projects.values():
-            projectFolder = GetProjectDataFolder(
-                TEST_NEW_PROJECT_PATH,
-                project.projectName,
-            )
-            projectFile = GetProjectDataFile(
-                TEST_NEW_PROJECT_PATH,
-                project.projectName,
-            )
-            assert not self._fs.exists(projectFolder), f"Project folder {projectFolder} already exists"  # type: ignore
-            assert not self._fs.exists(projectFile), f"Project file {projectFile} already exists"  # type: ignore
-
-            self._fs.create_dir(projectFolder)  # type: ignore
-
-            with open(projectFile, "w") as f:
-                f.write(project.ToJson())
+        for project in self._projectBuilders:
+            project.Build(self._fs)
         # ===============================================================
 
         # ================ APP DATA FOLDER CONFIGURE ====================
-        if self._appDataShouldBeError:
-            with open(GetApplicationDataFile(), "w") as f:
-                f.write('"Error": ')
+        if self._applicationBuilder is not None:
+            self._applicationBuilder.Build(self._fs)
         else:
-            if self._application is not None:
-                for projectName in self._recentProjects:
-                    project = self._projects[projectName]
-                    projectFolder = GetProjectDataFolder(
-                        TEST_NEW_PROJECT_PATH,
-                        project.projectName,
-                    )
-                    projectFile = GetProjectDataFile(
-                        TEST_NEW_PROJECT_PATH,
-                        project.projectName,
-                    )
-                    assert self._fs.exists(projectFolder), f"Project folder {projectFolder} does not exist"  # type: ignore
-                    assert self._fs.exists(projectFile), f"Project file {projectFile} does not exist"  # type: ignore
-                    self._application.recentProjectFilePaths[project.projectName] = (
-                        projectFile
-                    )
-                    self._application.recentProjectNames.append(project.projectName)
-
-                with open(GetApplicationDataFile(), "w") as f:
-                    f.write(self._application.ToJson())
+            ApplicationBuilder().Build(self._fs)
         # ===============================================================
 
         # ================ MAIN WINDOW CONFIGURE =========================

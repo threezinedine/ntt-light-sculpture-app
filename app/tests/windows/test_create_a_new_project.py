@@ -15,7 +15,12 @@ from utils.application import (
     GetWindowTitle,
 )
 
-from .helper import FolderDialogSetup, FixtureBuilder
+from .helper import (
+    ApplicationBuilder,
+    FolderDialogSetup,
+    FixtureBuilder,
+    ProjectBuilder,
+)
 from constants import (
     TEST_NEW_PROJECT_NAME,
     TEST_NEW_PROJECT_NAME_2,
@@ -37,7 +42,11 @@ def test_create_a_new_project(
     EXSITED_PROJECT_NAME = "Existed Project"
 
     mainWindow: MainWindow = (
-        fixtureBuilder.UseAppDataApplication().AddProject(EXSITED_PROJECT_NAME).Build()
+        fixtureBuilder.AddApplication(
+            ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
+        )
+        .AddProject(ProjectBuilder().Name(EXSITED_PROJECT_NAME))
+        .Build()
     )
 
     mainWindow.ui.newProjectAction.trigger()
@@ -159,13 +168,15 @@ def test_create_a_new_project_and_it_the_most_recent_project(
     folderDialogSetup: FolderDialogSetup,
 ):
     mainWindow = (
-        fixtureBuilder.UseAppDataApplication()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddProject(TEST_NEW_PROJECT_NAME)
-        .AddProject(TEST_NEW_PROJECT_NAME_2)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+        fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
+        .AddApplication(
+            ApplicationBuilder()
+            .AddAppDataFolder()
+            .AddAppDataFile()
+            .AddRecentProject(TEST_NEW_PROJECT_NAME)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+        )
         .Build()
     )
 

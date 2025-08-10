@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from dacite import from_dict
 
 from utils.application import GetApplicationDataFile
-from .helper import FixtureBuilder
+from .helper import ApplicationBuilder, FixtureBuilder
 from structs.application import Application
 
 
@@ -15,7 +15,9 @@ def test_create_application_data_folder_and_data_file(
     mocker: MockerFixture,
 ):
     warningMocker = mocker.patch("utils.logger.logger.warning")
-    fixtureBuilder.UseAppDataApplication().AddAppDataFolder().AddErrorAppDataFile().Build()
+    fixtureBuilder.AddApplication(
+        ApplicationBuilder().AddAppDataFolder().AddAppDataFile().AddErrorAppDataFile()
+    ).Build()
 
     assert warningMocker.call_count == 1
     with open(GetApplicationDataFile(), "r") as f:
@@ -30,7 +32,9 @@ def test_open_application_without_app_data(
     fatalMock = mocker.patch("utils.logger.logger.fatal")
 
     with pytest.raises(EnvironmentError):
-        fixtureBuilder.Build()
+        fixtureBuilder.AddApplication(
+            ApplicationBuilder().NotUseAppDataEnvironmentVariable()
+        ).Build()
 
     fatalMock.assert_called_once()
 
@@ -42,7 +46,9 @@ def test_create_application_without_app_data_file(
 ):
     infoMocker = mocker.patch("utils.logger.logger.info")
 
-    mainWindow = fixtureBuilder.UseAppDataApplication().AddAppDataFolder().Build()
+    mainWindow = fixtureBuilder.AddApplication(
+        ApplicationBuilder().AddAppDataFolder()
+    ).Build()
 
     applicationJsonFile = GetApplicationDataFile()
     assert fs.exists(applicationJsonFile)  # type: ignore
@@ -65,7 +71,7 @@ def test_open_application_without_app_data_folder(
     fixtureBuilder: FixtureBuilder,
 ):
     infoMocker = mocker.patch("utils.logger.logger.info")
-    fixtureBuilder.UseAppDataApplication().Build()
+    fixtureBuilder.AddApplication(ApplicationBuilder()).Build()
 
     assert infoMocker.call_count == 2
 

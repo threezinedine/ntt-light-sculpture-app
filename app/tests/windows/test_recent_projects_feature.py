@@ -12,7 +12,12 @@ from constants import (
     TEST_NEW_PROJECT_PATH,
 )
 from structs.application import Application
-from tests.windows.helper import FileDialogSetup, FixtureBuilder
+from tests.windows.helper import (
+    ApplicationBuilder,
+    FileDialogSetup,
+    FixtureBuilder,
+    ProjectBuilder,
+)
 from utils.application import GetApplicationDataFile, GetProjectDataFile, GetWindowTitle
 
 
@@ -20,11 +25,13 @@ def test_recent_projects_feature(
     fixtureBuilder: FixtureBuilder,
 ):
     mainWindow = (
-        fixtureBuilder.UseAppDataApplication()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddProject(TEST_NEW_PROJECT_NAME)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        .AddApplication(
+            ApplicationBuilder()
+            .AddAppDataFolder()
+            .AddAppDataFile()
+            .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        )
         .Build()
     )
 
@@ -46,21 +53,23 @@ def test_only_has_maximum_5_recent_projects(
     fileDialogSetup: FileDialogSetup,
 ):
     mainWindow = (
-        fixtureBuilder.UseAppDataApplication()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddProject(TEST_NEW_PROJECT_NAME)
-        .AddProject(TEST_NEW_PROJECT_NAME_2)
-        .AddProject(TEST_NEW_PROJECT_NAME_3)
-        .AddProject(TEST_NEW_PROJECT_NAME_4)
-        .AddProject(TEST_NEW_PROJECT_NAME_5)
-        .AddProject(TEST_NEW_PROJECT_NAME_6)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_3)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_4)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_5)
-        .AddRecentProject(TEST_NEW_PROJECT_NAME_6)
+        fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_3))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_4))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_5))
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_6))
+        .AddApplication(
+            ApplicationBuilder()
+            .AddAppDataFolder()
+            .AddAppDataFile()
+            .AddRecentProject(TEST_NEW_PROJECT_NAME)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_3)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_4)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_5)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_6)
+        )
         .Build()
     )
 
