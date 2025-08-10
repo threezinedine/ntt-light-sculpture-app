@@ -24,7 +24,6 @@ class DependencyContainer:
         DependencyContainer._singletons.clear()
         DependencyContainer._singletonFactories.clear()
         DependencyContainer._transitions.clear()
-        DependencyContainer._dependencies.clear()
 
     @staticmethod
     def RegisterSingleton(name: str, instance: Any) -> None:

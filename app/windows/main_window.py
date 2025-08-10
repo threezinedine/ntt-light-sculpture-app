@@ -6,12 +6,11 @@ from components.new_project_dialog.dialog import NewProjectDialog
 from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
 from converted_uis.main_window import Ui_MainWindow
 from components.openg_widget import OpenGlWidget
-from modules.dependency_injection.decorators import as_dependency, as_singleton
+from modules.dependency_injection.helper import as_dependency
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
 
 
-@as_singleton()
 @as_dependency(
     MainWindowViewModel,
     NewProjectDialog,

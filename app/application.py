@@ -3,14 +3,14 @@ import sys
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QApplication
 from modules.dependency_injection import DependencyContainer
+from windows.main_window import MainWindow
 from utils.logger import engineLogger, logger
 
 from Engine import Logging, LogLevel, EngineLogRecord, Engine
 
-# ignore the deprecation warning
-import warnings
+from utils.config import WarningFilter, DependencyInjectionConfig
 
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+WarningFilter()
 
 
 class LighSculptureApplication(QApplication):
@@ -48,7 +48,7 @@ class LighSculptureApplication(QApplication):
 def main() -> None:
     app = LighSculptureApplication(sys.argv)
 
-    from windows.main_window import MainWindow
+    DependencyInjectionConfig()
 
     window = DependencyContainer.GetInstance(MainWindow.__name__)
     window.showMaximized()

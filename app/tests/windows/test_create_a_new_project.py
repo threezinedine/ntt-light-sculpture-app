@@ -11,7 +11,6 @@ from pytestqt.qtbot import QtBot
 from pyfakefs.fake_filesystem import FakeFilesystem
 from dacite import from_dict
 
-from modules.dependency_injection import DependencyContainer
 from utils.application import (
     GetApplicationDataFile,
     GetProjectDataFolder,
@@ -19,8 +18,12 @@ from utils.application import (
     GetWindowTitle,
 )
 
-from .helper import AppDataSetup, FolderDialogSetup
+from .helper import AppDataSetup, FolderDialogSetup, MainWindowBuilder
 from constants import TEST_NEW_PROJECT_PATH
+from windows.main_window import MainWindow
+from structs.application import Application
+from structs.project import Project
+from components.new_project_dialog.dialog import NewProjectDialog
 
 
 def test_create_a_new_project(
@@ -29,21 +32,15 @@ def test_create_a_new_project(
     monkeypatch: MonkeyPatch,
     fs: FakeFilesystem,
     folderDialogSetup: FolderDialogSetup,
+    mainWindowBuilder: MainWindowBuilder,
 ):
-    from windows.main_window import MainWindow
-    from structs.application import Application
-    from structs.project import Project
-    from components.new_project_dialog.dialog import NewProjectDialog
-
     NEW_PROJECT_NAME = "Test Project"
     EXISTED_FOLDER = os.path.join(TEST_NEW_PROJECT_PATH, "Existed Folder")
     fs.create_dir(os.path.join(EXISTED_FOLDER, NEW_PROJECT_NAME))  # type: ignore
 
     appDataSetup.SetupApplicationData(Application())
 
-    mainWindow: MainWindow = DependencyContainer.GetInstance(MainWindow.__name__)
-    qtbot.addWidget(mainWindow)
-    mainWindow.showMaximized()
+    mainWindow: MainWindow = mainWindowBuilder.Build()
 
     mainWindow.ui.newProjectAction.trigger()
 

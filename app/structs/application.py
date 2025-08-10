@@ -2,10 +2,8 @@ from dataclasses import dataclass, field
 
 from .struct_base import StructBase
 from .version import Version
-from modules.dependency_injection.decorators import as_singleton
 
 
-@as_singleton()
 @dataclass
 class Application(StructBase):
     """

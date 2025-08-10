@@ -4,9 +4,10 @@ from pytestqt.qtbot import QtBot
 from pyfakefs.fake_filesystem import FakeFilesystem
 
 from constants import TEST_NEW_PROJECT_NAME, TEST_NEW_PROJECT_PATH
-from modules.dependency_injection import DependencyContainer
-from tests.windows.helper import AppDataSetup, ProjectSetup
+from tests.windows.helper import AppDataSetup, MainWindowBuilder, ProjectSetup
 from utils.application import GetProjectDataFile, GetWindowTitle
+from windows.main_window import MainWindow
+from structs.application import Application
 
 
 def test_recent_projects_feature(
@@ -14,10 +15,8 @@ def test_recent_projects_feature(
     fs: FakeFilesystem,
     appDataSetup: AppDataSetup,
     projectSetup: ProjectSetup,
+    mainWindowBuilder: MainWindowBuilder,
 ):
-    from windows.main_window import MainWindow
-    from structs.application import Application
-
     projectSetup.SetupProjectData(TEST_NEW_PROJECT_PATH, TEST_NEW_PROJECT_NAME)
 
     application = Application()
@@ -27,9 +26,7 @@ def test_recent_projects_feature(
     application.recentProjectNames.append(TEST_NEW_PROJECT_NAME)
     appDataSetup.SetupApplicationData(application)
 
-    mainWindow: MainWindow = DependencyContainer.GetInstance(MainWindow.__name__)
-    qtbot.addWidget(mainWindow)
-    mainWindow.showMaximized()
+    mainWindow: MainWindow = mainWindowBuilder.Build()
 
     noProjectAction: QAction = mainWindow.ui.noProjectsAction
     recentProjectsActions: list[QAction] = mainWindow.recentProjectsActions

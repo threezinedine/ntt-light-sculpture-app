@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import pytest
 from pytest_mock import MockerFixture
 from modules.dependency_injection import DependencyContainer
-from modules.dependency_injection.decorators import (
+from modules.dependency_injection.helper import (
     as_singleton,
     as_transition,
     as_dependency,
@@ -131,7 +131,6 @@ def test_register_transition_with_empty_name(mocker: MockerFixture) -> None:
 
 
 def test_get_singleton_instance_with_arguments():
-    @as_singleton()
     class SingletonClass:
         count: int = 0
 
@@ -142,6 +141,7 @@ def test_get_singleton_instance_with_arguments():
         def __init__(self, value: int) -> None:
             self.value = value
 
+    as_singleton(SingletonClass)
     assert DependencyContainer.GetInstance(SingletonClass.__name__, 3).value == 3
     assert SingletonClass.count == 1
     assert DependencyContainer.GetInstance(SingletonClass.__name__).value == 3
@@ -177,13 +177,14 @@ def test_query_non_existent_instance(mocker: MockerFixture) -> None:
 
 
 def test_register_object_using_decorator() -> None:
-    @as_singleton()
     class SingletonClass:
         count: int = 0
 
         def __new__(cls) -> "SingletonClass":
             cls.count += 1
             return super().__new__(cls)
+
+    as_singleton(SingletonClass)
 
     DependencyContainer.GetInstance(SingletonClass.__name__)
     DependencyContainer.GetInstance(SingletonClass.__name__)
@@ -192,13 +193,14 @@ def test_register_object_using_decorator() -> None:
 
 
 def test_register_object_using_decorator_with_parameters() -> None:
-    @as_transition()
     class TransitionClass:
         count: int = 0
 
         def __new__(cls) -> "TransitionClass":
             cls.count += 1
             return super().__new__(cls)
+
+    as_transition(TransitionClass)
 
     DependencyContainer.GetInstance(TransitionClass.__name__)
     DependencyContainer.GetInstance(TransitionClass.__name__)
@@ -207,7 +209,6 @@ def test_register_object_using_decorator_with_parameters() -> None:
 
 
 def test_register_object_as_singleton_and_its_dependency() -> None:
-    @as_singleton()
     class SingletonClass:
         count: int = 0
 
@@ -218,9 +219,9 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
         def __init__(self) -> None:
             self.singletonValue = 0
 
+    as_singleton(SingletonClass)
     DependencyContainer.GetInstance(SingletonClass.__name__).singletonValue = 1994
 
-    @as_singleton()
     @as_dependency(SingletonClass)
     class DependencyClass:
         count: int = 0
@@ -236,6 +237,7 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
         def print(self) -> None:
             print(self.value)
 
+    as_singleton(DependencyClass)
     assert DependencyContainer.GetInstance(DependencyClass.__name__).count == 1
     assert DependencyContainer.GetInstance(SingletonClass.__name__).count == 1
 
@@ -245,7 +247,6 @@ def test_register_transition_with_dependency(
 ) -> None:
     warningMock = mocker.patch("utils.logger.logger.warning")
 
-    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -256,9 +257,9 @@ def test_register_transition_with_dependency(
         def __init__(self) -> None:
             self.value: int = 0
 
+    as_transition(TransitionClass)
     DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
 
-    @as_singleton()
     @as_dependency(TransitionClass)
     class SingletonClass:
         count: int = 0
@@ -273,6 +274,7 @@ def test_register_transition_with_dependency(
             self.transition = transition
             transition.value = 1
 
+    as_singleton(SingletonClass)
     DependencyContainer.GetInstance(SingletonClass.__name__)
 
     assert TransitionClass.count == 2
@@ -286,7 +288,6 @@ def test_register_transition_with_dependency(
 
 
 def test_register_transition_with_dependency_as_transition() -> None:
-    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -297,9 +298,9 @@ def test_register_transition_with_dependency_as_transition() -> None:
         def __init__(self) -> None:
             self.value: int = 0
 
+    as_transition(TransitionClass)
     DependencyContainer.GetInstance(TransitionClass.__name__).value = 1994
 
-    @as_transition()
     @as_dependency(TransitionClass)
     class TransitionClass2:
         count: int = 0
@@ -312,6 +313,7 @@ def test_register_transition_with_dependency_as_transition() -> None:
             assert transition.value == 0
             self.value: int = 0
 
+    as_transition(TransitionClass2)
     DependencyContainer.GetInstance(TransitionClass2.__name__)
     DependencyContainer.GetInstance(TransitionClass2.__name__)
 
@@ -320,7 +322,6 @@ def test_register_transition_with_dependency_as_transition() -> None:
 
 
 def test_get_transition_instance_with_arguments() -> None:
-    @as_transition()
     class TransitionClass:
         count: int = 0
 
@@ -331,13 +332,14 @@ def test_get_transition_instance_with_arguments() -> None:
         def __init__(self, value: int) -> None:
             self.value = value
 
+    as_transition(TransitionClass)
     assert DependencyContainer.GetInstance(TransitionClass.__name__, 3).value == 3
 
 
 def test_get_singleton_instance_does_not_create_new_instance_until_it_is_requested() -> (
     None
 ):
-    @as_singleton()
+
     class SingletonClass:
         count: int = 0
 
@@ -345,6 +347,9 @@ def test_get_singleton_instance_does_not_create_new_instance_until_it_is_request
             cls.count += 1
             return super().__new__(cls)
 
+    DependencyContainer._dependencies[SingletonClass.__name__] = []  # type: ignore
+
+    as_singleton(SingletonClass)
     assert SingletonClass.count == 0
 
     DependencyContainer.GetInstance(SingletonClass.__name__)
@@ -359,7 +364,6 @@ def test_register_singleton_with_different_name() -> None:
         def value(self) -> int:
             raise NotImplementedError
 
-    @as_singleton(ISingleton)
     class SingletonClass(ISingleton):
         count: int = 0
 
@@ -374,6 +378,7 @@ def test_register_singleton_with_different_name() -> None:
         def value(self) -> int:
             return 1994
 
+    as_singleton(SingletonClass, ISingleton)
     instance: ISingleton = DependencyContainer.GetInstance(ISingleton.__name__)
     assert instance.value == 1994
 
@@ -387,13 +392,14 @@ def test_register_singleton_without_the_inheritance_of_the_interface() -> None:
 
     with pytest.raises(TypeError):
 
-        @as_singleton(ISingleton)
         class SingletonClass:
             count: int = 0
 
             def __new__(cls) -> "SingletonClass":
                 cls.count += 1
                 return super().__new__(cls)
+
+        as_singleton(SingletonClass, ISingleton)
 
 
 def test_register_transition_with_different_name() -> None:
@@ -403,7 +409,6 @@ def test_register_transition_with_different_name() -> None:
         def value(self) -> int:
             raise NotImplementedError
 
-    @as_transition(ITransition)
     class TransitionClass(ITransition):
         def __new__(cls) -> "TransitionClass":
             return super().__new__(cls)
@@ -412,6 +417,7 @@ def test_register_transition_with_different_name() -> None:
         def value(self) -> int:
             return 1994
 
+    as_transition(TransitionClass, ITransition)
     instance: ITransition = DependencyContainer.GetInstance(ITransition.__name__)
     assert instance.value == 1994
 
@@ -425,7 +431,6 @@ def test_register_transition_without_the_inheritance_of_the_interface() -> None:
 
     with pytest.raises(TypeError):
 
-        @as_transition(ITransition)
         class TransitionClass:
             def __new__(cls) -> "TransitionClass":
                 return super().__new__(cls)
@@ -433,3 +438,5 @@ def test_register_transition_without_the_inheritance_of_the_interface() -> None:
             @property
             def value(self) -> int:
                 return 1994
+
+        as_transition(TransitionClass, ITransition)

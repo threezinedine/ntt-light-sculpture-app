@@ -2,7 +2,10 @@
 from typing import Generator
 import warnings
 
+from pyfakefs.fake_filesystem import FakeFilesystem
+
 from modules.event_system.event_system import EventSystem
+from utils.config import DependencyInjectionConfig
 
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -28,13 +31,16 @@ from tests.windows.helper import (
     folderDialogSetup,  # type: ignore
     fileDialogSetup,  # type: ignore
     projectSetup,  # type: ignore
+    mainWindowBuilder,  # type: ignore
 )
 
 
 @pytest.fixture(autouse=True)
-def CleanDependencyContainer() -> Generator[None, None, None]:
+def CleanDependencyContainer(fs: FakeFilesystem) -> Generator[None, None, None]:
     DependencyContainer.Clear()
+    DependencyInjectionConfig()
     EventSystem.Clear()
+    fs.reset()
     yield
     DependencyContainer.Clear()
     EventSystem.Clear()

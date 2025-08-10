@@ -1,11 +1,9 @@
 import os
 from typing import Callable
-from modules.dependency_injection.decorators import as_singleton
 from structs.project import Project
 from utils.application import GetProjectDataFolder
 
 
-@as_singleton()
 class NewProjectDialogViewModel:
     def __init__(self) -> None:
         self.project = Project()

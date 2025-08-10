@@ -2,14 +2,10 @@ from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QWidget
 from PyQt6.QtCore import Qt
 
 from converted_uis.create_new_project_dialog import Ui_CreateNewProjectDialog
-from modules.dependency_injection.decorators import (
-    as_dependency,
-    as_singleton,
-)
+from modules.dependency_injection.helper import as_dependency
 from .viewmodel import NewProjectDialogViewModel
 
 
-@as_singleton()
 @as_dependency(NewProjectDialogViewModel)
 class NewProjectDialog(QDialog):
     def __init__(

@@ -1,12 +1,9 @@
 from datetime import datetime
 from dataclasses import dataclass, field
 
-from modules.dependency_injection.decorators import as_singleton
-
 from .struct_base import StructBase
 
 
-@as_singleton()
 @dataclass
 class Project(StructBase):
     """

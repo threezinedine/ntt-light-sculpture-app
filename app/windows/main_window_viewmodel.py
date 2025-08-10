@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
-from modules.dependency_injection.decorators import as_dependency, as_singleton
+from modules.dependency_injection.helper import as_dependency
 from modules.event_system.event_system import EventSystem
 from structs.application import Application
 from structs.project import Project
@@ -21,7 +21,6 @@ from constants import (
 )
 
 
-@as_singleton()
 @as_dependency(Application, Project, NewProjectDialogViewModel)
 class MainWindowViewModel:
     def __init__(

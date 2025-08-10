@@ -4,7 +4,10 @@ from typing import Generator, Any
 from PyQt6.QtWidgets import QFileDialog
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
+from pytestqt.qtbot import QtBot
 
+from modules.dependency_injection import DependencyContainer
+from windows.main_window import MainWindow
 from constants import APP_DATA_KEY, TEST_APP_DATA_FOLDER
 from utils.application import (
     GetApplicationDataFile,
@@ -87,3 +90,33 @@ def fileDialogSetup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> Generator[FileDialogSetup, None, None]:
     yield FileDialogSetup(monkeypatch)
+
+
+class MainWindowBuilder:
+    def __init__(
+        self,
+        fs: FakeFilesystem,
+        qtbot: QtBot,
+        appDataSetup: AppDataSetup,
+    ) -> None:
+        self._fs = fs
+        self._qtbot = qtbot
+        self._appDataSetup = appDataSetup
+
+    def Build(self) -> MainWindow:
+        from windows.main_window import MainWindow
+
+        mainWindow: MainWindow = DependencyContainer.GetInstance(MainWindow.__name__)
+        self._qtbot.addWidget(mainWindow)
+        mainWindow.showMaximized()
+
+        return mainWindow
+
+
+@pytest.fixture()
+def mainWindowBuilder(
+    fs: FakeFilesystem,
+    qtbot: QtBot,
+    appDataSetup: AppDataSetup,
+) -> Generator[MainWindowBuilder, None, None]:
+    yield MainWindowBuilder(fs, qtbot, appDataSetup)
