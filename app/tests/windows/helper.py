@@ -77,11 +77,11 @@ class FileDialogSetup:
     def __init__(self, monkeypatch: pytest.MonkeyPatch) -> None:
         self._monkeypatch = monkeypatch
 
-    def SetOutput(self, output: str | None) -> None:
+    def SetOutput(self, output: str | None, success: bool = True) -> None:
         self._monkeypatch.setattr(
             QFileDialog,
             "getOpenFileName",
-            lambda *args, **kwargs: output,  # type: ignore
+            lambda *args, **kwargs: (output, success),  # type: ignore
         )
 
 

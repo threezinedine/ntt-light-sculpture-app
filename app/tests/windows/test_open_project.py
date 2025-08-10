@@ -4,14 +4,17 @@ import pytest  # type: ignore
 from pytest_mock import MockerFixture
 from pytestqt.qtbot import QtBot
 
+from windows.main_window import MainWindow
+from structs.application import Application
+from structs.project import Project
+
 from constants import (
     TEST_NEW_PROJECT_NAME,
     TEST_NEW_PROJECT_PATH,
     TEST_PROJECT_FILE_ERROR_FOLDER,
     TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
 )
-from tests.windows.helper import AppDataSetup, FileDialogSetup
-from modules.dependency_injection import DependencyContainer
+from tests.windows.helper import AppDataSetup, FileDialogSetup, MainWindowBuilder
 from utils.application import GetProjectDataFile, GetProjectDataFolder, GetWindowTitle
 
 
@@ -21,16 +24,11 @@ def test_open_project(
     appDataSetup: AppDataSetup,
     fileDialogSetup: FileDialogSetup,
     mocker: MockerFixture,
+    mainWindowBuilder: MainWindowBuilder,
 ):
-    from windows.main_window import MainWindow
-    from structs.application import Application
-    from structs.project import Project
-
     appDataSetup.SetupApplicationData(Application())
 
-    mainWindow: MainWindow = DependencyContainer.GetInstance(MainWindow.__name__)
-    qtbot.addWidget(mainWindow)
-    mainWindow.showMaximized()
+    mainWindow: MainWindow = mainWindowBuilder.Build()
 
     # ================================= SYSTEM HEALTH CHECK =================================
     assert mainWindow.windowTitle() == GetWindowTitle()

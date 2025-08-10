@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
     def _OpenProjectCallback(self) -> None:
         options = QFileDialog.Option.ReadOnly
 
-        projectFile = QFileDialog.getOpenFileName(
+        projectFile, _ = QFileDialog.getOpenFileName(
             self,
             "Open Project",
             "",
