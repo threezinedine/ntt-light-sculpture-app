@@ -20,10 +20,13 @@ file(
     "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h"
 )
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
 # =================== externals ===================
 set(CMAKE_FOLDER "externals")
-find_package(ntt-opengl REQUIRED)
-find_package(ntt-gtest REQUIRED)
+find_package(ntt-opengl REQUIRED PATHS ${CMAKE_MODULE_PATH})
+find_package(ntt-gtest REQUIRED PATHS ${CMAKE_MODULE_PATH})
 unset(CMAKE_FOLDER)
 # =====================================================
 
@@ -41,7 +44,7 @@ unset(CMAKE_FOLDER)
 
 # =================== python libraries ===================
 set(CMAKE_FOLDER "binding")
-find_package(pybind11 REQUIRED)
+find_package(pybind11 REQUIRED PATHS ${CMAKE_MODULE_PATH})
 pybind11_add_module(${PROJECT_NAME} "binding.cpp")
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBRARY_NAME})
 unset(CMAKE_FOLDER)
