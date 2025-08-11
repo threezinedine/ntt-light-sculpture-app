@@ -1,1 +1,1 @@
-test_choose_wrong_recent_project_file
+test_open_image_tab_with_correct_path

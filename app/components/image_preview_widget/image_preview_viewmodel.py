@@ -3,8 +3,7 @@ from modules.dependency_injection.helper import as_dependency
 from structs.application import Application
 from structs.project import Project
 from utils.application import GetImageFilePath
-from PIL import Image
-import numpy as np
+from utils.images import LoadImage
 
 
 @as_dependency(Project, Application)
@@ -41,6 +40,4 @@ class ImagePreviewViewModel:
             self._application.CurrentProjectDirectory, self._project.images[self._index]
         )
 
-        finalImage = Image.open(imagePath)
-
-        return cv.cvtColor(np.array(finalImage), cv.COLOR_RGB2BGR)  # type: ignore
+        return LoadImage(imagePath)

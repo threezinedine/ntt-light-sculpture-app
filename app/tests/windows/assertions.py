@@ -138,3 +138,8 @@ class TabWidgetAssertion:
     def AssertTabCount(self, count: int) -> Self:
         assert self._tabWidget.count() == count
         return self
+
+    def AssertImagePreviewWidgetNotEmpty(self, index: int) -> Self:
+        assert self._tabWidget.widget(index) is not None
+        assert self._tabWidget.widget(index).ui.imagePreviewLabel.pixmap() is not None  # type: ignore
+        return self
