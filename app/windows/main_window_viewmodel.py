@@ -66,8 +66,7 @@ class MainWindowViewModel:
                         f"Application data file is invalid: {applicationJsonFile}"
                     )
                     self.application = Application()
-                    with open(applicationJsonFile, "w") as f:
-                        f.write(self.application.ToJson())
+                    self._UpdateApplicationDataFile()
                 else:
                     # Reload recent projects
                     if len(self.application.recentProjectNames) > 0:
@@ -105,46 +104,49 @@ class MainWindowViewModel:
         EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
 
     def OpenProject(self, projectFile: str) -> bool:
+        projectName = GetProjectNameFromFilePath(projectFile)
         if not os.path.exists(projectFile):
-            projectName = GetProjectNameFromFilePath(projectFile)
-            if projectName in self.application.recentProjectNames:
-                self.application.recentProjectNames.remove(projectName)
-            if projectName in self.application.recentProjectFilePaths:
-                del self.application.recentProjectFilePaths[projectName]
-            with open(GetApplicationDataFile(), "w") as f:
-                f.write(self.application.ToJson())
+            self._RemoveRecentProject(projectName)
             return False
 
         with open(projectFile, "r") as f:
             valid = self.project.FromJson(f.read())
             if not valid:
-                projectName = GetProjectNameFromFilePath(projectFile)
-                if projectName in self.application.recentProjectNames:
-                    self.application.recentProjectNames.remove(projectName)
-                if projectName in self.application.recentProjectFilePaths:
-                    del self.application.recentProjectFilePaths[projectName]
-                with open(GetApplicationDataFile(), "w") as f:
-                    f.write(self.application.ToJson())
+                self._RemoveRecentProject(projectName)
 
                 return False
 
-        if self.project.projectName in self.application.recentProjectNames:
-            self.application.recentProjectNames.remove(self.project.projectName)
+        self._AddRecentProject(self.project.projectName, projectFile)
 
-        self.application.recentProjectNames.insert(0, self.project.projectName)
+        EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
+        EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
+        return True
+
+    def _RemoveRecentProject(self, projectName: str) -> None:
+        if projectName in self.application.recentProjectNames:
+            self.application.recentProjectNames.remove(projectName)
+        if projectName in self.application.recentProjectFilePaths:
+            del self.application.recentProjectFilePaths[projectName]
+        self._UpdateApplicationDataFile()
+
+    def _AddRecentProject(self, projectName: str, projectFilePath: str) -> None:
+        if projectName in self.application.recentProjectNames:
+            self.application.recentProjectNames.remove(projectName)
+        if projectName in self.application.recentProjectFilePaths:
+            del self.application.recentProjectFilePaths[projectName]
+
+        self.application.recentProjectNames.insert(0, projectName)
+        self.application.recentProjectFilePaths[projectName] = projectFilePath
 
         if len(self.application.recentProjectNames) > MAX_NUMBER_OF_RECENT_PROJECTS:
             removedProjectNames = self.application.recentProjectNames.pop()
             del self.application.recentProjectFilePaths[removedProjectNames]
 
-        self.application.recentProjectFilePaths[self.project.projectName] = projectFile
+        self._UpdateApplicationDataFile()
 
+    def _UpdateApplicationDataFile(self) -> None:
         with open(GetApplicationDataFile(), "w") as f:
             f.write(self.application.ToJson())
-
-        EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
-        EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
-        return True
 
     @property
     def WindowTitle(self) -> str:
