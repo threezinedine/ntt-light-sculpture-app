@@ -140,35 +140,28 @@ class ApplicationBuilder:
         os.environ[APP_DATA_KEY] = TEST_APP_DATA_FOLDER
 
         self._appDataFileShouldBeError = False
-        self._createAppDataFolder = False
+        self._createAppDataFolder = True
+        self._createAppDataFile = True
         self._saveErrorAppDataFile = False
-        self._application: Application | None = None
+        self._application: Application = Application()
 
     def NotUseAppDataEnvironmentVariable(self) -> Self:
         if APP_DATA_KEY in os.environ:
             os.environ.pop(APP_DATA_KEY)
         return self
 
-    def AddAppDataFolder(self) -> Self:
-        assert (
-            self._application is None
-        ), "This method must be called before adding an application"
-        self._createAppDataFolder = True
+    def DontAddAppDataFolder(self) -> Self:
+        self._createAppDataFolder = False
+        self._createAppDataFile = False
         return self
 
     def AddErrorAppDataFile(self) -> Self:
-        assert self._application is not None, "Cannot be used with add app data file"
         assert self._createAppDataFolder, "AppData folder must be created first"
         self._appDataFileShouldBeError = True
         return self
 
-    def AddAppDataFile(self) -> Self:
-        assert self._application is None, "Application already exists"
-        assert self._createAppDataFolder, "AppData folder must be created first"
-        assert (
-            not self._appDataFileShouldBeError
-        ), "Cannot be used with add error app data file"
-        self._application = Application()
+    def DontAddAppDataFile(self) -> Self:
+        self._createAppDataFile = False
         return self
 
     def Version(self, major: int, minor: int, patch: int) -> Self:
@@ -179,7 +172,6 @@ class ApplicationBuilder:
         return self
 
     def AddRecentProject(self, projectName: str) -> Self:
-        assert self._application is not None, "Application must be created first"
         projectFile = GetProjectDataFile(
             TEST_NEW_PROJECT_PATH,
             projectName,
@@ -195,19 +187,23 @@ class ApplicationBuilder:
         assert not fs.exists(GetApplicationDataFolder()), "AppData folder already exists"  # type: ignore
 
         if not self._createAppDataFolder:
+            assert (
+                not self._appDataFileShouldBeError
+            ), "AppData file should be error settup wrong"
             return
 
         fs.create_dir(GetApplicationDataFolder())  # type: ignore
 
         if self._appDataFileShouldBeError:
+            assert self._createAppDataFile, "AppData file should be error settup wrong"
             with open(GetApplicationDataFile(), "w") as f:
                 f.write('"Error": ')
             return
 
-        if self._application is None:
-            return
-
         assert not fs.exists(GetApplicationDataFile()), "AppData file already exists"  # type: ignore
+
+        if not self._createAppDataFile:
+            return
 
         with open(GetApplicationDataFile(), "w") as f:
             f.write(self._application.ToJson())

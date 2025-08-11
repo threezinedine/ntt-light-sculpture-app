@@ -27,12 +27,7 @@ def test_recent_projects_feature(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
-        .AddApplication(
-            ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
-            .AddRecentProject(TEST_NEW_PROJECT_NAME)
-        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
     )
 
@@ -62,8 +57,6 @@ def test_only_has_maximum_5_recent_projects(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_6))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_3)
@@ -138,8 +131,6 @@ def test_auto_reload_recent_projects_on_project_open(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_3))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
         )
@@ -164,8 +155,6 @@ def test_auto_reload_recent_projects_with_error_project_data_file(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
         )
@@ -198,8 +187,6 @@ def test_auto_reload_recent_projects_without_existed_project_file(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
         )
@@ -225,10 +212,7 @@ def test_auto_reload_recent_projects_without_folder(
     infoMocker = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
 
     mainWindow = fixtureBuilder.AddApplication(
-        ApplicationBuilder()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME)
     ).Build()
 
     assert mainWindow.windowTitle() == GetWindowTitle()
@@ -249,10 +233,7 @@ def test_auto_reload_recent_projects_without_project_folder(
     infoMocker = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
 
     mainWindow = fixtureBuilder.AddApplication(
-        ApplicationBuilder()
-        .AddAppDataFolder()
-        .AddAppDataFile()
-        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME)
     ).Build()
 
     assert mainWindow.windowTitle() == GetWindowTitle()
@@ -279,8 +260,6 @@ def test_choose_recent_project_with_error_project_data_file(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
         )
@@ -316,8 +295,6 @@ def test_choose_recent_project_without_existed_project_file(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
         )
@@ -349,8 +326,6 @@ def test_choose_recent_project_without_folder(
         fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
         )

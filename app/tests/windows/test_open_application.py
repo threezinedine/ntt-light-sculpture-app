@@ -15,9 +15,7 @@ def test_create_application_data_folder_and_data_file(
     mocker: MockerFixture,
 ):
     warningMocker = mocker.patch("utils.logger.logger.warning")
-    fixtureBuilder.AddApplication(
-        ApplicationBuilder().AddAppDataFolder().AddAppDataFile().AddErrorAppDataFile()
-    ).Build()
+    fixtureBuilder.AddApplication(ApplicationBuilder().AddErrorAppDataFile()).Build()
 
     assert warningMocker.call_count == 1
     with open(GetApplicationDataFile(), "r") as f:
@@ -47,7 +45,7 @@ def test_create_application_without_app_data_file(
     infoMocker = mocker.patch("utils.logger.logger.info")
 
     mainWindow = fixtureBuilder.AddApplication(
-        ApplicationBuilder().AddAppDataFolder()
+        ApplicationBuilder().DontAddAppDataFile()
     ).Build()
 
     applicationJsonFile = GetApplicationDataFile()
@@ -71,7 +69,7 @@ def test_open_application_without_app_data_folder(
     fixtureBuilder: FixtureBuilder,
 ):
     infoMocker = mocker.patch("utils.logger.logger.info")
-    fixtureBuilder.AddApplication(ApplicationBuilder()).Build()
+    fixtureBuilder.AddApplication(ApplicationBuilder().DontAddAppDataFolder()).Build()
 
     assert infoMocker.call_count == 2
 

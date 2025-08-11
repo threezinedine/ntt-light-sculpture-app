@@ -33,9 +33,7 @@ def test_open_project(
     mocker: MockerFixture,
     fs: FakeFilesystem,
 ):
-    mainWindow = fixtureBuilder.AddApplication(
-        ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
-    ).Build()
+    mainWindow = fixtureBuilder.AddApplication(ApplicationBuilder()).Build()
 
     # ================================= SYSTEM HEALTH CHECK =================================
     assert mainWindow.windowTitle() == GetWindowTitle()
@@ -94,9 +92,7 @@ def test_open_project_with_current_recent_project(
     fileDialogSetup: FileDialogSetup,
 ):
     mainWindow = (
-        fixtureBuilder.AddApplication(
-            ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
-        )
+        fixtureBuilder.AddApplication(ApplicationBuilder())
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .Build()

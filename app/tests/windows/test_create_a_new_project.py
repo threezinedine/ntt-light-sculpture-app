@@ -42,10 +42,8 @@ def test_create_a_new_project(
     EXSITED_PROJECT_NAME = "Existed Project"
 
     mainWindow: MainWindow = (
-        fixtureBuilder.AddApplication(
-            ApplicationBuilder().AddAppDataFolder().AddAppDataFile()
-        )
-        .AddProject(ProjectBuilder().Name(EXSITED_PROJECT_NAME))
+        fixtureBuilder.AddProject(ProjectBuilder().Name(EXSITED_PROJECT_NAME))
+        .AddApplication(ApplicationBuilder())
         .Build()
     )
 
@@ -172,8 +170,6 @@ def test_create_a_new_project_and_it_the_most_recent_project(
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
-            .AddAppDataFolder()
-            .AddAppDataFile()
             .AddRecentProject(TEST_NEW_PROJECT_NAME)
             .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
         )
