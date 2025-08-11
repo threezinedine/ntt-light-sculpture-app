@@ -2,6 +2,7 @@ import os
 from typing import Self
 from PyQt6.QtWidgets import QTabWidget
 from pyfakefs.fake_filesystem import FakeFilesystem
+from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from constants import TEST_NEW_PROJECT_PATH
 from structs.application import Application
 from structs.project import Project
@@ -141,5 +142,9 @@ class TabWidgetAssertion:
 
     def AssertImagePreviewWidgetNotEmpty(self, index: int) -> Self:
         assert self._tabWidget.widget(index) is not None
-        assert self._tabWidget.widget(index).ui.imagePreviewLabel.pixmap() is not None  # type: ignore
+
+        imagePreviewWidget: ImagePreviewWidget = self._tabWidget.widget(index)  # type: ignore
+
+        assert imagePreviewWidget.ui.imagePreviewLabel.hasContent
+        assert imagePreviewWidget.ui.binaryImageLabel.hasContent
         return self

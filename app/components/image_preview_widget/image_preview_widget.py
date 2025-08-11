@@ -24,3 +24,4 @@ class ImagePreviewWidget(QWidget):
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.imagePreviewLabel.SetImage(self.viewModel.Image)
+        self.ui.binaryImageLabel.SetImage(self.viewModel.BinaryImage)
