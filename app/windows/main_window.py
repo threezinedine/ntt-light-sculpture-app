@@ -7,7 +7,6 @@ from components.new_project_dialog.dialog import NewProjectDialog
 from components.project_widget.project_widget import ProjectWidget
 from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
 from converted_uis.main_window import Ui_MainWindow
-from components.openg_widget import OpenGlWidget
 from modules.dependency_injection.helper import as_dependency
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
@@ -44,7 +43,6 @@ class MainWindow(QMainWindow):
         """
         self.ui.setupUi(self)  # type: ignore
         self.setWindowTitle(self.viewModel.WindowTitle)
-        self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
         self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
 

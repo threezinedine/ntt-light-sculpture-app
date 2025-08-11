@@ -1,5 +1,6 @@
 from PyQt6.QtGui import (
     QAction,
+    QKeyEvent,
     QKeySequence,
     QMouseEvent,
     QStandardItem,
@@ -34,6 +35,7 @@ class ProjectWidget(QWidget):
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore
         self.ui.projectTreeView.SetMousePressEventCallBack(self._MousePressEvent)
+        self.ui.projectTreeView.SetKeyPressEventCallBack(self._KeyPressEvent)
 
         self.importImageAction = QAction("Import Image", self)
         self.importImageAction.setShortcut(QKeySequence("Ctrl+Shift+I"))
@@ -83,3 +85,7 @@ class ProjectWidget(QWidget):
             partial(self.viewModel.DeleteImage, item.row()),
         )
         menu.popup(e.globalPosition().toPoint())
+
+    def _KeyPressEvent(self, e: QKeyEvent, row: int) -> None:
+        if e.key() == Qt.Key.Key_Enter or e.key() == Qt.Key.Key_Return:
+            print("Enter at index", row)

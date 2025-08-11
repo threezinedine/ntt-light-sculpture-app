@@ -6,13 +6,13 @@ from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from Engine import Renderer
 
 
-class OpenGlWidget(QOpenGLWidget):
+class OpenGLWidget(QOpenGLWidget):
     def __init__(
         self,
         parent: Optional[QWidget] = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
-        super(OpenGlWidget, self).__init__(parent, flags=flags)
+        super(OpenGLWidget, self).__init__(parent, flags=flags)
 
     def initializeGL(self):
         try:

@@ -1,8 +1,7 @@
-from PyQt6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
+from tests.windows.actor import ProjectTreeActor
 from utils.application import GetImageFileNameFromFilePath
-from .utils import deleteProjectTreeItem
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
 from constants import (
@@ -33,36 +32,35 @@ def test_import_image_file(
     mainWindow.projectWidget.ui.importFileButton.click()
 
     # ================== checking the image is loadded ==================
-    projectTreeView = mainWindow.projectWidget.ui.projectTreeView
-    assert projectTreeView.model() is not None
-    assert projectTreeView.model().rowCount() == 1
-
-    item = projectTreeView.model().index(0, 0)
-    assert item is not None
-    assert item.data(Qt.ItemDataRole.DisplayRole) == GetImageFileNameFromFilePath(
+    projectTreeActor = ProjectTreeActor(
+        qtbot,
+        mainWindow.projectWidget.ui.projectTreeView,
+    )
+    assert projectTreeActor.NumberOfRows == 1
+    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
     )
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
-    assert projectTreeView.model() is not None
-    assert projectTreeView.model().rowCount() == 1
-
-    item = projectTreeView.model().index(0, 0)
-    assert item is not None
-    assert item.data(Qt.ItemDataRole.DisplayRole) == GetImageFileNameFromFilePath(
+    projectTreeActor = ProjectTreeActor(
+        qtbot,
+        mainWindow.projectWidget.ui.projectTreeView,
+    )
+    assert projectTreeActor.NumberOfRows == 1
+    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
     )
 
     # ================== delete the image ==================
-    deleteProjectTreeItem(qtbot, projectTreeView, 0, "Delete")
+    projectTreeActor.OpenContextMenuAt(0).DeleteImage()
 
     # ================== assert image is deleted ==================
-    assert projectTreeView.model() is not None
-    assert projectTreeView.model().rowCount() == 0
+    assert projectTreeActor.NumberOfRows == 0
 
 
 def test_open_with_with_loadded_file(
+    qtbot: QtBot,
     fixtureBuilder: FixtureBuilder,
 ):
     mainWindow = (
@@ -73,13 +71,13 @@ def test_open_with_with_loadded_file(
         .Build()
     )
 
-    projectViewTree = mainWindow.projectWidget.ui.projectTreeView
-    assert projectViewTree.model() is not None
-    assert projectViewTree.model().rowCount() == 1
+    projectTreeActor = ProjectTreeActor(
+        qtbot,
+        mainWindow.projectWidget.ui.projectTreeView,
+    )
 
-    item = projectViewTree.model().index(0, 0)
-    assert item is not None
-    assert item.data(Qt.ItemDataRole.DisplayRole) == GetImageFileNameFromFilePath(
+    assert projectTreeActor.NumberOfRows == 1
+    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
     )
 
@@ -99,24 +97,25 @@ def test_delete_1_among_multiple_images(
         .Build()
     )
 
-    projectViewTree = mainWindow.projectWidget.ui.projectTreeView
+    projectTreeActor = ProjectTreeActor(
+        qtbot,
+        mainWindow.projectWidget.ui.projectTreeView,
+    )
 
     # ================== assert 2 images are loaded ==================
-    assert projectViewTree.model() is not None
-    assert projectViewTree.model().rowCount() == 2
-    assert projectViewTree.model().index(0, 0).data(
-        Qt.ItemDataRole.DisplayRole
-    ) == GetImageFileNameFromFilePath(TEST_PNG_IMAGE_PATH)
-    assert projectViewTree.model().index(1, 0).data(
-        Qt.ItemDataRole.DisplayRole
-    ) == GetImageFileNameFromFilePath(TEST_PNG_IMAGE_PATH_2)
+    assert projectTreeActor.NumberOfRows == 2
+    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
+        TEST_PNG_IMAGE_PATH
+    )
+    assert projectTreeActor.GetItemNameAt(1) == GetImageFileNameFromFilePath(
+        TEST_PNG_IMAGE_PATH_2
+    )
 
     # ================== delete the first image ==================
-    deleteProjectTreeItem(qtbot, projectViewTree, 0, "Delete")
+    projectTreeActor.OpenContextMenuAt(0).DeleteImage()
 
     # ================== assert image is deleted ==================
-    assert projectViewTree.model() is not None
-    assert projectViewTree.model().rowCount() == 1
-    assert projectViewTree.model().index(0, 0).data(
-        Qt.ItemDataRole.DisplayRole
-    ) == GetImageFileNameFromFilePath(TEST_PNG_IMAGE_PATH_2)
+    assert projectTreeActor.NumberOfRows == 1
+    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
+        TEST_PNG_IMAGE_PATH_2
+    )
