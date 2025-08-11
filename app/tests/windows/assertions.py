@@ -104,6 +104,17 @@ class ApplicationAssertion:
 
         return self
 
+    def AssertRecentProjectFilePaths(self) -> Self:
+        assert self._application is not None
+
+        for projectName in self._application.recentProjectNames:
+            dataFile = GetProjectDataFile(TEST_NEW_PROJECT_PATH, projectName)
+            assert self._fs.exists(dataFile)  # type: ignore
+
+            assert self._application.recentProjectFilePaths[projectName] == dataFile
+
+        return self
+
     def Assert(self) -> Self:
         if self._fs is not None:
             assert self._fs.exists(GetApplicationDataFolder())  # type: ignore

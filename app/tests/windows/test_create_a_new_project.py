@@ -142,7 +142,7 @@ def test_create_a_new_project(
     assert len(mainWindow.recentProjectsActions) == 1
     assert mainWindow.recentProjectsActions[0].text() == NEW_PROJECT_NAME
 
-    ApplicationAssertion(fs).AssertRecentProjects([NEW_PROJECT_NAME])
+    ApplicationAssertion(fs).AssertRecentProjects([NEW_PROJECT_NAME]).AssertRecentProjectFilePaths()
 
 
 def test_create_a_new_project_and_it_the_most_recent_project(

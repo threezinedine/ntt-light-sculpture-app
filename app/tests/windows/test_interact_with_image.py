@@ -58,3 +58,25 @@ def test_cannot_close_the_view_tab(
     tabWidgetActor.CloseTabWithName("View")
 
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
+
+def test_cannont_open_image_tab_multiple_times(
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+    tabWidgetActor: TabWidgetActor,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    tabWidgetActor.SetTabWidget(mainWindow.ui.centerTabWidget)
+
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)

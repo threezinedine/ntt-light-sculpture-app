@@ -102,8 +102,13 @@ class MainWindowViewModel:
         with open(projectDataFile, "w") as f:
             f.write(self.project.ToJson())
 
+        imageFolder = GetImageFolder(GetProjectDataFolder(projectDirectory, projectName))
+        if not os.path.exists(imageFolder):
+            os.makedirs(imageFolder)
+            logger.info(f"Image folder created: {imageFolder}")
+
         EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
-        self.application.recentProjectFilePaths[projectName] = GetProjectDataFolder(
+        self.application.recentProjectFilePaths[projectName] = GetProjectDataFile(
             projectDirectory, projectName
         )
         self.application.recentProjectNames.insert(0, projectName)
@@ -134,6 +139,7 @@ class MainWindowViewModel:
             return False
 
         imageFolder = GetImageFolder(self.application.CurrentProjectDirectory)
+
         if not os.path.exists(imageFolder):
             os.makedirs(imageFolder)
             logger.info(f"Image folder created: {imageFolder}")

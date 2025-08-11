@@ -132,6 +132,11 @@ class MainWindow(QMainWindow):
             super().keyPressEvent(a0)  # type: ignore
 
     def _OpenImageTabCallback(self, row: int) -> None:
+        for i in range(self.ui.centerTabWidget.count()):
+            if self.ui.centerTabWidget.tabText(i) == self.projectWidget.viewModel.ImageItems[row].text():
+                self.ui.centerTabWidget.setCurrentWidget(self.ui.centerTabWidget.widget(i))
+                return
+
         imagePreviewWidget: ImagePreviewWidget = DependencyContainer.GetInstance(
             ImagePreviewWidget.__name__,
             row,
