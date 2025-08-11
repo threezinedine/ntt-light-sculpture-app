@@ -1,6 +1,6 @@
+from pyfakefs.fake_filesystem import FakeFilesystem
 from tests.windows.assertions import ProjectAssertion
 from .actors import ProjectTreeActor
-from utils.application import GetImageFileNameFromFilePath
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
 from constants import (
@@ -9,15 +9,18 @@ from constants import (
     TEST_PNG_IMAGE_PATH,
     TEST_PNG_IMAGE_PATH_2,
 )
+from converted_constants import TEST_PNG_IMAGE_NAME, TEST_PNG_IMAGE_NAME_2
 
 
 def test_import_image_file(
     fixtureBuilder: FixtureBuilder,
     fileDialogSetup: FileDialogSetup,
     projectTreeActor: ProjectTreeActor,
+    fs: FakeFilesystem,
 ):
     mainWindow = (
-        fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        fixtureBuilder.AddRealFile(TEST_PNG_IMAGE_PATH)
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
         .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
         .AddApplication(
             ApplicationBuilder()
@@ -33,17 +36,15 @@ def test_import_image_file(
     # ================== checking the image is loadded ==================
     projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
     assert projectTreeActor.NumberOfRows == 1
-    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH
-    )
-    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_PATH])
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
+    ProjectAssertion(TEST_NEW_PROJECT_NAME, fs).AssertImages(
+        [TEST_PNG_IMAGE_NAME]
+    ).AssertImageLoadded()
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
     assert projectTreeActor.NumberOfRows == 1
-    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH
-    )
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
 
     # ================== delete the image ==================
     projectTreeActor.OpenContextMenuAt(0).ChooseDeleteAction()
@@ -67,14 +68,13 @@ def test_open_with_with_loadded_file(
     projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
 
     assert projectTreeActor.NumberOfRows == 1
-    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH
-    )
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
 
 
 def test_delete_1_among_multiple_images(
     fixtureBuilder: FixtureBuilder,
     projectTreeActor: ProjectTreeActor,
+    fs: FakeFilesystem,
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
@@ -91,22 +91,16 @@ def test_delete_1_among_multiple_images(
 
     # ================== assert 2 images are loaded ==================
     assert projectTreeActor.NumberOfRows == 2
-    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH
-    )
-    assert projectTreeActor.GetItemNameAt(1) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH_2
-    )
-    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages(
-        [TEST_PNG_IMAGE_PATH, TEST_PNG_IMAGE_PATH_2]
-    )
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
+    assert projectTreeActor.GetItemNameAt(1) == TEST_PNG_IMAGE_NAME_2
+    ProjectAssertion(TEST_NEW_PROJECT_NAME, fs).AssertImages(
+        [TEST_PNG_IMAGE_NAME, TEST_PNG_IMAGE_NAME_2]
+    ).AssertImageLoadded()
 
     # ================== delete the first image ==================
     projectTreeActor.OpenContextMenuAt(0).ChooseDeleteAction()
 
     # ================== assert image is deleted ==================
     assert projectTreeActor.NumberOfRows == 1
-    assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
-        TEST_PNG_IMAGE_PATH_2
-    )
-    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_PATH_2])
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME_2
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME_2])

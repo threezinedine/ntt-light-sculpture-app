@@ -32,7 +32,7 @@ from tests.windows.helper import (
     fixtureBuilder,  # type: ignore
 )
 
-from tests.windows.actors import projectTreeActor  # type: ignore
+from tests.windows.actors import projectTreeActor, tabWidgetActor  # type: ignore
 
 
 @pytest.fixture(autouse=True)

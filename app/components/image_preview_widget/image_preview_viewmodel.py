@@ -1,6 +1,5 @@
 from modules.dependency_injection.helper import as_dependency
 from structs.project import Project
-from utils.application import GetImageFileNameFromFilePath
 
 
 @as_dependency(Project)
@@ -19,6 +18,6 @@ class ImagePreviewViewModel:
 
     @property
     def TabName(self) -> str:
-        if self._index < 0 or self._index >= len(self._project.imagePaths):
+        if self._index < 0 or self._index >= len(self._project.images):
             return ""
-        return GetImageFileNameFromFilePath(self._project.imagePaths[self._index])
+        return self._project.images[self._index]

@@ -5,6 +5,7 @@ from constants import (
     APPLICATION_DATA_FILE,
     APPLICATION_DATA_FOLDER,
     PROJECT_DATA_FILE,
+    TEST_NEW_PROJECT_PATH,
 )
 
 
@@ -20,6 +21,10 @@ def GetProjectDataFolder(projectDirectory: str, projectName: str) -> str:
     return os.path.normpath(os.path.join(projectDirectory, projectName))
 
 
+def GetTestProjectDataFolder(projectName: str) -> str:
+    return os.path.join(TEST_NEW_PROJECT_PATH, projectName)
+
+
 def GetProjectDataFile(projectDirectory: str, projectName: str) -> str:
     return os.path.normpath(
         os.path.join(
@@ -33,7 +38,7 @@ def GetProjectNameFromFilePath(projectFilePath: str) -> str:
 
 
 def GetImageFileNameFromFilePath(imageFilePath: str) -> str:
-    return os.path.splitext(os.path.split(imageFilePath)[-1])[0]
+    return os.path.split(imageFilePath)[-1]
 
 
 def GetWindowTitle(projectName: str | None = None) -> str:
@@ -41,3 +46,11 @@ def GetWindowTitle(projectName: str | None = None) -> str:
         return "Light Sculpture Studio"
 
     return f"Light Sculpture Studio - {projectName}"
+
+
+def GetImageFolder(projectDirectory: str) -> str:
+    return os.path.normpath(os.path.join(projectDirectory, "images"))
+
+
+def GetImageFilePath(projectDirectory: str, imageName: str) -> str:
+    return os.path.normpath(os.path.join(GetImageFolder(projectDirectory), imageName))

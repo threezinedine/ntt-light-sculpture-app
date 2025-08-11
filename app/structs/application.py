@@ -62,7 +62,11 @@ class Application(StructBase):
 
         return True
 
-    def GetCurrentProjectDirectory(self) -> str:
+    @property
+    def CurrentProjectDirectory(self) -> str:
+        if len(self.recentProjectNames) == 0:
+            return ""
+
         currentProject = self.recentProjectNames[0]
         currentProjectFilePaths = self.recentProjectFilePaths[currentProject]
 

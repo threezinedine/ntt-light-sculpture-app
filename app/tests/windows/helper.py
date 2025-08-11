@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import shutil
 from typing import Generator, Self
 from PyQt6.QtWidgets import QFileDialog
 import pytest
@@ -14,13 +15,16 @@ from constants import (
     APP_DATA_KEY,
     TEST_APP_DATA_FOLDER,
     TEST_NEW_PROJECT_PATH,
-    TEST_PNG_IMAGE_PATH,
 )
 from utils.application import (
     GetApplicationDataFile,
     GetApplicationDataFolder,
+    GetImageFileNameFromFilePath,
+    GetImageFilePath,
+    GetImageFolder,
     GetProjectDataFile,
     GetProjectDataFolder,
+    GetTestProjectDataFolder,
 )
 
 
@@ -96,6 +100,7 @@ class ProjectBuilder:
         self._project = Project()
         self._useErrorProjectFile = False
         self._createProjectFile = True
+        self._imagePaths: list[str] = []
 
     def Name(self, projectName: str) -> Self:
         self._project.projectName = projectName
@@ -110,7 +115,7 @@ class ProjectBuilder:
         return self
 
     def AddImage(self, imagePath: str) -> Self:
-        self._project.imagePaths.append(imagePath)
+        self._imagePaths.append(imagePath)
         return self
 
     def Build(self, fs: FakeFilesystem) -> None:
@@ -120,6 +125,32 @@ class ProjectBuilder:
         )
         assert not fs.exists(projectFolder), f"Project folder {projectFolder} already exists"  # type: ignore
         fs.create_dir(projectFolder)  # type: ignore
+
+        for imagePath in self._imagePaths:
+            imageName = GetImageFileNameFromFilePath(imagePath)
+            imageFolder = GetImageFolder(
+                GetTestProjectDataFolder(self._project.projectName)
+            )
+
+            if not os.path.exists(imageFolder):
+                os.makedirs(imageFolder)
+
+            finalImagePath = GetImageFilePath(
+                GetTestProjectDataFolder(self._project.projectName),
+                imageName,
+            )
+
+            assert not fs.exists(finalImagePath), f"Image file {finalImagePath} already exists"  # type: ignore
+            fs.add_real_file(imagePath, read_only=True)  # type: ignore
+            assert fs.exists(imagePath), f"Image file {imagePath} does not exist"  # type: ignore
+
+            self._project.images.append(imageName)
+            shutil.copy(
+                imagePath,
+                GetImageFilePath(
+                    GetTestProjectDataFolder(self._project.projectName), imageName
+                ),
+            )
 
         self._project.SetCreatedAt(datetime.now())
         self._project.SetLastEditAt(datetime.now())
@@ -227,8 +258,6 @@ class FixtureBuilder:
         self._fs = fs
         self._qtBot = qtBot
 
-        self._fs.add_real_file(TEST_PNG_IMAGE_PATH, read_only=True)  # type: ignore
-
         self._projectBuilders: list[ProjectBuilder] = []
         self._applicationBuilder: ApplicationBuilder | None = None
 
@@ -239,6 +268,10 @@ class FixtureBuilder:
 
     def AddProject(self, builder: ProjectBuilder) -> Self:
         self._projectBuilders.append(builder)
+        return self
+
+    def AddRealFile(self, filePath: str) -> Self:
+        self._fs.add_real_file(filePath, read_only=True)  # type: ignore
         return self
 
     def Build(self) -> MainWindow:

@@ -8,6 +8,7 @@ from structs.project import Project
 from utils.application import (
     GetApplicationDataFile,
     GetApplicationDataFolder,
+    GetImageFilePath,
     GetProjectDataFile,
     GetProjectDataFolder,
 )
@@ -42,11 +43,26 @@ class ProjectAssertion:
 
         return self
 
-    def AssertImages(self, imagePaths: list[str]) -> Self:
+    def AssertImages(self, images: list[str]) -> Self:
         assert self._project is not None
 
-        for imagePath, inputImagePath in zip(self._project.imagePaths, imagePaths):
-            assert imagePath == inputImagePath
+        for image, inputImage in zip(self._project.images, images):
+            assert image == inputImage
+
+        return self
+
+    def AssertImageLoadded(self) -> Self:
+        assert self._fs is not None
+        assert self._project is not None
+
+        print("Checking images", self._project.images)
+        for image in self._project.images:
+            loadedImagePath = GetImageFilePath(
+                os.path.join(TEST_NEW_PROJECT_PATH, self._project.projectName),
+                image,
+            )
+
+            assert self._fs.exists(loadedImagePath), f"Image {loadedImagePath} is not loaded"  # type: ignore
 
         return self
 

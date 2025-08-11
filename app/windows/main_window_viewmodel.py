@@ -12,6 +12,7 @@ from utils.logger import logger
 from utils.application import (
     GetApplicationDataFolder,
     GetApplicationDataFile,
+    GetImageFolder,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetProjectNameFromFilePath,
@@ -112,6 +113,12 @@ class MainWindowViewModel:
 
     def OpenProject(self, projectFile: str) -> bool:
         projectName = GetProjectNameFromFilePath(projectFile)
+
+        imageFolder = GetImageFolder(self.application.CurrentProjectDirectory)
+        if not os.path.exists(imageFolder):
+            os.makedirs(imageFolder)
+            logger.info(f"Image folder created: {imageFolder}")
+
         if not os.path.exists(projectFile):
             self._RemoveRecentProject(projectName)
             return False
