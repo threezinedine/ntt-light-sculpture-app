@@ -54,6 +54,8 @@ class MainWindow(QMainWindow):
 
         self.ui.projectTreeWidget.setWidget(self.projectWidget)
 
+        self.ui.centerTabWidget.tabCloseRequested.connect(self._OnTabCloseCallback)
+
         self._RecentProjectsCallback()
 
         EventSystem.RegisterEvent(
@@ -139,3 +141,11 @@ class MainWindow(QMainWindow):
         centerTabWidget = self.ui.centerTabWidget
         centerTabWidget.addTab(imagePreviewWidget, imagePreviewWidget.viewModel.TabName)  # type: ignore
         centerTabWidget.setCurrentWidget(imagePreviewWidget)
+
+    def _OnTabCloseCallback(self, index: int) -> None:
+        centerTabWidget = self.ui.centerTabWidget
+
+        widget = centerTabWidget.widget(index)
+
+        if widget and isinstance(widget, ImagePreviewWidget):
+            centerTabWidget.removeTab(index)

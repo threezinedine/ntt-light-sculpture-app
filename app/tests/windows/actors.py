@@ -1,6 +1,7 @@
 from typing import Generator, Self
 from PyQt6.QtCore import QAbstractItemModel, Qt
-from PyQt6.QtWidgets import QMenu
+from PyQt6.QtWidgets import QMenu, QTabWidget
+from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest
 from pytestqt.qtbot import QtBot
 
@@ -76,3 +77,31 @@ def projectTreeActor(
     qtbot: QtBot,
 ) -> Generator[ProjectTreeActor, None, None]:
     yield ProjectTreeActor(qtbot)
+
+
+class TabWidgetActor:
+    def __init__(self, qtbot: QtBot, fs: FakeFilesystem | None = None) -> None:
+        self.qtbot = qtbot
+        self.fs = fs
+
+        self._tabWidget: QTabWidget | None = None
+
+    def SetTabWidget(self, tabWidget: QTabWidget) -> Self:
+        self._tabWidget = tabWidget
+        return self
+
+    def CloseTabWithName(self, name: str) -> Self:
+        assert self._tabWidget is not None
+        for i in range(self._tabWidget.count()):
+            if self._tabWidget.tabText(i) == name:
+                self._tabWidget.tabCloseRequested.emit(i)
+                break
+
+        return self
+
+
+@pytest.fixture()
+def tabWidgetActor(
+    qtbot: QtBot,
+) -> Generator[TabWidgetActor, None, None]:
+    yield TabWidgetActor(qtbot)

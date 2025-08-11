@@ -1,5 +1,6 @@
 import os
 from typing import Self
+from PyQt6.QtWidgets import QTabWidget
 from pyfakefs.fake_filesystem import FakeFilesystem
 from constants import TEST_NEW_PROJECT_PATH
 from structs.application import Application
@@ -95,4 +96,18 @@ class ApplicationAssertion:
         assert self._application is not None
         assert self._application.Compare(Application())
 
+        return self
+
+
+class TabWidgetAssertion:
+    def __init__(self, tabWidget: QTabWidget) -> None:
+        self._tabWidget = tabWidget
+
+    def AssertCurrentTabName(self, name: str) -> Self:
+        index = self._tabWidget.currentIndex()
+        assert self._tabWidget.tabText(index) == name
+        return self
+
+    def AssertTabCount(self, count: int) -> Self:
+        assert self._tabWidget.count() == count
         return self
