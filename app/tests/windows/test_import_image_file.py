@@ -1,3 +1,4 @@
+from tests.windows.assertions import ProjectAssertion
 from .actors import ProjectTreeActor
 from utils.application import GetImageFileNameFromFilePath
 
@@ -35,6 +36,7 @@ def test_import_image_file(
     assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
     )
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_PATH])
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
@@ -95,6 +97,9 @@ def test_delete_1_among_multiple_images(
     assert projectTreeActor.GetItemNameAt(1) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH_2
     )
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages(
+        [TEST_PNG_IMAGE_PATH, TEST_PNG_IMAGE_PATH_2]
+    )
 
     # ================== delete the first image ==================
     projectTreeActor.OpenContextMenuAt(0).DeleteImage()
@@ -104,3 +109,4 @@ def test_delete_1_among_multiple_images(
     assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH_2
     )
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_PATH_2])

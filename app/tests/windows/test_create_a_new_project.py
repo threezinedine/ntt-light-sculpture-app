@@ -1,17 +1,14 @@
-import json
 from PyQt6.QtWidgets import (
     QDialogButtonBox,
     QLabel,
     QLineEdit,
     QPushButton,
 )
-from dacite import from_dict
 from pyfakefs.fake_filesystem import FakeFilesystem
 
+from tests.windows.assertions import ApplicationAssertion, ProjectAssertion
 from utils.application import (
-    GetApplicationDataFile,
     GetProjectDataFolder,
-    GetProjectDataFile,
     GetWindowTitle,
 )
 
@@ -28,8 +25,6 @@ from constants import (
     TEST_NEW_PROJECT_PATH,
 )
 from windows.main_window import MainWindow
-from structs.application import Application
-from structs.project import Project
 from components.new_project_dialog.dialog import NewProjectDialog
 
 
@@ -141,24 +136,13 @@ def test_create_a_new_project(
 
     okButton.click()
 
-    project = Project(projectName=NEW_PROJECT_NAME)
-
-    assert fs.exists(GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))  # type: ignore
-    assert fs.exists(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME))  # type: ignore
-    with open(GetProjectDataFile(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME), "r") as f:
-        assert project.Compare(from_dict(data_class=Project, data=json.loads(f.read())))
+    ProjectAssertion(NEW_PROJECT_NAME, fs).AssertImages([])
 
     assert mainWindow.windowTitle() == GetWindowTitle(NEW_PROJECT_NAME)
     assert len(mainWindow.recentProjectsActions) == 1
     assert mainWindow.recentProjectsActions[0].text() == NEW_PROJECT_NAME
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = from_dict(data_class=Application, data=json.loads(f.read()))
-        assert len(application.recentProjectFilePaths) == 1
-        assert application.recentProjectFilePaths[
-            NEW_PROJECT_NAME
-        ] == GetProjectDataFolder(TEST_NEW_PROJECT_PATH, NEW_PROJECT_NAME)
-        assert application.recentProjectNames[0] == NEW_PROJECT_NAME
+    ApplicationAssertion(fs).AssertRecentProjects([NEW_PROJECT_NAME])
 
 
 def test_create_a_new_project_and_it_the_most_recent_project(

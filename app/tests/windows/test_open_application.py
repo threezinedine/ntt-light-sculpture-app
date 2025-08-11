@@ -5,6 +5,7 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from pytest_mock import MockerFixture
 from dacite import from_dict
 
+from tests.windows.assertions import ApplicationAssertion
 from utils.application import GetApplicationDataFile
 from .helper import ApplicationBuilder, FixtureBuilder
 from structs.application import Application
@@ -13,14 +14,13 @@ from structs.application import Application
 def test_create_application_data_folder_and_data_file(
     fixtureBuilder: FixtureBuilder,
     mocker: MockerFixture,
+    fs: FakeFilesystem,
 ):
     warningMocker = mocker.patch("utils.logger.logger.warning")
     fixtureBuilder.AddApplication(ApplicationBuilder().AddErrorAppDataFile()).Build()
 
     assert warningMocker.call_count == 1
-    with open(GetApplicationDataFile(), "r") as f:
-        writtenApplicationJson = from_dict(data_class=Application, data=json.load(f))
-        assert writtenApplicationJson.Compare(Application())
+    ApplicationAssertion(fs).Assert()
 
 
 def test_open_application_without_app_data(
@@ -73,9 +73,4 @@ def test_open_application_without_app_data_folder(
 
     assert infoMocker.call_count == 2
 
-    applicationJsonFile = GetApplicationDataFile()
-    assert fs.exists(applicationJsonFile)  # type: ignore
-
-    with open(applicationJsonFile, "r") as f:
-        writtenApplicationJson = from_dict(data_class=Application, data=json.load(f))
-        assert writtenApplicationJson.Compare(Application())
+    ApplicationAssertion(fs).Assert()

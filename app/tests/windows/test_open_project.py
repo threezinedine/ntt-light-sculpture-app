@@ -1,16 +1,13 @@
-from datetime import datetime
 from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest  # type: ignore
 from pytest_mock import MockerFixture
 
 from structs.application import Application
-from structs.project import Project
 
 from constants import (
     TEST_NEW_PROJECT_NAME,
     TEST_NEW_PROJECT_NAME_2,
     TEST_NEW_PROJECT_PATH,
-    TEST_PROJECT_FILE_ERROR_FOLDER,
     TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
 )
 from tests.windows.helper import (
@@ -22,7 +19,6 @@ from tests.windows.helper import (
 from utils.application import (
     GetApplicationDataFile,
     GetProjectDataFile,
-    GetProjectDataFolder,
     GetWindowTitle,
 )
 
@@ -33,55 +29,41 @@ def test_open_project(
     mocker: MockerFixture,
     fs: FakeFilesystem,
 ):
-    mainWindow = fixtureBuilder.AddApplication(ApplicationBuilder()).Build()
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_PROJECT_FILE_ERROR_PROJECT_NAME)
+            .UseErrorProjectFile()
+        )
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
+        .AddApplication(ApplicationBuilder())
+        .Build()
+    )
 
     # ================================= SYSTEM HEALTH CHECK =================================
     assert mainWindow.windowTitle() == GetWindowTitle()
 
     # ================================= Open Errored Project =================================
-    fs.create_dir(  # type: ignore
-        GetProjectDataFolder(
-            TEST_PROJECT_FILE_ERROR_FOLDER,
+    dialogMock = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
+
+    fileDialogSetup.SetOutput(
+        GetProjectDataFile(
+            TEST_NEW_PROJECT_PATH,
             TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
         )
     )
-
-    projectFile = GetProjectDataFile(
-        TEST_PROJECT_FILE_ERROR_FOLDER,
-        TEST_PROJECT_FILE_ERROR_PROJECT_NAME,
-    )
-    dialogMock = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
-
-    with open(projectFile, "w") as f:
-        f.write('{"Error"}')
-
-    fileDialogSetup.SetOutput(projectFile)
     mainWindow.ui.openProjectAction.trigger()
 
     assert dialogMock.call_count == 1
     assert mainWindow.windowTitle() == GetWindowTitle()
 
     # ================================= Open Valid Project =================================
-    fs.create_dir(  # type: ignore
-        GetProjectDataFolder(
+    fileDialogSetup.SetOutput(
+        GetProjectDataFile(
             TEST_NEW_PROJECT_PATH,
             TEST_NEW_PROJECT_NAME,
         )
     )
-
-    projectFile = GetProjectDataFile(
-        TEST_NEW_PROJECT_PATH,
-        TEST_NEW_PROJECT_NAME,
-    )
-
-    with open(projectFile, "w") as f:
-        project = Project()
-        project.projectName = TEST_NEW_PROJECT_NAME
-        project.SetCreatedAt(datetime.now())
-        project.SetLastEditAt(datetime.now())
-        f.write(project.ToJson())
-
-    fileDialogSetup.SetOutput(projectFile)
     mainWindow.ui.openProjectAction.trigger()
 
     assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)
