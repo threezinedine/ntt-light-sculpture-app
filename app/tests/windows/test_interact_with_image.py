@@ -4,6 +4,7 @@ from tests.windows.assertions import TabWidgetAssertion
 from tests.windows.helper import ApplicationBuilder, FixtureBuilder, ProjectBuilder
 from utils.application import GetImageFileNameFromFilePath
 from .actors import tabWidgetActor  # type: ignore
+from converted_constants import TEST_PNG_IMAGE_NAME
 
 
 def test_open_tab_when_interact_with_image(
@@ -79,4 +80,10 @@ def test_cannont_open_image_tab_multiple_times(
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
 
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
+
+    tabWidgetActor.CloseTabWithName(TEST_PNG_IMAGE_NAME)
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(1)
+
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
