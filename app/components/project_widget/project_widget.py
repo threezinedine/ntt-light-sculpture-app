@@ -1,4 +1,10 @@
-from PyQt6.QtGui import QMouseEvent, QStandardItem, QStandardItemModel
+from PyQt6.QtGui import (
+    QAction,
+    QKeySequence,
+    QMouseEvent,
+    QStandardItem,
+    QStandardItemModel,
+)
 from PyQt6.QtWidgets import QFileDialog, QMenu, QWidget
 from PyQt6.QtCore import Qt
 from functools import partial
@@ -27,8 +33,13 @@ class ProjectWidget(QWidget):
 
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore
-        self.ui.importFileButton.clicked.connect(self._ImportImageFile)
         self.ui.projectTreeView.SetMousePressEventCallBack(self._MousePressEvent)
+
+        self.importImageAction = QAction("Import Image", self)
+        self.importImageAction.setShortcut(QKeySequence("Ctrl+Shift+I"))
+        self.importImageAction.triggered.connect(self._ImportImageFile)
+        self.addAction(self.importImageAction)
+        self.ui.importFileButton.clicked.connect(self.importImageAction.trigger)
 
         self._ShowImages()
         EventSystem.RegisterEvent(MODIFY_IMAGES_LIST_EVENT_NAME, self._ShowImages)
