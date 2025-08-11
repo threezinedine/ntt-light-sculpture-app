@@ -109,6 +109,10 @@ class ProjectBuilder:
         self._useErrorProjectFile = True
         return self
 
+    def AddImage(self, imagePath: str) -> Self:
+        self._project.imagePaths.append(imagePath)
+        return self
+
     def Build(self, fs: FakeFilesystem) -> None:
         projectFolder = GetProjectDataFolder(
             TEST_NEW_PROJECT_PATH,

@@ -146,7 +146,6 @@ def test_open_project_with_current_recent_project(
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
 
     # ================================= Choose project 2 again =================================
-    print("Choose project 2 again")
     mainWindow.recentProjectsActions[0].trigger()
 
     assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)

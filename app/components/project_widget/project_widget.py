@@ -1,8 +1,9 @@
-from PyQt6.QtGui import QStandardItemModel
-from PyQt6.QtWidgets import QFileDialog, QWidget
+from PyQt6.QtGui import QMouseEvent, QStandardItem, QStandardItemModel
+from PyQt6.QtWidgets import QFileDialog, QMenu, QWidget
 from PyQt6.QtCore import Qt
+from functools import partial
 
-from constants import LOAD_IMAGE_EVENT_NAME
+from constants import MODIFY_IMAGES_LIST_EVENT_NAME
 from modules.event_system.event_system import EventSystem
 from .project_widget_view_model import ProjectWidgetViewModel
 from converted_uis.project_widget import Ui_ProjectWidget
@@ -27,9 +28,10 @@ class ProjectWidget(QWidget):
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore
         self.ui.importFileButton.clicked.connect(self._ImportImageFile)
+        self.ui.projectTreeView.SetMousePressEventCallBack(self._MousePressEvent)
 
         self._ShowImages()
-        EventSystem.RegisterEvent(LOAD_IMAGE_EVENT_NAME, self._ShowImages)
+        EventSystem.RegisterEvent(MODIFY_IMAGES_LIST_EVENT_NAME, self._ShowImages)
 
     def _ImportImageFile(self) -> None:
         file, _ = QFileDialog.getOpenFileName(
@@ -50,3 +52,23 @@ class ProjectWidget(QWidget):
             rootNode.appendRow(item)
 
         projectView.setModel(model)
+
+    def _MousePressEvent(self, e: QMouseEvent) -> None:
+        if e.button() != Qt.MouseButton.RightButton:
+            return
+
+        model: QStandardItemModel = self.ui.projectTreeView.model()  # type: ignore
+        item: QStandardItem | None = model.itemFromIndex(
+            self.ui.projectTreeView.indexAt(e.pos())  # type: ignore
+        )
+
+        if item is None:  # type: ignore
+            return
+
+        menu = QMenu(self.ui.projectTreeView)
+
+        menu.addAction(
+            "Delete",
+            partial(self.viewModel.DeleteImage, item.row()),
+        )
+        menu.popup(e.globalPosition().toPoint())

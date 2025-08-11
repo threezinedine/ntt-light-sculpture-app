@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QStandardItem
-from constants import LOAD_IMAGE_EVENT_NAME
+from constants import MODIFY_IMAGES_LIST_EVENT_NAME
 from structs.project import Project
 from modules.dependency_injection.helper import as_dependency
 from modules.event_system.event_system import EventSystem
@@ -26,8 +26,12 @@ class ProjectWidgetViewModel:
 
     def LoadImage(self, imagePath: str) -> None:
         self.project.imagePaths.append(imagePath)
-        EventSystem.TriggerEvent(LOAD_IMAGE_EVENT_NAME)
+        EventSystem.TriggerEvent(MODIFY_IMAGES_LIST_EVENT_NAME)
 
     @property
     def ImageItems(self) -> list[QStandardItem]:
         return [ImageItem(imagePath) for imagePath in self.project.imagePaths]
+
+    def DeleteImage(self, index: int) -> None:
+        self.project.imagePaths.pop(index)
+        EventSystem.TriggerEvent(MODIFY_IMAGES_LIST_EVENT_NAME)

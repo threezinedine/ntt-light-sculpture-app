@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from copy import deepcopy
 
@@ -60,3 +61,9 @@ class Application(StructBase):
                 return False
 
         return True
+
+    def GetCurrentProjectDirectory(self) -> str:
+        currentProject = self.recentProjectNames[0]
+        currentProjectFilePaths = self.recentProjectFilePaths[currentProject]
+
+        return os.path.dirname(currentProjectFilePaths)

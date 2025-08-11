@@ -98,7 +98,6 @@ class MainWindow(QMainWindow):
         else:
             self.ui.noProjectsAction.setVisible(False)
 
-        print("Recent projects", recentProjects)
         assert len(self.recentProjectsActions) == 0
 
         for projectName, projectFilePath in recentProjects:

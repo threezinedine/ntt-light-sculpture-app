@@ -20,6 +20,7 @@ from utils.application import (
 from constants import (
     APP_DATA_KEY,
     CHANGE_PROJECT_EVENT_NAME,
+    MODIFY_IMAGES_LIST_EVENT_NAME,
     MAX_NUMBER_OF_RECENT_PROJECTS,
     RECENT_PROJECTS_EVENT_NAME,
 )
@@ -83,6 +84,12 @@ class MainWindowViewModel:
                                 f'Project "{projectName}" is invalid',
                             )
 
+        # ================ Event callbacks setup ==================
+        EventSystem.RegisterEvent(
+            MODIFY_IMAGES_LIST_EVENT_NAME,
+            self._UpdateProjectDataFile,
+        )
+
     def CreateNewProject(self, projectDirectory: str, projectName: str) -> None:
         os.makedirs(GetProjectDataFolder(projectDirectory, projectName))
 
@@ -120,6 +127,7 @@ class MainWindowViewModel:
 
         EventSystem.TriggerEvent(CHANGE_PROJECT_EVENT_NAME)
         EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
+        EventSystem.TriggerEvent(MODIFY_IMAGES_LIST_EVENT_NAME)
         return True
 
     def _RemoveRecentProject(self, projectName: str) -> None:
@@ -143,6 +151,12 @@ class MainWindowViewModel:
             del self.application.recentProjectFilePaths[removedProjectNames]
 
         self._UpdateApplicationDataFile()
+
+    def _UpdateProjectDataFile(self) -> None:
+        currentProjectName = self.project.projectName
+        currentProjectFile = self.application.recentProjectFilePaths[currentProjectName]
+        with open(currentProjectFile, "w") as f:
+            f.write(self.project.ToJson())
 
     def _UpdateApplicationDataFile(self) -> None:
         with open(GetApplicationDataFile(), "w") as f:

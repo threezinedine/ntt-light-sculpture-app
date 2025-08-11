@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
+    <width>300</width>
     <height>464</height>
    </rect>
   </property>
@@ -39,10 +39,17 @@
     </layout>
    </item>
    <item>
-    <widget class="QTreeView" name="projectTreeView"/>
+    <widget class="CustomTreeView" name="projectTreeView"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomTreeView</class>
+   <extends>QTreeView</extends>
+   <header>components/customs/tree_view/tree_view.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
