@@ -54,16 +54,20 @@ class ProjectTreeActor:
 
         return self
 
-    def DeleteImage(self) -> Self:
+    def _ChooseContextMenuAction(self, actionName: str) -> None:
         assert self.projectTreeView is not None
         assert self._contextMenu is not None, "Context menu is not open"
-
         actions = self._contextMenu.actions()
-        action = next((a for a in actions if a.text() == "Delete"), None)
+        action = next((a for a in actions if a.text() == actionName), None)
         assert action is not None
         action.trigger()
-        self._contextMenu = None
 
+    def ChooseDeleteAction(self) -> Self:
+        self._ChooseContextMenuAction("Delete")
+        return self
+
+    def ChooseOpenImageTabAction(self) -> Self:
+        self._ChooseContextMenuAction("Open")
         return self
 
 

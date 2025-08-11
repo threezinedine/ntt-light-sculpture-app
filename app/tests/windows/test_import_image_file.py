@@ -46,7 +46,7 @@ def test_import_image_file(
     )
 
     # ================== delete the image ==================
-    projectTreeActor.OpenContextMenuAt(0).DeleteImage()
+    projectTreeActor.OpenContextMenuAt(0).ChooseDeleteAction()
 
     # ================== assert image is deleted ==================
     assert projectTreeActor.NumberOfRows == 0
@@ -102,7 +102,7 @@ def test_delete_1_among_multiple_images(
     )
 
     # ================== delete the first image ==================
-    projectTreeActor.OpenContextMenuAt(0).DeleteImage()
+    projectTreeActor.OpenContextMenuAt(0).ChooseDeleteAction()
 
     # ================== assert image is deleted ==================
     assert projectTreeActor.NumberOfRows == 1

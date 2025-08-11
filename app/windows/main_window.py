@@ -3,11 +3,17 @@ from PyQt6.QtWidgets import QFileDialog, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtCore import Qt
 from functools import partial
 
+from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from components.new_project_dialog.dialog import NewProjectDialog
 from components.project_widget.project_widget import ProjectWidget
-from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
+from constants import (
+    CHANGE_PROJECT_EVENT_NAME,
+    OPEN_IMAGE_TAB_EVENT_NAME,
+    RECENT_PROJECTS_EVENT_NAME,
+)
 from converted_uis.main_window import Ui_MainWindow
 from modules.dependency_injection.helper import as_dependency
+from modules.dependency_injection import DependencyContainer
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
 
@@ -57,6 +63,7 @@ class MainWindow(QMainWindow):
         EventSystem.RegisterEvent(
             RECENT_PROJECTS_EVENT_NAME, self._RecentProjectsCallback
         )
+        EventSystem.RegisterEvent(OPEN_IMAGE_TAB_EVENT_NAME, self._OpenImageTabCallback)
 
     def _ChangeProjectCallback(self) -> None:
         self.setWindowTitle(self.viewModel.WindowTitle)
@@ -122,3 +129,13 @@ class MainWindow(QMainWindow):
             self.close()
         else:
             super().keyPressEvent(a0)  # type: ignore
+
+    def _OpenImageTabCallback(self, row: int) -> None:
+        imagePreviewWidget: ImagePreviewWidget = DependencyContainer.GetInstance(
+            ImagePreviewWidget.__name__,
+            row,
+        )
+
+        centerTabWidget = self.ui.centerTabWidget
+        centerTabWidget.addTab(imagePreviewWidget, imagePreviewWidget.viewModel.TabName)  # type: ignore
+        centerTabWidget.setCurrentWidget(imagePreviewWidget)

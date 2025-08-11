@@ -51,4 +51,6 @@ APPLICATION_UPDATED_EVENT_NAME = "application_updated"
 CHANGE_PROJECT_EVENT_NAME = "change_project"
 RECENT_PROJECTS_EVENT_NAME = "recent_projects"
 MODIFY_IMAGES_LIST_EVENT_NAME = "load_image"
+
+OPEN_IMAGE_TAB_EVENT_NAME = "open_image_tab"
 # ==================================================================================
