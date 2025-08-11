@@ -94,10 +94,21 @@ class MainWindow(QMainWindow):
         print("Recent projects", recentProjects)
         assert len(self.recentProjectsActions) == 0
 
-        for projectName, projectFolder in recentProjects:
+        for projectName, projectFilePath in recentProjects:
+
+            def OpenProject(projectFilePath: str) -> None:
+                success = self.viewModel.OpenProject(projectFilePath)
+                if not success:
+                    QMessageBox.information(
+                        self,
+                        "Error",
+                        f'Project "{projectName}" is invalid',
+                    )
+                    EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
+
             action = QAction(projectName, self.ui.recentProjectsMenu)
             action.triggered.connect(
-                partial(self.viewModel.OpenProject, projectFolder)  # type: ignore
+                partial(OpenProject, projectFilePath)  # type: ignore
             )
             self.recentProjectsActions.append(action)
             self.ui.recentProjectsMenu.addAction(action)

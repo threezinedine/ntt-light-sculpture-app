@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+
+from PyQt6.QtWidgets import QMessageBox
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
 from modules.dependency_injection.helper import as_dependency
 from modules.event_system.event_system import EventSystem
@@ -12,6 +14,7 @@ from utils.application import (
     GetApplicationDataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
+    GetProjectNameFromFilePath,
     GetWindowTitle,
 )
 from constants import (
@@ -65,6 +68,21 @@ class MainWindowViewModel:
                     self.application = Application()
                     with open(applicationJsonFile, "w") as f:
                         f.write(self.application.ToJson())
+                else:
+                    # Reload recent projects
+                    if len(self.application.recentProjectNames) > 0:
+                        projectFilePath = self.application.recentProjectFilePaths[
+                            self.application.recentProjectNames[0]
+                        ]
+                        projectName = GetProjectNameFromFilePath(projectFilePath)
+                        success = self.OpenProject(projectFilePath)
+
+                        if not success:
+                            QMessageBox.information(
+                                None,  # type: ignore
+                                "Error",
+                                f'Project "{projectName}" is invalid',
+                            )
 
     def CreateNewProject(self, projectDirectory: str, projectName: str) -> None:
         os.makedirs(GetProjectDataFolder(projectDirectory, projectName))
@@ -87,9 +105,27 @@ class MainWindowViewModel:
         EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
 
     def OpenProject(self, projectFile: str) -> bool:
+        if not os.path.exists(projectFile):
+            projectName = GetProjectNameFromFilePath(projectFile)
+            if projectName in self.application.recentProjectNames:
+                self.application.recentProjectNames.remove(projectName)
+            if projectName in self.application.recentProjectFilePaths:
+                del self.application.recentProjectFilePaths[projectName]
+            with open(GetApplicationDataFile(), "w") as f:
+                f.write(self.application.ToJson())
+            return False
+
         with open(projectFile, "r") as f:
             valid = self.project.FromJson(f.read())
             if not valid:
+                projectName = GetProjectNameFromFilePath(projectFile)
+                if projectName in self.application.recentProjectNames:
+                    self.application.recentProjectNames.remove(projectName)
+                if projectName in self.application.recentProjectFilePaths:
+                    del self.application.recentProjectFilePaths[projectName]
+                with open(GetApplicationDataFile(), "w") as f:
+                    f.write(self.application.ToJson())
+
                 return False
 
         if self.project.projectName in self.application.recentProjectNames:

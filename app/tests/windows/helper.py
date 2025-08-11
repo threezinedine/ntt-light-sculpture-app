@@ -89,9 +89,19 @@ class ProjectBuilder:
         self,
     ) -> None:
         self._project = Project()
+        self._useErrorProjectFile = False
+        self._createProjectFile = True
 
     def Name(self, projectName: str) -> Self:
         self._project.projectName = projectName
+        return self
+
+    def NotCreateProjectFile(self) -> Self:
+        self._createProjectFile = False
+        return self
+
+    def UseErrorProjectFile(self) -> Self:
+        self._useErrorProjectFile = True
         return self
 
     def Build(self, fs: FakeFilesystem) -> None:
@@ -110,6 +120,15 @@ class ProjectBuilder:
             self._project.projectName,
         )
         assert not fs.exists(projectFile), f"Project file {projectFile} already exists"  # type: ignore
+
+        if not self._createProjectFile:
+            return
+
+        if self._useErrorProjectFile:
+            with open(projectFile, "w") as f:
+                f.write('"Error": ')
+            return
+
         with open(projectFile, "w") as f:
             f.write(self._project.ToJson())
 
@@ -189,13 +208,6 @@ class ApplicationBuilder:
             return
 
         assert not fs.exists(GetApplicationDataFile()), "AppData file already exists"  # type: ignore
-
-        for projectName in self._application.recentProjectNames:
-            projectFile = GetProjectDataFile(
-                TEST_NEW_PROJECT_PATH,
-                projectName,
-            )
-            assert fs.exists(projectFile), f"Project file {projectFile} does not exist"  # type: ignore
 
         with open(GetApplicationDataFile(), "w") as f:
             f.write(self._application.ToJson())

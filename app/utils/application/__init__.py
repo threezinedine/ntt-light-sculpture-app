@@ -28,6 +28,10 @@ def GetProjectDataFile(projectDirectory: str, projectName: str) -> str:
     )
 
 
+def GetProjectNameFromFilePath(projectFilePath: str) -> str:
+    return os.path.split(os.path.dirname(projectFilePath))[-1]
+
+
 def GetWindowTitle(projectName: str | None = None) -> str:
     if projectName is None or projectName == "":
         return "Light Sculpture Studio"
