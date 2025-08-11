@@ -220,6 +220,11 @@ class ApplicationBuilder:
         self._application.recentProjectFilePaths[projectName] = projectFile
         return self
 
+    def AddErrorRecentProject(self, projectName: str, projectFilePath: str) -> Self:
+        self._application.recentProjectNames.append(projectName)
+        self._application.recentProjectFilePaths[projectName] = projectFilePath
+        return self
+
     def Build(self, fs: FakeFilesystem) -> None:
         if os.environ.get(APP_DATA_KEY) is None:
             return

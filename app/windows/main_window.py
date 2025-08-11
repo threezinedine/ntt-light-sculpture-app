@@ -95,7 +95,6 @@ class MainWindow(QMainWindow):
 
         for action in self.recentProjectsActions:
             action.setParent(None)  # type: ignore
-            action.deleteLater()  # type: ignore
 
         self.recentProjectsActions.clear()
 
@@ -109,7 +108,7 @@ class MainWindow(QMainWindow):
 
         for projectName, projectFilePath in recentProjects:
 
-            def OpenProject(projectFilePath: str) -> None:
+            def OpenProject(projectName: str, projectFilePath: str) -> None:
                 success = self.viewModel.OpenProject(projectFilePath)
                 if not success:
                     QMessageBox.information(
@@ -121,7 +120,7 @@ class MainWindow(QMainWindow):
 
             action = QAction(projectName, self.ui.recentProjectsMenu)
             action.triggered.connect(
-                partial(OpenProject, projectFilePath)  # type: ignore
+                partial(OpenProject, projectName, projectFilePath)  # type: ignore
             )
             self.recentProjectsActions.append(action)
             self.ui.recentProjectsMenu.addAction(action)

@@ -8,7 +8,6 @@ class CustomTreeView(QTreeView):
         super().__init__(parent)
         self._mousePressCallback: Callable[[QMouseEvent], None] | None = None
         self._keyPressCallback: Callable[[QKeyEvent, int], None] | None = None
-        print("CustomTreeView")
 
     def SetMousePressEventCallBack(
         self, callback: Callable[[QMouseEvent], None]

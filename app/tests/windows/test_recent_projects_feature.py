@@ -13,6 +13,7 @@ from constants import (
     TEST_NEW_PROJECT_PATH,
 )
 from structs.application import Application
+from tests.windows.assertions import ApplicationAssertion
 from tests.windows.helper import (
     ApplicationBuilder,
     FileDialogSetup,
@@ -199,10 +200,7 @@ def test_auto_reload_recent_projects_without_existed_project_file(
 
     infoMocker.assert_called_once()
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME_2])
 
 
 def test_auto_reload_recent_projects_without_folder(
@@ -218,11 +216,7 @@ def test_auto_reload_recent_projects_without_folder(
     assert mainWindow.windowTitle() == GetWindowTitle()
     assert len(mainWindow.recentProjectsActions) == 0
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == []
-
+    ApplicationAssertion().AssertRecentProjects([])
     infoMocker.assert_called_once()
 
 
@@ -241,10 +235,7 @@ def test_auto_reload_recent_projects_without_project_folder(
 
     infoMocker.assert_called_once()
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == []
+    ApplicationAssertion().AssertRecentProjects([])
 
 
 def test_choose_recent_project_with_error_project_data_file(
@@ -276,10 +267,7 @@ def test_choose_recent_project_with_error_project_data_file(
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
     infoMocker.assert_called_once()
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME_2])
 
 
 def test_choose_recent_project_without_existed_project_file(
@@ -310,10 +298,7 @@ def test_choose_recent_project_without_existed_project_file(
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
     infoMocker.assert_called_once()
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME_2])
 
 
 def test_choose_recent_project_without_folder(
@@ -342,7 +327,4 @@ def test_choose_recent_project_without_folder(
 
     infoMocker.assert_called_once()
 
-    with open(GetApplicationDataFile(), "r") as f:
-        application = Application()
-        application.FromJson(f.read())
-        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME_2])

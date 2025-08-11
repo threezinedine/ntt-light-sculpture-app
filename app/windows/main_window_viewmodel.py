@@ -72,10 +72,10 @@ class MainWindowViewModel:
                 else:
                     # Reload recent projects
                     if len(self.application.recentProjectNames) > 0:
+                        projectName = self.application.recentProjectNames[0]
                         projectFilePath = self.application.recentProjectFilePaths[
-                            self.application.recentProjectNames[0]
+                            projectName
                         ]
-                        projectName = GetProjectNameFromFilePath(projectFilePath)
                         success = self.OpenProject(projectFilePath)
 
                         if not success:
@@ -84,6 +84,7 @@ class MainWindowViewModel:
                                 "Error",
                                 f'Project "{projectName}" is invalid',
                             )
+                            EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
 
         # ================ Event callbacks setup ==================
         EventSystem.RegisterEvent(
@@ -114,20 +115,33 @@ class MainWindowViewModel:
     def OpenProject(self, projectFile: str) -> bool:
         projectName = GetProjectNameFromFilePath(projectFile)
 
+        if not os.path.exists(projectFile):
+            localProjectName = projectName
+            if not os.path.isfile(projectFile):
+                for key, value in self.application.recentProjectFilePaths.items():
+                    if value == projectFile:
+                        localProjectName = key
+                        break
+
+            print(
+                "Not Exists",
+                localProjectName,
+                projectFile,
+                os.path.isfile(projectFile),
+                os.path.exists(projectFile),
+            )
+            self._RemoveRecentProject(localProjectName)
+            return False
+
         imageFolder = GetImageFolder(self.application.CurrentProjectDirectory)
         if not os.path.exists(imageFolder):
             os.makedirs(imageFolder)
             logger.info(f"Image folder created: {imageFolder}")
 
-        if not os.path.exists(projectFile):
-            self._RemoveRecentProject(projectName)
-            return False
-
         with open(projectFile, "r") as f:
             valid = self.project.FromJson(f.read())
             if not valid:
                 self._RemoveRecentProject(projectName)
-
                 return False
 
         self._AddRecentProject(self.project.projectName, projectFile)
@@ -138,10 +152,12 @@ class MainWindowViewModel:
         return True
 
     def _RemoveRecentProject(self, projectName: str) -> None:
+        print("Removing recent project", projectName)
         if projectName in self.application.recentProjectNames:
             self.application.recentProjectNames.remove(projectName)
         if projectName in self.application.recentProjectFilePaths:
             del self.application.recentProjectFilePaths[projectName]
+
         self._UpdateApplicationDataFile()
 
     def _AddRecentProject(self, projectName: str, projectFilePath: str) -> None:
