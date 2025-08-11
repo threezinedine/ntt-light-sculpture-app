@@ -218,6 +218,30 @@ def test_auto_reload_recent_projects_without_existed_project_file(
         assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
 
 
+def test_auto_reload_recent_projects_without_folder(
+    fixtureBuilder: FixtureBuilder,
+    mocker: MockerFixture,
+):
+    infoMocker = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
+
+    mainWindow = fixtureBuilder.AddApplication(
+        ApplicationBuilder()
+        .AddAppDataFolder()
+        .AddAppDataFile()
+        .AddRecentProject(TEST_NEW_PROJECT_NAME)
+    ).Build()
+
+    assert mainWindow.windowTitle() == GetWindowTitle()
+    assert len(mainWindow.recentProjectsActions) == 0
+
+    with open(GetApplicationDataFile(), "r") as f:
+        application = Application()
+        application.FromJson(f.read())
+        assert application.recentProjectNames == []
+
+    infoMocker.assert_called_once()
+
+
 def test_auto_reload_recent_projects_without_project_folder(
     fixtureBuilder: FixtureBuilder,
     mocker: MockerFixture,
@@ -271,6 +295,76 @@ def test_choose_recent_project_with_error_project_data_file(
     assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
     assert len(mainWindow.recentProjectsActions) == 1
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
+    infoMocker.assert_called_once()
+
+    with open(GetApplicationDataFile(), "r") as f:
+        application = Application()
+        application.FromJson(f.read())
+        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+
+
+def test_choose_recent_project_without_existed_project_file(
+    fixtureBuilder: FixtureBuilder,
+    mocker: MockerFixture,
+):
+    infoMocker = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
+
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).NotCreateProjectFile()
+        )
+        .AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
+        .AddApplication(
+            ApplicationBuilder()
+            .AddAppDataFolder()
+            .AddAppDataFile()
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        )
+        .Build()
+    )
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+
+    mainWindow.recentProjectsActions[1].trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+    assert len(mainWindow.recentProjectsActions) == 1
+    assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
+    infoMocker.assert_called_once()
+
+    with open(GetApplicationDataFile(), "r") as f:
+        application = Application()
+        application.FromJson(f.read())
+        assert application.recentProjectNames == [TEST_NEW_PROJECT_NAME_2]
+
+
+def test_choose_recent_project_without_folder(
+    fixtureBuilder: FixtureBuilder,
+    mocker: MockerFixture,
+):
+    infoMocker = mocker.patch("PyQt6.QtWidgets.QMessageBox.information")
+
+    mainWindow = (
+        fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME_2))
+        .AddApplication(
+            ApplicationBuilder()
+            .AddAppDataFolder()
+            .AddAppDataFile()
+            .AddRecentProject(TEST_NEW_PROJECT_NAME_2)
+            .AddRecentProject(TEST_NEW_PROJECT_NAME)
+        )
+        .Build()
+    )
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+
+    mainWindow.recentProjectsActions[1].trigger()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME_2)
+    assert len(mainWindow.recentProjectsActions) == 1
+    assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME_2
+
     infoMocker.assert_called_once()
 
     with open(GetApplicationDataFile(), "r") as f:
