@@ -1,8 +1,8 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMenu
 from pytestqt.qtbot import QtBot
 
 from utils.application import GetImageFileNameFromFilePath
+from .utils import deleteProjectTreeItem
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
 from constants import (
@@ -55,25 +55,7 @@ def test_import_image_file(
     )
 
     # ================== delete the image ==================
-    imageItem = projectTreeView.model().index(0, 0)
-    imageItemRect = projectTreeView.visualRect(imageItem)
-    print("Clicking on the image")
-    qtbot.mouseClick(  # type: ignore
-        projectTreeView.viewport(),
-        Qt.MouseButton.RightButton,
-        pos=imageItemRect.center(),
-    )
-
-    qtbot.wait(100)
-
-    contextMenu: QMenu | None = projectTreeView.findChild(QMenu)  # type: ignore
-
-    # ================== assert context menu is shown ==================
-    assert contextMenu is not None
-    actions = contextMenu.actions()
-    action = next((a for a in actions if a.text() == "Delete"), None)
-    assert action is not None
-    action.trigger()
+    deleteProjectTreeItem(qtbot, projectTreeView, 0, "Delete")
 
     # ================== assert image is deleted ==================
     assert projectTreeView.model() is not None
@@ -130,24 +112,7 @@ def test_delete_1_among_multiple_images(
     ) == GetImageFileNameFromFilePath(TEST_PNG_IMAGE_PATH_2)
 
     # ================== delete the first image ==================
-    imageItem = projectViewTree.model().index(0, 0)
-    imageItemRect = projectViewTree.visualRect(imageItem)
-    qtbot.mouseClick(  # type: ignore
-        projectViewTree.viewport(),
-        Qt.MouseButton.RightButton,
-        pos=imageItemRect.center(),
-    )
-
-    qtbot.wait(100)
-
-    contextMenu: QMenu | None = projectViewTree.findChild(QMenu)  # type: ignore
-
-    # ================== assert context menu is shown ==================
-    assert contextMenu is not None
-    actions = contextMenu.actions()
-    action = next((a for a in actions if a.text() == "Delete"), None)
-    assert action is not None
-    action.trigger()
+    deleteProjectTreeItem(qtbot, projectViewTree, 0, "Delete")
 
     # ================== assert image is deleted ==================
     assert projectViewTree.model() is not None
