@@ -1,6 +1,4 @@
-from pytestqt.qtbot import QtBot
-
-from tests.windows.actor import ProjectTreeActor
+from .actors import ProjectTreeActor
 from utils.application import GetImageFileNameFromFilePath
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
@@ -13,9 +11,9 @@ from constants import (
 
 
 def test_import_image_file(
-    qtbot: QtBot,
     fixtureBuilder: FixtureBuilder,
     fileDialogSetup: FileDialogSetup,
+    projectTreeActor: ProjectTreeActor,
 ):
     mainWindow = (
         fixtureBuilder.AddProject(ProjectBuilder().Name(TEST_NEW_PROJECT_NAME))
@@ -32,10 +30,7 @@ def test_import_image_file(
     mainWindow.projectWidget.ui.importFileButton.click()
 
     # ================== checking the image is loadded ==================
-    projectTreeActor = ProjectTreeActor(
-        qtbot,
-        mainWindow.projectWidget.ui.projectTreeView,
-    )
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
@@ -43,10 +38,6 @@ def test_import_image_file(
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
-    projectTreeActor = ProjectTreeActor(
-        qtbot,
-        mainWindow.projectWidget.ui.projectTreeView,
-    )
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
         TEST_PNG_IMAGE_PATH
@@ -60,8 +51,8 @@ def test_import_image_file(
 
 
 def test_open_with_with_loadded_file(
-    qtbot: QtBot,
     fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
@@ -71,10 +62,7 @@ def test_open_with_with_loadded_file(
         .Build()
     )
 
-    projectTreeActor = ProjectTreeActor(
-        qtbot,
-        mainWindow.projectWidget.ui.projectTreeView,
-    )
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
 
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == GetImageFileNameFromFilePath(
@@ -84,7 +72,7 @@ def test_open_with_with_loadded_file(
 
 def test_delete_1_among_multiple_images(
     fixtureBuilder: FixtureBuilder,
-    qtbot: QtBot,
+    projectTreeActor: ProjectTreeActor,
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
@@ -97,10 +85,7 @@ def test_delete_1_among_multiple_images(
         .Build()
     )
 
-    projectTreeActor = ProjectTreeActor(
-        qtbot,
-        mainWindow.projectWidget.ui.projectTreeView,
-    )
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
 
     # ================== assert 2 images are loaded ==================
     assert projectTreeActor.NumberOfRows == 2
