@@ -22,3 +22,5 @@ class ImagePreviewWidget(QWidget):
 
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore
+
+        self.ui.imagePreviewLabel.SetImage(self.viewModel.Image)
