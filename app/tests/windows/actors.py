@@ -6,6 +6,7 @@ import pytest
 from pytestqt.qtbot import QtBot
 
 from components.customs.tree_view.tree_view import CustomTreeView
+from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 
 
 class ProjectTreeActor:
@@ -105,3 +106,34 @@ def tabWidgetActor(
     qtbot: QtBot,
 ) -> Generator[TabWidgetActor, None, None]:
     yield TabWidgetActor(qtbot)
+
+
+class ImagePreviewWidgetActor:
+    def __init__(self, qtbot: QtBot) -> None:
+        self.qtbot = qtbot
+        self._imagePreviewWidget: ImagePreviewWidget | None = None
+
+    def SetImagePreviewWidget(self, imagePreviewWidget: ImagePreviewWidget) -> Self:
+        self._imagePreviewWidget = imagePreviewWidget
+        return self
+
+    def AssertThresholdSliderValue(self, value: int) -> Self:
+        assert self._imagePreviewWidget is not None
+        thresholdSliderValue = self._imagePreviewWidget.ui.thresholdSlider.value()
+        assert (
+            thresholdSliderValue == value
+        ), f"Threshold value is {thresholdSliderValue}, expected {value} but got {thresholdSliderValue}"
+        return self
+
+    def DragThresholdSlider(self, value: int) -> Self:
+        assert self._imagePreviewWidget is not None
+        self._imagePreviewWidget.ui.thresholdSlider.setValue(value)
+        self.qtbot.wait(100)
+        return self
+
+
+@pytest.fixture()
+def imagePreviewWidgetActor(
+    qtbot: QtBot,
+) -> Generator[ImagePreviewWidgetActor, None, None]:
+    yield ImagePreviewWidgetActor(qtbot)

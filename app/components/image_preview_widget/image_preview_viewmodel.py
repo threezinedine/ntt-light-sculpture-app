@@ -4,6 +4,7 @@ from structs.application import Application
 from structs.project import Project
 from utils.application import GetImageFilePath
 from utils.images import ConvertToBinary, LoadImage
+from utils.logger import logger
 
 
 @as_dependency(Project, Application)
@@ -50,9 +51,9 @@ class ImagePreviewViewModel:
         self._isLoaded = True
         return self._image
 
-    @property
-    def BinaryImage(self) -> cv.Mat | None:
-        if self._index < 0 or self._index >= len(self._project.images):
+    def GetBinaryImage(self, threshold: int) -> cv.Mat | None:
+        if self.Image is None:
             return None
 
-        return ConvertToBinary(self._image)
+        logger.debug(f"self.Image: {self.Image.shape}")
+        return ConvertToBinary(self.Image, threshold)

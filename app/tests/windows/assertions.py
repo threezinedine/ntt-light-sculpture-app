@@ -56,7 +56,6 @@ class ProjectAssertion:
         assert self._fs is not None
         assert self._project is not None
 
-        print("Checking images", self._project.images)
         for image in self._project.images:
             loadedImagePath = GetImageFilePath(
                 os.path.join(TEST_NEW_PROJECT_PATH, self._project.projectName),

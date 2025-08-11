@@ -1,1 +1,1 @@
-test_open_image_tab_with_correct_path
+test_modify_threshold_then_binary_image_is_updated

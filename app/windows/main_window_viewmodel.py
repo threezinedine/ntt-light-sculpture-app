@@ -102,7 +102,9 @@ class MainWindowViewModel:
         with open(projectDataFile, "w") as f:
             f.write(self.project.ToJson())
 
-        imageFolder = GetImageFolder(GetProjectDataFolder(projectDirectory, projectName))
+        imageFolder = GetImageFolder(
+            GetProjectDataFolder(projectDirectory, projectName)
+        )
         if not os.path.exists(imageFolder):
             os.makedirs(imageFolder)
             logger.info(f"Image folder created: {imageFolder}")
@@ -128,13 +130,6 @@ class MainWindowViewModel:
                         localProjectName = key
                         break
 
-            print(
-                "Not Exists",
-                localProjectName,
-                projectFile,
-                os.path.isfile(projectFile),
-                os.path.exists(projectFile),
-            )
             self._RemoveRecentProject(localProjectName)
             return False
 
@@ -158,7 +153,6 @@ class MainWindowViewModel:
         return True
 
     def _RemoveRecentProject(self, projectName: str) -> None:
-        print("Removing recent project", projectName)
         if projectName in self.application.recentProjectNames:
             self.application.recentProjectNames.remove(projectName)
         if projectName in self.application.recentProjectFilePaths:

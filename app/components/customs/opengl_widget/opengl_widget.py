@@ -4,6 +4,7 @@ from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from Engine import Renderer
+from utils.logger import logger
 
 
 class OpenGLWidget(QOpenGLWidget):
@@ -18,7 +19,7 @@ class OpenGLWidget(QOpenGLWidget):
         try:
             Renderer.Initialize()
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def resizeGL(self, w: int, h: int):
         Renderer.Resize(w, h)
@@ -27,7 +28,7 @@ class OpenGLWidget(QOpenGLWidget):
         try:
             Renderer.Render()
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def closeEvent(self, a0: QCloseEvent):
         Renderer.Shutdown()

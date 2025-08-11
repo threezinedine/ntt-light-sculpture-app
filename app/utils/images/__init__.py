@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import cv2 as cv
+from utils.logger import logger
 
 
 def LoadImage(imagePath: str) -> cv.Mat | None:
@@ -10,8 +11,14 @@ def LoadImage(imagePath: str) -> cv.Mat | None:
         return None
 
 
-def ConvertToBinary(image: cv.Mat | None) -> cv.Mat | None:
+def ConvertToBinary(image: cv.Mat | None, threshold: int = 128) -> cv.Mat | None:
     if image is None:
         return None
 
-    return cv.threshold(image, 127, 255, cv.THRESH_BINARY)[1]  # type: ignore
+    grayImage = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+    try:
+        _, binaryImage = cv.threshold(grayImage, threshold, 255, cv.THRESH_BINARY)
+        return binaryImage  # type: ignore
+    except:
+        return grayImage  # type: ignore

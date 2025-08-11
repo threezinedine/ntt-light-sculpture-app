@@ -8,7 +8,8 @@ from utils.application import (
     GetImageFilePath,
     GetTestProjectDataFolder,
 )
-from .actors import tabWidgetActor  # type: ignore
+from utils.images import ConvertToBinary, LoadImage
+from .actors import ImagePreviewWidgetActor, tabWidgetActor  # type: ignore
 from converted_constants import TEST_PNG_IMAGE_NAME
 from PIL import Image
 
@@ -131,3 +132,41 @@ def test_open_image_tab_with_correct_path(
             GetTestProjectDataFolder(TEST_NEW_PROJECT_NAME), TEST_PNG_IMAGE_NAME
         )
     )
+
+
+def test_modify_threshold_then_binary_image_is_updated(
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+    tabWidgetActor: TabWidgetActor,
+    imagePreviewWidgetActor: ImagePreviewWidgetActor,
+    mocker: MockerFixture,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    tabWidgetActor.SetTabWidget(mainWindow.ui.centerTabWidget)
+
+    loadedImage = ConvertToBinary(LoadImage(TEST_PNG_IMAGE_PATH))
+
+    thresholdSliderValueMocker = mocker.patch(
+        "cv2.threshold",
+        return_value=loadedImage,
+    )
+
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+    imagePreviewWidgetActor.SetImagePreviewWidget(
+        mainWindow.ui.centerTabWidget.widget(1)  # type: ignore
+    )
+
+    imagePreviewWidgetActor.AssertThresholdSliderValue(128)
+    imagePreviewWidgetActor.DragThresholdSlider(123)
+
+    assert thresholdSliderValueMocker.call_count >= 1
+    finalThresholdSliderValue = thresholdSliderValueMocker.call_args[0]
+    assert finalThresholdSliderValue[1] == 123  # threshold value

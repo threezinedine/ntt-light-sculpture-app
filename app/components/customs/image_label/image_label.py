@@ -14,10 +14,16 @@ class ImageLabel(QLabel):
 
         self.hasContent = False
 
-    def SetImage(self, image: cv.Mat | None) -> None:
+    def SetImage(
+        self,
+        image: cv.Mat | None,
+        format: QImage.Format = QImage.Format.Format_BGR888,
+    ) -> None:
         if image is None:
             return
 
         self.hasContent = True
-        imageData = QImage(image.data, image.shape[1], image.shape[0], QImage.Format.Format_BGR888)  # type: ignore
+        imageData = QImage(
+            image.data, image.shape[1], image.shape[0], format  # type: ignore
+        )
         self.setPixmap(QPixmap.fromImage(imageData))

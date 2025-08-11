@@ -1,3 +1,4 @@
+from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
 from converted_uis.image_preview import Ui_ImagePreviewWidget
@@ -24,4 +25,11 @@ class ImagePreviewWidget(QWidget):
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.imagePreviewLabel.SetImage(self.viewModel.Image)
-        self.ui.binaryImageLabel.SetImage(self.viewModel.BinaryImage)
+        self.ui.thresholdSlider.valueChanged.connect(self._UpdateBinaryImage)
+        self._UpdateBinaryImage()
+
+    def _UpdateBinaryImage(self) -> None:
+        self.ui.binaryImageLabel.SetImage(
+            self.viewModel.GetBinaryImage(self.ui.thresholdSlider.value()),
+            QImage.Format.Format_Grayscale8,
+        )

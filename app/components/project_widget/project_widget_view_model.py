@@ -32,7 +32,6 @@ class ProjectWidgetViewModel:
         imageName = GetImageFileNameFromFilePath(imagePath)
         self.project.images.append(imageName)
 
-        print(self.application.CurrentProjectDirectory)
         targetPath = GetImageFilePath(
             self.application.CurrentProjectDirectory,
             imageName,
