@@ -1,5 +1,7 @@
 from components.new_project_dialog.dialog import NewProjectDialog
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
+from components.project_widget.project_widget import ProjectWidget
+from components.project_widget.project_widget_view_model import ProjectWidgetViewModel
 from modules.dependency_injection.helper import as_singleton
 from structs.application import Application
 from structs.project import Project
@@ -19,6 +21,9 @@ def DependencyInjectionConfig():
 
     as_singleton(NewProjectDialogViewModel)
     as_singleton(MainWindowViewModel)
+
+    as_singleton(ProjectWidgetViewModel)
+    as_singleton(ProjectWidget)
 
     as_singleton(NewProjectDialog)
     as_singleton(MainWindow)

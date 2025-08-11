@@ -10,7 +10,12 @@ from modules.dependency_injection import DependencyContainer
 from structs.application import Application
 from structs.project import Project
 from windows.main_window import MainWindow
-from constants import APP_DATA_KEY, TEST_APP_DATA_FOLDER, TEST_NEW_PROJECT_PATH
+from constants import (
+    APP_DATA_KEY,
+    TEST_APP_DATA_FOLDER,
+    TEST_NEW_PROJECT_PATH,
+    TEST_PNG_IMAGE_PATH,
+)
 from utils.application import (
     GetApplicationDataFile,
     GetApplicationDataFolder,
@@ -217,6 +222,8 @@ class FixtureBuilder:
     ) -> None:
         self._fs = fs
         self._qtBot = qtBot
+
+        self._fs.add_real_file(TEST_PNG_IMAGE_PATH, read_only=True)  # type: ignore
 
         self._projectBuilders: list[ProjectBuilder] = []
         self._applicationBuilder: ApplicationBuilder | None = None

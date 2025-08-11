@@ -2,6 +2,9 @@ import os
 
 # ================================ CONSTANTS =======================================
 MAX_NUMBER_OF_RECENT_PROJECTS = 5
+CURRENT_PROJECT_FOLDER = os.path.dirname(__file__)
+ASSETS_FOLDER = os.path.join(CURRENT_PROJECT_FOLDER, "assets")
+TEST_IMAGE_FOLDER = os.path.join(ASSETS_FOLDER, "images", "tests")
 # ==================================================================================
 
 # ================================ ENVIRONMENT VARIABLES ===========================
@@ -36,6 +39,8 @@ TEST_NEW_PROJECT_NAME_9 = "Testing 8"
 TEST_NEW_PROJECT_NAME_10 = "Testing 9"
 TEST_PROJECT_FILE_ERROR_FOLDER = "C:/Users/jason/Errors"
 TEST_PROJECT_FILE_ERROR_PROJECT_NAME = "Error Project"
+
+TEST_PNG_IMAGE_PATH = os.path.join(TEST_IMAGE_FOLDER, "test-png.png")
 # ==================================================================================
 
 # ================================ EVENTS ==========================================
@@ -44,4 +49,5 @@ OPEN_NON_EXISTED_PROJECT_DIR_EVENT_NAME = "open_non_existed_project_dir"
 APPLICATION_UPDATED_EVENT_NAME = "application_updated"
 CHANGE_PROJECT_EVENT_NAME = "change_project"
 RECENT_PROJECTS_EVENT_NAME = "recent_projects"
+LOAD_IMAGE_EVENT_NAME = "load_image"
 # ==================================================================================

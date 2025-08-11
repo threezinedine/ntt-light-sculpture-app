@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from dataclasses import dataclass, field
 
@@ -15,6 +16,7 @@ class Project(StructBase):
     """
 
     projectName: str = field(default="")
+    imagePaths: list[str] = field(default_factory=list)
     createdAt: int = field(default=0)
     lastEditAt: int = field(default=0)
 
@@ -22,15 +24,21 @@ class Project(StructBase):
         if not isinstance(other, Project):
             raise ValueError("other is not a Project")
 
+        self.imagePaths = other.imagePaths
         self.projectName = other.projectName
         self.createdAt = other.createdAt
         self.lastEditAt = other.lastEditAt
+
+        self.imagePaths = deepcopy(other.imagePaths)
 
     def Compare(self, other: "StructBase") -> bool:
         if not isinstance(other, Project):
             raise ValueError("other is not a Project")
 
         if self.projectName != other.projectName:
+            return False
+
+        if set(self.imagePaths) != set(other.imagePaths):
             return False
 
         return True

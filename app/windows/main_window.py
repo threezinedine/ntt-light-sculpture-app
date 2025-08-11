@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt
 from functools import partial
 
 from components.new_project_dialog.dialog import NewProjectDialog
+from components.project_widget.project_widget import ProjectWidget
 from constants import CHANGE_PROJECT_EVENT_NAME, RECENT_PROJECTS_EVENT_NAME
 from converted_uis.main_window import Ui_MainWindow
 from components.openg_widget import OpenGlWidget
@@ -15,12 +16,14 @@ from modules.event_system.event_system import EventSystem
 @as_dependency(
     MainWindowViewModel,
     NewProjectDialog,
+    ProjectWidget,
 )
 class MainWindow(QMainWindow):
     def __init__(
         self,
         viewModel: MainWindowViewModel,
         newProjectDialog: NewProjectDialog,
+        projectWidget: ProjectWidget,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
@@ -32,6 +35,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.recentProjectsActions: list[QAction] = []
         self.newProjectDialog = newProjectDialog
+        self.projectWidget = projectWidget
         self._SetupUI()
 
     def _SetupUI(self) -> None:
@@ -43,6 +47,9 @@ class MainWindow(QMainWindow):
         self.ui.centerLayout.addWidget(OpenGlWidget())
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
         self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
+
+        self.ui.projectTreeWidget.setWidget(self.projectWidget)
+
         self._RecentProjectsCallback()
 
         EventSystem.RegisterEvent(

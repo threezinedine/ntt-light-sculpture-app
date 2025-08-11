@@ -47,7 +47,7 @@
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="projectTree">
+  <widget class="QDockWidget" name="projectTreeWidget">
    <property name="windowTitle">
     <string>Project</string>
    </property>

@@ -32,6 +32,10 @@ def GetProjectNameFromFilePath(projectFilePath: str) -> str:
     return os.path.split(os.path.dirname(projectFilePath))[-1]
 
 
+def GetImageFileNameFromFilePath(imageFilePath: str) -> str:
+    return os.path.splitext(os.path.split(imageFilePath)[-1])[0]
+
+
 def GetWindowTitle(projectName: str | None = None) -> str:
     if projectName is None or projectName == "":
         return "Light Sculpture Studio"
