@@ -10,3 +10,6 @@
 [submodule "engine/vendors/gtest"]
 	path = engine/vendors/gtest
 	url = https://github.com/google/googletest.git
+[submodule "engine/vendors/glm"]
+	path = engine/vendors/glm
+	url = https://github.com/g-truc/glm.git

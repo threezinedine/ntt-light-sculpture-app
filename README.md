@@ -14,7 +14,7 @@ The core functionality revolves around computational geometry and light simulati
 
 ## Requirements
 
--   Python [3.11](https://www.python.org/downloads/) or higher
+-   Python [3.11](https://www.python.org/downloads/)
 -   CMake [3.20](https://cmake.org/download/) or higher
 -   Clang [18.1.1](https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.1) or higher
 -   Git [2.30](https://git-scm.com/downloads) or higher
