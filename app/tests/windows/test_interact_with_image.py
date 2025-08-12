@@ -1,5 +1,5 @@
 from pytest_mock import MockerFixture
-from constants import TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_PATH
+from constants import TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_PATH, TEST_PNG_IMAGE_PATH_2
 from tests.windows.actors import ProjectTreeActor, TabWidgetActor
 from tests.windows.assertions import TabWidgetAssertion
 from tests.windows.helper import ApplicationBuilder, FixtureBuilder, ProjectBuilder
@@ -99,6 +99,30 @@ def test_cannont_open_image_tab_multiple_times(
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(
         2
     ).AssertImagePreviewWidgetNotEmpty(1)
+
+
+def test_cannot_open_the_second_image_multiple_times(
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+    tabWidgetActor: TabWidgetActor,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(TEST_PNG_IMAGE_PATH)
+            .AddImage(TEST_PNG_IMAGE_PATH_2)
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    tabWidgetActor.SetTabWidget(mainWindow.ui.centerTabWidget)
+
+    projectTreeActor.OpenContextMenuAt(1).ChooseOpenImageTabAction()
+    projectTreeActor.OpenContextMenuAt(1).ChooseOpenImageTabAction()
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
 
 
 def test_open_image_tab_with_correct_path(

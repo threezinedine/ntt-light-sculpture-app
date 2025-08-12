@@ -18,11 +18,11 @@ from utils.logger import logger  # type: ignore
 class ImageItem(QStandardItem):
     def __init__(
         self,
-        imagePath: str,
+        imageName: str,
     ) -> None:
         super().__init__()
-        self.imagePath = imagePath
-        self.setText(GetImageFileNameFromFilePath(imagePath))
+        self.imageName = imageName
+        self.setText(imageName)
 
 
 @as_dependency(Project, Application)
@@ -63,7 +63,7 @@ class ProjectWidgetViewModel:
 
     @property
     def ImageItems(self) -> list[QStandardItem]:
-        return [ImageItem(image) for image in self.project.images]
+        return [ImageItem(imageName) for imageName in self.project.images]
 
     def DeleteImage(self, index: int) -> None:
         self.project.images.pop(index)

@@ -15,6 +15,7 @@ from modules.event_system.event_system import EventSystem
 from .project_widget_view_model import ProjectWidgetViewModel
 from converted_uis.project_widget import Ui_ProjectWidget
 from modules.dependency_injection.helper import as_dependency
+from utils.logger import logger  # type: ignore
 
 
 @as_dependency(ProjectWidgetViewModel)
@@ -79,14 +80,15 @@ class ProjectWidget(QWidget):
             return
 
         menu = QMenu(self.ui.projectTreeView)
+        itemRow = item.row()
 
         menu.addAction(
             "Open",
-            partial(EventSystem.TriggerEvent, OPEN_IMAGE_TAB_EVENT_NAME, item.row()),
+            partial(EventSystem.TriggerEvent, OPEN_IMAGE_TAB_EVENT_NAME, itemRow),
         )
         menu.addAction(
             "Delete",
-            partial(self.viewModel.DeleteImage, item.row()),
+            partial(self.viewModel.DeleteImage, itemRow),
         )
         menu.popup(e.globalPosition().toPoint())
 

@@ -111,6 +111,30 @@ def test_delete_1_among_multiple_images(
     ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME_2])
 
 
+def test_delete_the_last_image(
+    qtbot: QtBot,
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(TEST_PNG_IMAGE_PATH)
+            .AddImage(TEST_PNG_IMAGE_PATH_2)
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    projectTreeActor.OpenContextMenuAt(1).ChooseDeleteAction()
+
+    assert projectTreeActor.NumberOfRows == 1
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME])
+
+
 def test_automatically_modify_the_name_of_when_import_existed_image_name(
     fixtureBuilder: FixtureBuilder,
     fileDialogSetup: FileDialogSetup,

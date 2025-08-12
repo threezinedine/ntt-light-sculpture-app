@@ -4,7 +4,7 @@ from structs.application import Application
 from structs.project import Project
 from utils.application import GetImageFilePath
 from utils.images import ConvertToBinary, LoadImage
-from utils.logger import logger
+from utils.logger import logger  # type: ignore
 
 
 @as_dependency(Project, Application)
@@ -33,6 +33,7 @@ class ImagePreviewViewModel:
     def TabName(self) -> str:
         if self._index < 0 or self._index >= len(self._project.images):
             return ""
+        logger.debug(f"Project Images: {self._project.images} {self._index}")
         return self._project.images[self._index]
 
     @property

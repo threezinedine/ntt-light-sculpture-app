@@ -16,6 +16,7 @@ from modules.dependency_injection.helper import as_dependency
 from modules.dependency_injection import DependencyContainer
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
+from utils.logger import logger  # type: ignore
 
 
 @as_dependency(
@@ -132,9 +133,15 @@ class MainWindow(QMainWindow):
             super().keyPressEvent(a0)  # type: ignore
 
     def _OpenImageTabCallback(self, row: int) -> None:
+        logger.debug(f"Open Image Tab Callback: {row}")
         for i in range(self.ui.centerTabWidget.count()):
-            if self.ui.centerTabWidget.tabText(i) == self.projectWidget.viewModel.ImageItems[row].text():
-                self.ui.centerTabWidget.setCurrentWidget(self.ui.centerTabWidget.widget(i))
+            if (
+                self.ui.centerTabWidget.tabText(i)
+                == self.projectWidget.viewModel.ImageItems[row].text()
+            ):
+                self.ui.centerTabWidget.setCurrentWidget(
+                    self.ui.centerTabWidget.widget(i)
+                )
                 return
 
         imagePreviewWidget: ImagePreviewWidget = DependencyContainer.GetInstance(

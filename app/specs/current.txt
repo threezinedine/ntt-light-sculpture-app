@@ -1,1 +1,1 @@
-test_automatically_modify_the_name_of_when_import_existed_image_name
+test_delete_the_last_image

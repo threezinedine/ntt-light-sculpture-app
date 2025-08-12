@@ -17,6 +17,7 @@ class ImagePreviewWidget(QWidget):
     ):
         super().__init__(parent, flags)
         self.viewModel = viewmodel
+        self.viewModel.Index = index
         self.ui = Ui_ImagePreviewWidget()
 
         self._SetupUI()
