@@ -60,3 +60,15 @@ def GetImageMetadataFile(projectDirectory: str, imageName: str) -> str:
     return os.path.normpath(
         os.path.join(GetImageFolder(projectDirectory), f"{imageName}.meta")
     )
+
+
+def GetImageNameBasedOnExistedImageNames(
+    imageName: str,
+    existedImageNames: list[str],
+) -> str:
+    finalName = imageName
+
+    while finalName in existedImageNames:
+        finalName = f"{imageName} (Copied)"
+
+    return finalName

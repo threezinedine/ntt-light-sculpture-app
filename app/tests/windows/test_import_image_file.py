@@ -1,5 +1,7 @@
 from pyfakefs.fake_filesystem import FakeFilesystem
+from pytestqt.qtbot import QtBot
 from tests.windows.assertions import ImageMetadataAssertion, ProjectAssertion
+from utils.application import GetImageNameBasedOnExistedImageNames
 from .actors import ProjectTreeActor
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
@@ -107,3 +109,40 @@ def test_delete_1_among_multiple_images(
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME_2
     ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME_2])
+
+
+def test_automatically_modify_the_name_of_when_import_existed_image_name(
+    fixtureBuilder: FixtureBuilder,
+    fileDialogSetup: FileDialogSetup,
+    projectTreeActor: ProjectTreeActor,
+    fs: FakeFilesystem,
+    qtbot: QtBot,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    fileDialogSetup.SetOutput(TEST_PNG_IMAGE_PATH)
+    mainWindow.projectWidget.ui.importFileButton.click()
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    assert projectTreeActor.NumberOfRows == 2
+    assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
+
+    NEW_IMAGE_NAME = GetImageNameBasedOnExistedImageNames(
+        TEST_PNG_IMAGE_NAME,
+        [TEST_PNG_IMAGE_NAME],
+    )
+    assert projectTreeActor.GetItemNameAt(1) == NEW_IMAGE_NAME
+
+    ImageMetadataAssertion(
+        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
+    ).AssertFileExists().AssertThreshold(128)
+
+    ImageMetadataAssertion(
+        TEST_NEW_PROJECT_NAME, NEW_IMAGE_NAME
+    ).AssertFileExists().AssertThreshold(128)

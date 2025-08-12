@@ -1,0 +1,1 @@
+test_automatically_modify_the_name_of_when_import_existed_image_name

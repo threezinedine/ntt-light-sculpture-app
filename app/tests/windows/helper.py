@@ -9,6 +9,7 @@ from pytestqt.qtbot import QtBot
 
 from modules.dependency_injection import DependencyContainer
 from structs.application import Application
+from structs.image_meta import ImageMeta
 from structs.project import Project
 from windows.main_window import MainWindow
 from constants import (
@@ -22,6 +23,7 @@ from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
     GetImageFolder,
+    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetTestProjectDataFolder,
@@ -145,12 +147,20 @@ class ProjectBuilder:
             assert fs.exists(imagePath), f"Image file {imagePath} does not exist"  # type: ignore
 
             self._project.images.append(imageName)
-            shutil.copy(
+            shutil.copyfile(
                 imagePath,
                 GetImageFilePath(
                     GetTestProjectDataFolder(self._project.projectName), imageName
                 ),
             )
+
+            with open(
+                GetImageMetadataFile(
+                    GetTestProjectDataFolder(self._project.projectName), imageName
+                ),
+                "w",
+            ) as f:
+                f.write(ImageMeta().ToJson())
 
         self._project.SetCreatedAt(datetime.now())
         self._project.SetLastEditAt(datetime.now())

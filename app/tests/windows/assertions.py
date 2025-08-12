@@ -179,6 +179,7 @@ class ImageMetadataAssertion:
         return self
 
     def AssertFileExists(self) -> Self:
+        logger.debug(f"metadataFile: {self._metadataFile}")
         assert os.path.exists(self._metadataFile)
         return self
 

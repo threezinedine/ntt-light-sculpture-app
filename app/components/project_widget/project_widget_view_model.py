@@ -10,6 +10,7 @@ from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
     GetImageMetadataFile,
+    GetImageNameBasedOnExistedImageNames,
 )
 from utils.logger import logger  # type: ignore
 
@@ -36,6 +37,10 @@ class ProjectWidgetViewModel:
 
     def LoadImage(self, imagePath: str) -> None:
         imageName = GetImageFileNameFromFilePath(imagePath)
+        imageName = GetImageNameBasedOnExistedImageNames(
+            imageName,
+            self.project.images,
+        )
         self.project.images.append(imageName)
 
         targetPath = GetImageFilePath(

@@ -46,5 +46,6 @@ def CleanDependencyContainer(fs: FakeFilesystem) -> Generator[None, None, None]:
     EventSystem.Clear()
     fs.reset()
     yield
+    fs.reset()
     DependencyContainer.Clear()
     EventSystem.Clear()
