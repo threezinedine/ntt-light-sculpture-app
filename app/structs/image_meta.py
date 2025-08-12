@@ -1,13 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from constants import DEFAULT_THRESHOLD
+
 from .struct_base import StructBase
 
 
 @dataclass
 class ImageMeta(StructBase):
     copiedAt: float = field(default=datetime.now().timestamp())
-    threshold: int = field(default=128)
+    threshold: int = field(default=DEFAULT_THRESHOLD)
 
     def Update(self, other: "StructBase") -> None:
         if not isinstance(other, ImageMeta):

@@ -10,6 +10,7 @@ from constants import (
     CHANGE_PROJECT_EVENT_NAME,
     OPEN_IMAGE_TAB_EVENT_NAME,
     RECENT_PROJECTS_EVENT_NAME,
+    VIEW_TAB_NAME,
 )
 from converted_uis.main_window import Ui_MainWindow
 from modules.dependency_injection.helper import as_dependency
@@ -56,6 +57,7 @@ class MainWindow(QMainWindow):
         self.ui.projectTreeWidget.setWidget(self.projectWidget)
 
         self.ui.centerTabWidget.tabCloseRequested.connect(self._OnTabCloseCallback)
+        self.ui.centerTabWidget.setTabText(0, VIEW_TAB_NAME)
 
         self._RecentProjectsCallback()
 

@@ -10,7 +10,12 @@ from PyQt6.QtWidgets import QFileDialog, QMenu, QWidget
 from PyQt6.QtCore import Qt
 from functools import partial
 
-from constants import MODIFY_IMAGES_LIST_EVENT_NAME, OPEN_IMAGE_TAB_EVENT_NAME
+from constants import (
+    IMAGE_CONTEXT_DELETE_OPTION,
+    IMAGE_CONTEXT_OPEN_OPTION,
+    MODIFY_IMAGES_LIST_EVENT_NAME,
+    OPEN_IMAGE_TAB_EVENT_NAME,
+)
 from modules.event_system.event_system import EventSystem
 from .project_widget_view_model import ProjectWidgetViewModel
 from converted_uis.project_widget import Ui_ProjectWidget
@@ -83,11 +88,11 @@ class ProjectWidget(QWidget):
         itemRow = item.row()
 
         menu.addAction(
-            "Open",
+            IMAGE_CONTEXT_OPEN_OPTION,
             partial(EventSystem.TriggerEvent, OPEN_IMAGE_TAB_EVENT_NAME, itemRow),
         )
         menu.addAction(
-            "Delete",
+            IMAGE_CONTEXT_DELETE_OPTION,
             partial(self.viewModel.DeleteImage, itemRow),
         )
         menu.popup(e.globalPosition().toPoint())

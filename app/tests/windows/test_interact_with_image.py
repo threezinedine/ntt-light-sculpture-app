@@ -1,5 +1,11 @@
 from pytest_mock import MockerFixture
-from constants import TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_PATH, TEST_PNG_IMAGE_PATH_2
+from constants import (
+    DEFAULT_THRESHOLD,
+    TEST_NEW_PROJECT_NAME,
+    TEST_PNG_IMAGE_PATH,
+    TEST_PNG_IMAGE_PATH_2,
+    VIEW_TAB_NAME,
+)
 from tests.windows.actors import ProjectTreeActor, TabWidgetActor
 from tests.windows.assertions import TabWidgetAssertion
 from tests.windows.helper import ApplicationBuilder, FixtureBuilder, ProjectBuilder
@@ -63,7 +69,7 @@ def test_cannot_close_the_view_tab(
 
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
 
-    tabWidgetActor.CloseTabWithName("View")
+    tabWidgetActor.CloseTabWithName(VIEW_TAB_NAME)
 
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(
         2
@@ -188,7 +194,7 @@ def test_modify_threshold_then_binary_image_is_updated(
         mainWindow.ui.centerTabWidget.widget(1)  # type: ignore
     )
 
-    imagePreviewWidgetActor.AssertThresholdSliderValue(128)
+    imagePreviewWidgetActor.AssertThresholdSliderValue(DEFAULT_THRESHOLD)
     imagePreviewWidgetActor.DragThresholdSlider(123)
 
     assert thresholdSliderValueMocker.call_count >= 1

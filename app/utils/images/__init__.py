@@ -2,6 +2,8 @@ from PIL import Image
 import numpy as np
 import cv2 as cv
 
+from constants import DEFAULT_THRESHOLD
+
 
 def LoadImage(imagePath: str) -> cv.Mat | None:
     try:
@@ -10,7 +12,10 @@ def LoadImage(imagePath: str) -> cv.Mat | None:
         return None
 
 
-def ConvertToBinary(image: cv.Mat | None, threshold: int = 128) -> cv.Mat | None:
+def ConvertToBinary(
+    image: cv.Mat | None,
+    threshold: int = DEFAULT_THRESHOLD,
+) -> cv.Mat | None:
     if image is None:
         return None
 

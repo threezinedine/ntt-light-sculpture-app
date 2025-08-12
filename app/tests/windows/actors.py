@@ -7,6 +7,7 @@ from pytestqt.qtbot import QtBot
 
 from components.customs.tree_view.tree_view import CustomTreeView
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
+from constants import IMAGE_CONTEXT_DELETE_OPTION, IMAGE_CONTEXT_OPEN_OPTION
 
 
 class ProjectTreeActor:
@@ -65,11 +66,11 @@ class ProjectTreeActor:
         action.trigger()
 
     def ChooseDeleteAction(self) -> Self:
-        self._ChooseContextMenuAction("Delete")
+        self._ChooseContextMenuAction(IMAGE_CONTEXT_DELETE_OPTION)
         return self
 
     def ChooseOpenImageTabAction(self) -> Self:
-        self._ChooseContextMenuAction("Open")
+        self._ChooseContextMenuAction(IMAGE_CONTEXT_OPEN_OPTION)
         return self
 
 

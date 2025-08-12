@@ -6,6 +6,7 @@ from .actors import ProjectTreeActor
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
 from constants import (
+    DEFAULT_THRESHOLD,
     TEST_NEW_PROJECT_NAME,
     TEST_NEW_PROJECT_NAME_2,
     TEST_PNG_IMAGE_PATH,
@@ -44,7 +45,7 @@ def test_import_image_file(
     ).AssertImageLoadded()
     ImageMetadataAssertion(
         TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(128)
+    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
@@ -165,8 +166,8 @@ def test_automatically_modify_the_name_of_when_import_existed_image_name(
 
     ImageMetadataAssertion(
         TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(128)
+    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)
 
     ImageMetadataAssertion(
         TEST_NEW_PROJECT_NAME, NEW_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(128)
+    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)

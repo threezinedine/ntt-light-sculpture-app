@@ -5,6 +5,14 @@ MAX_NUMBER_OF_RECENT_PROJECTS = 5
 CURRENT_PROJECT_FOLDER = os.path.dirname(__file__)
 ASSETS_FOLDER = os.path.join(CURRENT_PROJECT_FOLDER, "assets")
 TEST_IMAGE_FOLDER = os.path.join(ASSETS_FOLDER, "images", "tests")
+
+VIEW_TAB_NAME = "OpenGL View"
+IMAGE_CONTEXT_OPEN_OPTION = "Open"
+IMAGE_CONTEXT_DELETE_OPTION = "Delete"
+# ==================================================================================
+
+# ================================ PARAMETERS ======================================
+DEFAULT_THRESHOLD = 128
 # ==================================================================================
 
 # ================================ ENVIRONMENT VARIABLES ===========================
