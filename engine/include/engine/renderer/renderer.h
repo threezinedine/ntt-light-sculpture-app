@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "engine/common/common.h"
+#include "engine/renderer/program.h"
 
 namespace NTT_NS
 {
@@ -54,7 +55,7 @@ namespace NTT_NS
          */
         GLFWwindow *m_window;
 
-        unsigned int m_shaderProgram;
+        Program m_shaderProgram; // Shader program used for rendering
         unsigned int m_VAO;
         unsigned int m_VBO;
     };
