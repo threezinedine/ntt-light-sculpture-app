@@ -1,7 +1,6 @@
 from PIL import Image
 import numpy as np
 import cv2 as cv
-from utils.logger import logger
 
 
 def LoadImage(imagePath: str) -> cv.Mat | None:

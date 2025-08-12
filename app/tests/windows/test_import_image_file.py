@@ -1,5 +1,5 @@
 from pyfakefs.fake_filesystem import FakeFilesystem
-from tests.windows.assertions import ProjectAssertion
+from tests.windows.assertions import ImageMetadataAssertion, ProjectAssertion
 from .actors import ProjectTreeActor
 
 from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
@@ -40,6 +40,9 @@ def test_import_image_file(
     ProjectAssertion(TEST_NEW_PROJECT_NAME, fs).AssertImages(
         [TEST_PNG_IMAGE_NAME]
     ).AssertImageLoadded()
+    ImageMetadataAssertion(
+        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
+    ).AssertFileExists().AssertThreshold(128)
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()

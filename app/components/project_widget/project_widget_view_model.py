@@ -2,10 +2,16 @@ import shutil
 from PyQt6.QtGui import QStandardItem
 from constants import MODIFY_IMAGES_LIST_EVENT_NAME
 from structs.application import Application
+from structs.image_meta import ImageMeta
 from structs.project import Project
 from modules.dependency_injection.helper import as_dependency
 from modules.event_system.event_system import EventSystem
-from utils.application import GetImageFileNameFromFilePath, GetImageFilePath
+from utils.application import (
+    GetImageFileNameFromFilePath,
+    GetImageFilePath,
+    GetImageMetadataFile,
+)
+from utils.logger import logger  # type: ignore
 
 
 class ImageItem(QStandardItem):
@@ -36,6 +42,15 @@ class ProjectWidgetViewModel:
             self.application.CurrentProjectDirectory,
             imageName,
         )
+
+        imageMetaPath = GetImageMetadataFile(
+            self.application.CurrentProjectDirectory,
+            imageName,
+        )
+
+        logger.debug(f"imageMetaPath: {imageMetaPath}")
+        with open(imageMetaPath, "w") as f:
+            f.write(ImageMeta().ToJson())
 
         shutil.copyfile(imagePath, targetPath)
 

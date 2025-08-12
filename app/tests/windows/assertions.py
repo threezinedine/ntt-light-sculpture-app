@@ -5,14 +5,18 @@ from pyfakefs.fake_filesystem import FakeFilesystem
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from constants import TEST_NEW_PROJECT_PATH
 from structs.application import Application
+from structs.image_meta import ImageMeta
 from structs.project import Project
 from utils.application import (
     GetApplicationDataFile,
     GetApplicationDataFolder,
     GetImageFilePath,
+    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
+    GetTestProjectDataFolder,
 )
+from utils.logger import logger  # type: ignore
 
 
 class ProjectAssertion:
@@ -146,4 +150,43 @@ class TabWidgetAssertion:
 
         assert imagePreviewWidget.ui.imagePreviewLabel.hasContent
         assert imagePreviewWidget.ui.binaryImageLabel.hasContent
+        return self
+
+
+class ImageMetadataAssertion:
+    def __init__(
+        self,
+        projectName: str,
+        imageName: str,
+        fs: FakeFilesystem | None = None,
+    ) -> None:
+        self._fs = fs
+
+        self._metadataFile = GetImageMetadataFile(
+            GetTestProjectDataFolder(projectName), imageName
+        )
+        logger.debug(f"metadataFile: {self._metadataFile}")
+        self._metadata: ImageMeta | None = None
+
+        if os.path.exists(self._metadataFile):
+            with open(self._metadataFile, "r") as f:
+                self._metadata = ImageMeta()
+                assert self._metadata.FromJson(f.read())
+
+    def AssertMetadataFileNotExists(self) -> Self:
+        assert not os.path.exists(self._metadataFile)
+
+        return self
+
+    def AssertFileExists(self) -> Self:
+        assert os.path.exists(self._metadataFile)
+        return self
+
+    def AssertThreshold(self, threshold: int) -> Self:
+        assert self._metadata is not None, "Metadata is not loaded"
+
+        assert (
+            self._metadata.threshold == threshold
+        ), f"Expected {threshold} but got {self._metadata.threshold}"
+
         return self
