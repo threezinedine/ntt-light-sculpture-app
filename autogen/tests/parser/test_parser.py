@@ -56,8 +56,11 @@ def assert_function(
     assert function.returnType == returnType
 
 
-def assert_struct(struct: PyStruct, name: str) -> None:
+def assert_struct(
+    struct: PyStruct, name: str, hasDefaultConstructor: bool = True
+) -> None:
     assert struct.name == name
+    assert struct.hasDefaultConstructor == hasDefaultConstructor
 
 
 def assert_attribute(attribute: PyAttribute, name: str, type: str) -> None:
@@ -218,3 +221,43 @@ def test_parse_singleton_class(util: AutoGenUtil) -> None:
 
     assert len(parsedClass.methods) == 1
     assert_method(parsedClass.methods[0], "run", False, "void", ["python"])
+
+
+def test_parse_struct_with(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+        namespace ntt 
+        {
+            struct Engine {
+                int a;
+                int b;
+            };
+        }
+        """,
+    )
+
+    parsedData = util.GetParsedData()
+    assert len(parsedData["structs"]) == 1
+    parsedStruct: PyStruct = parsedData["structs"][0]  # type: ignore
+    assert_struct(parsedStruct, "Engine")
+
+
+def test_parse_struct_without_default_constructor(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+        namespace ntt 
+        {
+            struct Engine {
+                int a;
+                int b;
+
+                Engine(int a, int b) : a(a), b(b) {}
+            };
+        }
+        """,
+    )
+
+    parsedData = util.GetParsedData()
+    assert len(parsedData["structs"]) == 1
+    parsedStruct: PyStruct = parsedData["structs"][0]  # type: ignore
+    assert_struct(parsedStruct, "Engine", False)

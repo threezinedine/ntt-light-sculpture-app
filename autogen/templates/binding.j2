@@ -19,12 +19,14 @@ enum_<::NTT_NS::{{ enum.name }}>(m, "{{ enum.name }}")
 
 // ============================ STRUCTS ============================
 {% for struct in structs %}
+    {% if "python" in struct.annotations %}
 class_<::NTT_NS::{{ struct.name }}>(m, "{{ struct.name }}")
     .def(init<>())
-    {% for attribute in struct.attributes %}
+        {% for attribute in struct.attributes %}
     .def_readwrite("{{ attribute.name }}", &::NTT_NS::{{ struct.name }}::{{ attribute.name }})
-    {% endfor %}
+        {% endfor %}
     ;
+    {% endif %}
 {% endfor %}
 // ===================================================================
 

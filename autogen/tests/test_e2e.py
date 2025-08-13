@@ -81,3 +81,54 @@ def test_bind_typedef_without_self_defined_type(
     mockWarning.assert_called_once()
 
     assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_bind_struct_without_constructor(
+    util: AutoGenUtil,
+) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt 
+    {
+        struct __attribute__((annotate("python"))) Engine {
+            int a;
+            int b;
+        };
+    }
+"""
+    )
+
+    result = util.GenerateOutput("templates/binding.j2")
+
+    expected = """
+        class_<::NTT_NS::Engine>(m, "Engine")
+            .def(init<>())
+            .def_readwrite("a", &::NTT_NS::Engine::a)
+            .def_readwrite("b", &::NTT_NS::Engine::b);
+"""
+
+    assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_not_bind_struct_without_annotation(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        struct Engine {
+            int a;
+            int b;
+        };
+    }
+"""
+    )
+
+    result = util.GenerateOutput("templates/binding.j2")
+
+    expected = """
+        class_<::NTT_NS::Engine>(m, "Engine")
+            .def(init<>())
+            .def_readwrite("a", &::NTT_NS::Engine::a)
+            .def_readwrite("b", &::NTT_NS::Engine::b);
+"""
+
+    assert util.ReformatOutput(expected) not in util.ReformatOutput(result)

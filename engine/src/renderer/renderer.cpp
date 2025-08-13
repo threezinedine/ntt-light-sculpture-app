@@ -4,13 +4,14 @@
 #include <stdexcept>
 #include "engine/renderer/renderer.h"
 #include "engine/singletonManager/singletonManager.h"
+#include "engine/model/model.h"
 
 namespace NTT_NS
 {
     NTT_DEFINE_SINGLETON(Renderer);
 
     Renderer::Renderer()
-        : m_window(nullptr), m_shaderProgram(), m_VAO(0), m_VBO(0)
+        : m_window(nullptr), m_shaderProgram(), m_VAO(0), m_VBO(0), m_vertexCount(0)
     {
     }
 
@@ -25,17 +26,17 @@ namespace NTT_NS
             throw std::runtime_error("Failed to initialize GLEW");
         }
 
-        // clang-format off
-        float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f,
-        };
-        // clang-format on
+        Node node1(1, 0, 0);
+        Node node2(0.5f, -0.5f, 0);
+        Node node3(0, 0.5f, 0);
+        Node node4(0.5f, -0.5f, 0);
+        Node node5(0, 0.5f, 0);
+        Node node6(-1, 0, 0);
+        Face face1({node1, node2, node3});
+        Face face2({node4, node5, node6});
+        Body body({face1, face2});
 
-        glGenBuffers(1, &m_VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        ToGPU(body, m_VBO, m_vertexCount);
 
         glGenVertexArrays(1, &m_VAO);
         glBindVertexArray(m_VAO);
@@ -81,7 +82,7 @@ namespace NTT_NS
         // Render
         m_shaderProgram.Use();
         glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
         glBindVertexArray(0);
 
         // After render

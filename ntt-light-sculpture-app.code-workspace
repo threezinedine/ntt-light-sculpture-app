@@ -30,7 +30,8 @@
 			"system_error": "cpp",
 			"xutility": "cpp",
 			"cstdint": "cpp",
-			"string": "cpp"
+			"string": "cpp",
+			"vector": "cpp"
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "utils/utils.h"
 #include "renderer/renderer.h"
 #include "singletonManager/singletonManager.h"
+#include "model/model.h"
 
 namespace NTT_NS
 {

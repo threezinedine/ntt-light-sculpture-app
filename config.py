@@ -859,15 +859,20 @@ def main():
         build_engine(release=args.release)
         run_application()
     elif args.action == "test":
-        build_engine(release=args.release)
+        if args.force:
+            convert_ui_files(force=True)
+            run_autogen(force=True)
 
         if args.test_action == "autogen":
             run_autogen_test()
         elif args.test_action == "engine":
+            build_engine(release=args.release)
             run_engine_test(release=args.release)
         elif args.test_action == "app":
+            build_engine(release=args.release)
             run_test_app()
         elif args.test_action == "all":
+            build_engine(release=args.release)
             run_engine_test(release=args.release)
             run_autogen_test()
             run_test_app()

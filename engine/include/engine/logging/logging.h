@@ -7,7 +7,7 @@ namespace NTT_NS
     /**
      * @brief The structure store all the information of the log message which will be sent to the application.
      */
-    struct EngineLogRecord
+    struct NTT_PYTHON_BINDING EngineLogRecord
     {
         LogLevel level;    ///< The information of the important of the message.
         string message;    ///< The main content of the message.

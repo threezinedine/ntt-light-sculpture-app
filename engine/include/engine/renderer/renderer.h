@@ -47,7 +47,7 @@ namespace NTT_NS
          * @param width The new width of the window.
          * @param height The new height of the window.
          */
-        void Resize(unsigned int width, unsigned int height) NTT_PYTHON_BINDING;
+        void Resize(u32 width, u32 height) NTT_PYTHON_BINDING;
 
     private:
         /**
@@ -56,7 +56,8 @@ namespace NTT_NS
         GLFWwindow *m_window;
 
         Program m_shaderProgram; // Shader program used for rendering
-        unsigned int m_VAO;
-        unsigned int m_VBO;
+        u32 m_VAO;
+        u32 m_VBO;
+        u32 m_vertexCount;
     };
 }

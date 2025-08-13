@@ -27,6 +27,7 @@ message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 set(CMAKE_FOLDER "externals")
 find_package(ntt-opengl REQUIRED PATHS ${CMAKE_MODULE_PATH})
 find_package(ntt-gtest REQUIRED PATHS ${CMAKE_MODULE_PATH})
+find_package(ntt-glm REQUIRED PATHS ${CMAKE_MODULE_PATH})
 unset(CMAKE_FOLDER)
 # =====================================================
 
@@ -37,7 +38,7 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 
 add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADERS})
 target_include_directories(${LIBRARY_NAME} PUBLIC include)
-target_link_libraries(${LIBRARY_NAME} PUBLIC ntt-opengl)
+target_link_libraries(${LIBRARY_NAME} PUBLIC ntt-opengl ntt-glm)
 set_target_properties(${LIBRARY_NAME} PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 unset(CMAKE_FOLDER)
 # =====================================================
@@ -61,7 +62,7 @@ file(
 
 set(ENGINE_TEST_NAME "engine-test")
 add_executable(${ENGINE_TEST_NAME} ${ENGINE_TEST_SOURCES})
-target_link_libraries(${ENGINE_TEST_NAME} PRIVATE ntt-gtest)
+target_link_libraries(${ENGINE_TEST_NAME} PRIVATE ntt-gtest ${LIBRARY_NAME})
 unset(CMAKE_FOLDER)
 # ========================================================
 

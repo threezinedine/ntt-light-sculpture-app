@@ -40,15 +40,7 @@ class AutoGenUtil:
         return result
 
     def ReformatOutput(self, result: str) -> str:
-        return (
-            result.strip()
-            .replace("\n", "")
-            .replace("    .", ".")
-            .replace("\t.", ".")
-            .replace("   .", ".")
-            .replace("  .", ".")
-            .replace(" .", ".")
-        )
+        return result.strip().replace("\n", "").replace("\t", "").replace(" ", "")
 
     def Cleanup(self) -> None:
         if os.path.exists(self.GetTestOutputFilePath()):
