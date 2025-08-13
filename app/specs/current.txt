@@ -1,1 +1,1 @@
-test_delete_the_last_image
+test_modify_threshold_then_binary_image_is_updated

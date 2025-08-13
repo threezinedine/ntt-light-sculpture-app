@@ -8,6 +8,7 @@ from .struct_base import StructBase
 
 @dataclass
 class ImageMeta(StructBase):
+    name: str = field(default="")
     copiedAt: float = field(default=datetime.now().timestamp())
     threshold: int = field(default=DEFAULT_THRESHOLD)
 
@@ -15,6 +16,7 @@ class ImageMeta(StructBase):
         if not isinstance(other, ImageMeta):
             raise ValueError("other is not a ImageMeta")
 
+        self.name = other.name
         self.copiedAt = other.copiedAt
         self.threshold = other.threshold
 
@@ -22,7 +24,11 @@ class ImageMeta(StructBase):
         if not isinstance(other, ImageMeta):
             raise ValueError("other is not a ImageMeta")
 
-        return self.copiedAt == other.copiedAt and self.threshold == other.threshold
+        return (
+            self.name == other.name
+            and self.copiedAt == other.copiedAt
+            and self.threshold == other.threshold
+        )
 
     def _Validate(self, loaded: "StructBase") -> bool:
         if not isinstance(loaded, ImageMeta):

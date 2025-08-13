@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.viewModel.WindowTitle)
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
         self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
+        self.ui.saveProjectAction.triggered.connect(self.viewModel.SaveProject)
 
         self.ui.projectTreeWidget.setWidget(self.projectWidget)
 
@@ -135,7 +136,6 @@ class MainWindow(QMainWindow):
             super().keyPressEvent(a0)  # type: ignore
 
     def _OpenImageTabCallback(self, row: int) -> None:
-        logger.debug(f"Open Image Tab Callback: {row}")
         for i in range(self.ui.centerTabWidget.count()):
             if (
                 self.ui.centerTabWidget.tabText(i)

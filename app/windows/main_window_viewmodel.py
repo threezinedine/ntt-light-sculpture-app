@@ -1,3 +1,5 @@
+from dataclasses import asdict
+import json
 import os
 from datetime import datetime
 
@@ -13,6 +15,7 @@ from utils.application import (
     GetApplicationDataFolder,
     GetApplicationDataFile,
     GetImageFolder,
+    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetProjectNameFromFilePath,
@@ -151,6 +154,19 @@ class MainWindowViewModel:
         EventSystem.TriggerEvent(RECENT_PROJECTS_EVENT_NAME)
         EventSystem.TriggerEvent(MODIFY_IMAGES_LIST_EVENT_NAME)
         return True
+
+    def SaveProject(self) -> None:
+        for imageMeta in self.project.images:
+            imageMetaDataFile = GetImageMetadataFile(
+                self.application.CurrentProjectDirectory,
+                imageMeta.name,
+            )
+
+            with open(imageMetaDataFile, "w") as f:
+                logger.debug(f"Saving image metadata to {imageMetaDataFile}")
+                f.write(json.dumps(asdict(imageMeta), indent=4))
+
+        self._UpdateProjectDataFile()
 
     def _RemoveRecentProject(self, projectName: str) -> None:
         if projectName in self.application.recentProjectNames:

@@ -52,7 +52,7 @@ class ProjectAssertion:
         assert self._project is not None
 
         for image, inputImage in zip(self._project.images, images):
-            assert image == inputImage
+            assert image.name == inputImage
 
         return self
 
@@ -63,7 +63,7 @@ class ProjectAssertion:
         for image in self._project.images:
             loadedImagePath = GetImageFilePath(
                 os.path.join(TEST_NEW_PROJECT_PATH, self._project.projectName),
-                image,
+                image.name,
             )
 
             assert self._fs.exists(loadedImagePath), f"Image {loadedImagePath} is not loaded"  # type: ignore
@@ -165,13 +165,13 @@ class ImageMetadataAssertion:
         self._metadataFile = GetImageMetadataFile(
             GetTestProjectDataFolder(projectName), imageName
         )
-        logger.debug(f"metadataFile: {self._metadataFile}")
         self._metadata: ImageMeta | None = None
 
         if os.path.exists(self._metadataFile):
             with open(self._metadataFile, "r") as f:
                 self._metadata = ImageMeta()
                 assert self._metadata.FromJson(f.read())
+                logger.debug(f"Reading from {self._metadataFile}")
 
     def AssertMetadataFileNotExists(self) -> Self:
         assert not os.path.exists(self._metadataFile)
@@ -179,7 +179,6 @@ class ImageMetadataAssertion:
         return self
 
     def AssertFileExists(self) -> Self:
-        logger.debug(f"metadataFile: {self._metadataFile}")
         assert os.path.exists(self._metadataFile)
         return self
 

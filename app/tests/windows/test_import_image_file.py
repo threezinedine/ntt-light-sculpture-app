@@ -4,7 +4,13 @@ from tests.windows.assertions import ImageMetadataAssertion, ProjectAssertion
 from utils.application import GetImageNameBasedOnExistedImageNames
 from .actors import ProjectTreeActor
 
-from .helper import ApplicationBuilder, FileDialogSetup, FixtureBuilder, ProjectBuilder
+from .helper import (
+    ApplicationBuilder,
+    FileDialogSetup,
+    FixtureBuilder,
+    ImageBuilder,
+    ProjectBuilder,
+)
 from constants import (
     DEFAULT_THRESHOLD,
     TEST_NEW_PROJECT_NAME,
@@ -65,7 +71,9 @@ def test_open_with_with_loadded_file(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -86,8 +94,8 @@ def test_delete_1_among_multiple_images(
         fixtureBuilder.AddProject(
             ProjectBuilder()
             .Name(TEST_NEW_PROJECT_NAME)
-            .AddImage(TEST_PNG_IMAGE_PATH)
-            .AddImage(TEST_PNG_IMAGE_PATH_2)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH_2))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -121,8 +129,8 @@ def test_delete_the_last_image(
         fixtureBuilder.AddProject(
             ProjectBuilder()
             .Name(TEST_NEW_PROJECT_NAME)
-            .AddImage(TEST_PNG_IMAGE_PATH)
-            .AddImage(TEST_PNG_IMAGE_PATH_2)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH_2))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -145,7 +153,9 @@ def test_automatically_modify_the_name_of_when_import_existed_image_name(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()

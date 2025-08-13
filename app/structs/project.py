@@ -2,6 +2,8 @@ from copy import deepcopy
 from datetime import datetime
 from dataclasses import dataclass, field
 
+from structs.image_meta import ImageMeta
+
 from .struct_base import StructBase
 
 
@@ -16,7 +18,7 @@ class Project(StructBase):
     """
 
     projectName: str = field(default="")
-    images: list[str] = field(
+    images: list[ImageMeta] = field(  # type: ignore
         default_factory=list
     )  # all images will be placed int images/ folder
     createdAt: int = field(default=0)

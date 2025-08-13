@@ -39,9 +39,9 @@ class ProjectWidgetViewModel:
         imageName = GetImageFileNameFromFilePath(imagePath)
         imageName = GetImageNameBasedOnExistedImageNames(
             imageName,
-            self.project.images,
+            [image.name for image in self.project.images],
         )
-        self.project.images.append(imageName)
+        self.project.images.append(ImageMeta(name=imageName))
 
         targetPath = GetImageFilePath(
             self.application.CurrentProjectDirectory,
@@ -63,7 +63,7 @@ class ProjectWidgetViewModel:
 
     @property
     def ImageItems(self) -> list[QStandardItem]:
-        return [ImageItem(imageName) for imageName in self.project.images]
+        return [ImageItem(image.name) for image in self.project.images]
 
     def DeleteImage(self, index: int) -> None:
         self.project.images.pop(index)

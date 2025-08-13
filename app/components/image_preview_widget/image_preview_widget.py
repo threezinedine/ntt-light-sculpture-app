@@ -26,11 +26,15 @@ class ImagePreviewWidget(QWidget):
         self.ui.setupUi(self)  # type: ignore
 
         self.ui.imagePreviewLabel.SetImage(self.viewModel.Image)
+        self.ui.thresholdSlider.setValue(self.viewModel.Threshold)
         self.ui.thresholdSlider.valueChanged.connect(self._UpdateBinaryImage)
         self._UpdateBinaryImage()
 
     def _UpdateBinaryImage(self) -> None:
+        value = self.ui.thresholdSlider.value()
+        self.viewModel.Threshold = value
+
         self.ui.binaryImageLabel.SetImage(
-            self.viewModel.GetBinaryImage(self.ui.thresholdSlider.value()),
+            self.viewModel.GetBinaryImage(value),
             QImage.Format.Format_Grayscale8,
         )

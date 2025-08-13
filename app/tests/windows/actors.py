@@ -8,6 +8,31 @@ from pytestqt.qtbot import QtBot
 from components.customs.tree_view.tree_view import CustomTreeView
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from constants import IMAGE_CONTEXT_DELETE_OPTION, IMAGE_CONTEXT_OPEN_OPTION
+from utils.logger import logger  # type: ignore
+from windows.main_window import MainWindow
+
+
+class MainWindowActor:
+    def __init__(self, qtbot: QtBot) -> None:
+        self.qtbot = qtbot
+        self._mainWindow: MainWindow | None = None
+
+    def SetMainWindow(self, mainWindow: MainWindow) -> Self:
+        self._mainWindow = mainWindow
+        return self
+
+    def SaveWindow(self) -> Self:
+        assert (
+            self._mainWindow is not None
+        ), "The main window must be set before using SaveWindow"
+
+        self._mainWindow.ui.saveProjectAction.trigger()
+        return self
+
+
+@pytest.fixture()
+def mainWindowActor(qtbot: QtBot) -> Generator[MainWindowActor, None, None]:
+    yield MainWindowActor(qtbot)
 
 
 class ProjectTreeActor:

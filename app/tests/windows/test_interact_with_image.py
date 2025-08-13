@@ -1,3 +1,4 @@
+from asyncio.log import logger  # type: ignore
 from pytest_mock import MockerFixture
 from constants import (
     DEFAULT_THRESHOLD,
@@ -7,15 +8,20 @@ from constants import (
     VIEW_TAB_NAME,
 )
 from tests.windows.actors import ProjectTreeActor, TabWidgetActor
-from tests.windows.assertions import TabWidgetAssertion
-from tests.windows.helper import ApplicationBuilder, FixtureBuilder, ProjectBuilder
+from tests.windows.assertions import ImageMetadataAssertion, TabWidgetAssertion
+from tests.windows.helper import (
+    ApplicationBuilder,
+    FixtureBuilder,
+    ImageBuilder,
+    ProjectBuilder,
+)
 from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
     GetTestProjectDataFolder,
 )
 from utils.images import ConvertToBinary, LoadImage
-from .actors import ImagePreviewWidgetActor, tabWidgetActor  # type: ignore
+from .actors import ImagePreviewWidgetActor, MainWindowActor, tabWidgetActor  # type: ignore
 from converted_constants import TEST_PNG_IMAGE_NAME
 from PIL import Image
 
@@ -27,7 +33,9 @@ def test_open_tab_when_interact_with_image(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -58,7 +66,9 @@ def test_cannot_close_the_view_tab(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -83,7 +93,9 @@ def test_cannont_open_image_tab_multiple_times(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -116,8 +128,8 @@ def test_cannot_open_the_second_image_multiple_times(
         fixtureBuilder.AddProject(
             ProjectBuilder()
             .Name(TEST_NEW_PROJECT_NAME)
-            .AddImage(TEST_PNG_IMAGE_PATH)
-            .AddImage(TEST_PNG_IMAGE_PATH_2)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH_2))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -139,7 +151,9 @@ def test_open_image_tab_with_correct_path(
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -169,16 +183,20 @@ def test_modify_threshold_then_binary_image_is_updated(
     projectTreeActor: ProjectTreeActor,
     tabWidgetActor: TabWidgetActor,
     imagePreviewWidgetActor: ImagePreviewWidgetActor,
+    mainWindowActor: MainWindowActor,
     mocker: MockerFixture,
 ):
     mainWindow = (
         fixtureBuilder.AddProject(
-            ProjectBuilder().Name(TEST_NEW_PROJECT_NAME).AddImage(TEST_PNG_IMAGE_PATH)
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH))
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
     )
 
+    mainWindowActor.SetMainWindow(mainWindow)
     projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
     tabWidgetActor.SetTabWidget(mainWindow.ui.centerTabWidget)
 
@@ -200,3 +218,13 @@ def test_modify_threshold_then_binary_image_is_updated(
     assert thresholdSliderValueMocker.call_count >= 1
     finalThresholdSliderValue = thresholdSliderValueMocker.call_args[0]
     assert finalThresholdSliderValue[1] == 123  # threshold value
+
+    ImageMetadataAssertion(
+        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
+    ).AssertFileExists().AssertThreshold(128)
+
+    mainWindowActor.SaveWindow()
+
+    ImageMetadataAssertion(
+        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
+    ).AssertFileExists().AssertThreshold(123)

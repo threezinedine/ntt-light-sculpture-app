@@ -36,6 +36,7 @@ from tests.windows.actors import (
     projectTreeActor,  # type: ignore
     tabWidgetActor,  # type: ignore
     imagePreviewWidgetActor,  # type: ignore
+    mainWindowActor,  # type: ignore
 )
 
 

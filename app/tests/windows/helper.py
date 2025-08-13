@@ -87,12 +87,37 @@ class MainWindowBuilder:
         return mainWindow
 
 
-@pytest.fixture()
-def mainWindowBuilder(
-    fs: FakeFilesystem,
-    qtbot: QtBot,
-) -> Generator[MainWindowBuilder, None, None]:
-    yield MainWindowBuilder(fs, qtbot)
+class ImageBuilder:
+    def __init__(self) -> None:
+        self._imageMeta = ImageMeta()
+        self._importPath: str | None = None
+
+    def ImportPath(self, importPath: str) -> Self:
+        self._importPath = importPath
+        return self
+
+    def Build(self, project: Project, fs: FakeFilesystem) -> ImageMeta:
+        assert self._importPath, "Import path must be set"
+        fs.add_real_file(self._importPath, read_only=True)  # type: ignore
+
+        imageName = GetImageFileNameFromFilePath(self._importPath)
+        projectFolder = GetTestProjectDataFolder(project.projectName)
+        imageDataFolder = GetImageFolder(projectFolder)
+        imageDataFile = GetImageMetadataFile(projectFolder, imageName)
+        assert fs.exists(imageDataFolder), f"Image data folder {imageDataFolder} does not exist"  # type: ignore
+
+        imagePath = GetImageFilePath(projectFolder, imageName=imageName)
+        self._imageMeta.name = imageName
+
+        shutil.copyfile(
+            self._importPath,
+            GetImageFilePath(GetTestProjectDataFolder(project.projectName), imagePath),
+        )
+
+        with open(imageDataFile, "w") as f:
+            f.write(self._imageMeta.ToJson())
+
+        return self._imageMeta
 
 
 class ProjectBuilder:
@@ -102,7 +127,7 @@ class ProjectBuilder:
         self._project = Project()
         self._useErrorProjectFile = False
         self._createProjectFile = True
-        self._imagePaths: list[str] = []
+        self._imageBuilders: list[ImageBuilder] = []
 
     def Name(self, projectName: str) -> Self:
         self._project.projectName = projectName
@@ -116,8 +141,8 @@ class ProjectBuilder:
         self._useErrorProjectFile = True
         return self
 
-    def AddImage(self, imagePath: str) -> Self:
-        self._imagePaths.append(imagePath)
+    def AddImage(self, imageBuilder: ImageBuilder) -> Self:
+        self._imageBuilders.append(imageBuilder)
         return self
 
     def Build(self, fs: FakeFilesystem) -> None:
@@ -128,39 +153,11 @@ class ProjectBuilder:
         assert not fs.exists(projectFolder), f"Project folder {projectFolder} already exists"  # type: ignore
         fs.create_dir(projectFolder)  # type: ignore
 
-        for imagePath in self._imagePaths:
-            imageName = GetImageFileNameFromFilePath(imagePath)
-            imageFolder = GetImageFolder(
-                GetTestProjectDataFolder(self._project.projectName)
-            )
+        imageDataFolder = GetImageFolder(projectFolder)
+        fs.create_dir(imageDataFolder)  # type: ignore
 
-            if not os.path.exists(imageFolder):
-                os.makedirs(imageFolder)
-
-            finalImagePath = GetImageFilePath(
-                GetTestProjectDataFolder(self._project.projectName),
-                imageName,
-            )
-
-            assert not fs.exists(finalImagePath), f"Image file {finalImagePath} already exists"  # type: ignore
-            fs.add_real_file(imagePath, read_only=True)  # type: ignore
-            assert fs.exists(imagePath), f"Image file {imagePath} does not exist"  # type: ignore
-
-            self._project.images.append(imageName)
-            shutil.copyfile(
-                imagePath,
-                GetImageFilePath(
-                    GetTestProjectDataFolder(self._project.projectName), imageName
-                ),
-            )
-
-            with open(
-                GetImageMetadataFile(
-                    GetTestProjectDataFolder(self._project.projectName), imageName
-                ),
-                "w",
-            ) as f:
-                f.write(ImageMeta().ToJson())
+        for imageBuilder in self._imageBuilders:
+            self._project.images.append(imageBuilder.Build(self._project, fs))
 
         self._project.SetCreatedAt(datetime.now())
         self._project.SetLastEditAt(datetime.now())
