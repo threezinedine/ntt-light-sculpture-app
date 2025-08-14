@@ -2,6 +2,7 @@
 from typing import Generator
 import warnings
 
+from modules.history_manager import HistoryManager
 from pyfakefs.fake_filesystem import FakeFilesystem
 
 from modules.event_system.event_system import EventSystem
@@ -44,6 +45,7 @@ from tests.windows.actors import (
 def CleanDependencyContainer(fs: FakeFilesystem) -> Generator[None, None, None]:
     DependencyContainer.Clear()
     DependencyInjectionConfig()
+    HistoryManager.Reset()
     EventSystem.Clear()
     fs.reset()
     yield

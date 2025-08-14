@@ -3,6 +3,7 @@ from datetime import datetime
 from dataclasses import dataclass, field
 
 from structs.image_meta import ImageMeta
+from structs.opengl_setting import OpenGLSetting
 
 from .struct_base import StructBase
 
@@ -23,6 +24,7 @@ class Project(StructBase):
     )  # all images will be placed int images/ folder
     createdAt: int = field(default=0)
     lastEditAt: int = field(default=0)
+    openglSetting: OpenGLSetting = field(default_factory=OpenGLSetting)
 
     def Update(self, other: "StructBase") -> None:
         if not isinstance(other, Project):
@@ -33,6 +35,7 @@ class Project(StructBase):
         self.lastEditAt = other.lastEditAt
 
         self.images = deepcopy(other.images)
+        self.openglSetting.Update(other.openglSetting)
 
     def Compare(self, other: "StructBase") -> bool:
         if not isinstance(other, Project):
@@ -42,6 +45,9 @@ class Project(StructBase):
             return False
 
         if set(self.images) != set(other.images):
+            return False
+
+        if self.openglSetting.Compare(other.openglSetting) is False:
             return False
 
         return True

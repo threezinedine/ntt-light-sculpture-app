@@ -5,6 +5,7 @@ from components.image_preview_widget.image_preview_widget import ImagePreviewWid
 from constants import TEST_NEW_PROJECT_PATH
 from structs.application import Application
 from structs.image_meta import ImageMeta
+from structs.opengl_setting import OpenGLSetting
 from structs.project import Project
 from utils.application import (
     GetApplicationDataFile,
@@ -49,6 +50,7 @@ class ProjectAssertion(Assertable):
         self._shouldProjectFileExisted = True
         self._expectedImagesCount: int | None = None
 
+        self._openglSettingAssertion: OpenGLSettingAssertion | None = None
         self._images: list[ImageAssertion] = []
 
         if os.path.exists(self._projectFile):
@@ -65,12 +67,15 @@ class ProjectAssertion(Assertable):
         return self
 
     def AssertImage(self, image: "ImageAssertion") -> Self:
-        image.SetOwnerProject(self)
         self._images.append(image)
         return self
 
     def AssertImagesCount(self, imageCount: int) -> Self:
         self._expectedImagesCount = imageCount
+        return self
+
+    def AssertOpenGLSetting(self, openglSetting: "OpenGLSettingAssertion") -> Self:
+        self._openglSettingAssertion = openglSetting
         return self
 
     def Assert(self) -> None:
@@ -92,7 +97,12 @@ class ProjectAssertion(Assertable):
                 len(self._images) == self._expectedImagesCount
             ), f"Expected {self._expectedImagesCount} images but got {len(self._images)}"
 
+        if self._openglSettingAssertion is not None:
+            self._openglSettingAssertion.SetProject(self.project)
+            self._openglSettingAssertion.Assert()
+
         for image in self._images:
+            image.SetOwnerProject(self.project)
             image.Assert()
 
 
@@ -179,13 +189,13 @@ class TabWidgetAssertion(Assertable):
 class ImageAssertion(Assertable):
     def __init__(self, imageName: str) -> None:
         super().__init__()
-        self._ownerProjectAssertion: ProjectAssertion | None = None
+        self._ownerProject: Project | None = None
         self._imageName = imageName
         self._imageBeCopied = True
         self._expectedThreshold: int | None = None
 
-    def SetOwnerProject(self, project: ProjectAssertion) -> None:
-        self._ownerProjectAssertion = project
+    def SetOwnerProject(self, project: Project) -> None:
+        self._ownerProject = project
 
     def AssertImageNotBeCopied(self) -> Self:
         self._imageBeCopied = False
@@ -196,13 +206,11 @@ class ImageAssertion(Assertable):
         return self
 
     def Assert(self) -> None:
-        assert (
-            self._ownerProjectAssertion is not None
-        ), "Owner project assertion is not set"
+        assert self._ownerProject is not None, "Owner project assertion is not set"
 
-        assert self._ownerProjectAssertion.project is not None, "Project is not loaded"
+        assert self._ownerProject is not None, "Project is not loaded"
 
-        project = self._ownerProjectAssertion.project
+        project = self._ownerProject
         imageData: ImageMeta | None = None
 
         for image in project.images:
@@ -227,3 +235,33 @@ class ImageAssertion(Assertable):
             assert (
                 imageData.threshold == self._expectedThreshold
             ), f"Expected {self._expectedThreshold} but got {imageData.threshold}"
+
+
+class OpenGLSettingAssertion(Assertable):
+    def __init__(self) -> None:
+        super().__init__()
+        self.project: Project | None = None
+
+        self._openglSetting = OpenGLSetting()
+        self._shouldDrawEdges = True
+        self._shouldDrawFaces = True
+
+    def SetProject(self, project: Project) -> None:
+        self.project = project
+
+    def AssertNotDrawEdges(self) -> Self:
+        self._shouldDrawEdges = False
+        return self
+
+    def AssertNotDrawFaces(self) -> Self:
+        self._shouldDrawFaces = False
+        return self
+
+    def Assert(self) -> None:
+        assert self.project is not None, "Project is not set"
+
+        assert self.project.openglSetting is not None, "OpenGL setting is not set"
+        assert self.project.openglSetting.drawEdges == self._shouldDrawEdges
+        assert self.project.openglSetting.drawFaces == self._shouldDrawFaces
+
+        return super().Assert()

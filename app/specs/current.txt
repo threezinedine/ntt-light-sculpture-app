@@ -1,1 +1,1 @@
-test_modify_threshold_then_binary_image_is_updated
+test_modified_draw_edges

@@ -23,11 +23,11 @@ class Command(ABC):
     def _ExecuteImpl(self, *args: Any, **kwargs: Any) -> None:
         raise NotImplementedError("Subclasses must implement _ExecuteImpl method.")
 
-    def Undo(self) -> None:
-        self._UndoImpl()
+    def Undo(self) -> str | None:
+        return self._UndoImpl()
 
     @abstractmethod
-    def _UndoImpl(self) -> None:
+    def _UndoImpl(self) -> str | None:
         raise NotImplementedError("Subclasses must implement _UndoImpl method.")
 
     def CanBeExecuted(self) -> bool:
@@ -66,10 +66,13 @@ class HistoryManager:
             return
 
         last_command = HistoryManager._history.pop()
-        last_command.Undo()
+        eventName = last_command.Undo()
 
         if HistoryManager.IsEmpty():
             EventSystem.TriggerEvent(EMPTY_HISTORY_EVENT_NAME)
+
+        if eventName is not None:
+            EventSystem.TriggerEvent(eventName)
 
     @staticmethod
     def Execute(command: Command) -> None:

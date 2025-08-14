@@ -6,6 +6,7 @@ from functools import partial
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from components.new_project_dialog.dialog import NewProjectDialog
 from components.project_widget.project_widget import ProjectWidget
+from components.opengl_setting_widget import OpenGLSettingWidget
 from constants import (
     CHANGE_PROJECT_EVENT_NAME,
     EMPTY_HISTORY_EVENT_NAME,
@@ -17,6 +18,7 @@ from constants import (
 from converted_uis.main_window import Ui_MainWindow
 from modules.dependency_injection.helper import as_dependency
 from modules.dependency_injection import DependencyContainer
+from modules.history_manager import HistoryManager
 from .main_window_viewmodel import MainWindowViewModel
 from modules.event_system.event_system import EventSystem
 from utils.logger import logger  # type: ignore
@@ -26,6 +28,7 @@ from utils.logger import logger  # type: ignore
     MainWindowViewModel,
     NewProjectDialog,
     ProjectWidget,
+    OpenGLSettingWidget,
 )
 class MainWindow(QMainWindow):
     def __init__(
@@ -33,6 +36,7 @@ class MainWindow(QMainWindow):
         viewModel: MainWindowViewModel,
         newProjectDialog: NewProjectDialog,
         projectWidget: ProjectWidget,
+        openglSettingWdiget: OpenGLSettingWidget,
         parent: QWidget | None = None,
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ) -> None:
@@ -45,6 +49,7 @@ class MainWindow(QMainWindow):
         self.recentProjectsActions: list[QAction] = []
         self.newProjectDialog = newProjectDialog
         self.projectWidget = projectWidget
+        self.openglSettingWidget = openglSettingWdiget
         self._SetupUI()
 
     def _SetupUI(self) -> None:
@@ -56,11 +61,14 @@ class MainWindow(QMainWindow):
         self.ui.newProjectAction.triggered.connect(self.newProjectDialog.show)
         self.ui.openProjectAction.triggered.connect(self._OpenProjectCallback)
         self.ui.saveProjectAction.triggered.connect(self.viewModel.SaveProject)
+        self.ui.undoAction.triggered.connect(HistoryManager.Undo)
 
         self.ui.projectTreeWidget.setWidget(self.projectWidget)
 
         self.ui.centerTabWidget.tabCloseRequested.connect(self._OnTabCloseCallback)
         self.ui.centerTabWidget.setTabText(0, VIEW_TAB_NAME)
+
+        self.ui.openglSettingWidget.setWidget(self.openglSettingWidget)
 
         self._RecentProjectsCallback()
 
@@ -74,6 +82,7 @@ class MainWindow(QMainWindow):
         EventSystem.RegisterEvent(OPEN_IMAGE_TAB_EVENT_NAME, self._OpenImageTabCallback)
 
     def _UpdateTitle(self) -> None:
+        logger.debug("Updating window title")
         self.setWindowTitle(self.viewModel.WindowTitle)
 
     def _OpenProjectCallback(self) -> None:

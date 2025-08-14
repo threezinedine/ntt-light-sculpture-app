@@ -10,6 +10,7 @@ from pytestqt.qtbot import QtBot
 from modules.dependency_injection import DependencyContainer
 from structs.application import Application
 from structs.image_meta import ImageMeta
+from structs.opengl_setting import OpenGLSetting
 from structs.project import Project
 from windows.main_window import MainWindow
 from constants import (
@@ -120,6 +121,24 @@ class ImageBuilder:
         return self._imageMeta
 
 
+class OpenGLSettingBuilder:
+    def __init__(self) -> None:
+        self._openglSetting = OpenGLSetting()
+        self._openglSetting.drawEdges = True
+        self._openglSetting.drawFaces = True
+
+    def NotDrawEdges(self) -> Self:
+        self._openglSetting.drawEdges = False
+        return self
+
+    def NotDrawFaces(self) -> Self:
+        self._openglSetting.drawFaces = False
+        return self
+
+    def Build(self) -> OpenGLSetting:
+        return self._openglSetting
+
+
 class ProjectBuilder:
     def __init__(
         self,
@@ -128,6 +147,7 @@ class ProjectBuilder:
         self._useErrorProjectFile = False
         self._createProjectFile = True
         self._imageBuilders: list[ImageBuilder] = []
+        self._openglSettingBuilder: OpenGLSettingBuilder | None = None
 
     def Name(self, projectName: str) -> Self:
         self._project.projectName = projectName
@@ -143,6 +163,10 @@ class ProjectBuilder:
 
     def AddImage(self, imageBuilder: ImageBuilder) -> Self:
         self._imageBuilders.append(imageBuilder)
+        return self
+
+    def AddOpenGLSetting(self, openglSettingBuilder: OpenGLSettingBuilder) -> Self:
+        self._openglSettingBuilder = openglSettingBuilder
         return self
 
     def Build(self, fs: FakeFilesystem) -> None:
@@ -175,6 +199,9 @@ class ProjectBuilder:
             with open(projectFile, "w") as f:
                 f.write('"Error": ')
             return
+
+        if self._openglSettingBuilder is not None:
+            self._project.openglSetting.Update(self._openglSettingBuilder.Build())
 
         with open(projectFile, "w") as f:
             f.write(self._project.ToJson())

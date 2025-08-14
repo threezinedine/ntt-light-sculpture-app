@@ -65,4 +65,6 @@ OPEN_IMAGE_TAB_EVENT_NAME = "open_image_tab"
 EMPTY_HISTORY_EVENT_NAME = "clear_history"
 HISTORY_NOT_EMPTY_EVENT_NAME = "history_not_empty"
 COMMAND_CAN_NOT_BE_EXECUTED_EVENT_NAME = "command_can_not_be_executed"
+
+OPENGL_SETTING_CHANGED_EVENT_NAME = "opengl_setting_changed"
 # ==================================================================================

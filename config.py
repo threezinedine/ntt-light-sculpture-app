@@ -837,7 +837,7 @@ def main():
     )
     test_parser.add_argument(
         "--folderName",
-        help="The spec file to be run",
+        help="The directory which its tests are run",
         default="modules",
     )
 

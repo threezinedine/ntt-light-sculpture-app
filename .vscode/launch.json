@@ -19,7 +19,7 @@
 			"program": "${workspaceFolder}/app/venv/Scripts/pytest.exe",
 			"args": [
 				"-k",
-				"test_modify_threshold_then_binary_image_is_updated"
+				"test_modified_draw_edges"
 			],
 			"cwd": "${workspaceFolder}/app",
 			"python": "${workspaceFolder}/app/venv/Scripts/python.exe",

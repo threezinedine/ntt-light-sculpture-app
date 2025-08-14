@@ -1,12 +1,14 @@
 from typing import Any
 from constants import EMPTY_HISTORY_EVENT_NAME, HISTORY_NOT_EMPTY_EVENT_NAME
 import pytest  # type: ignore
-from pytest_mock import MockerFixture
+from pytest_mock import MockFixture, MockerFixture
 from modules.history_manager import Command, HistoryManager
 
 
 class Global:
     count = 0
+
+    TEST_EVENT = "test_event"
 
 
 class AddOne(Command):
@@ -23,6 +25,15 @@ class AddTwo(Command):
 
     def _UndoImpl(self) -> None:
         Global.count -= 2
+
+
+class AddThreeAndTriggerFreeEvent(Command):
+    def _ExecuteImpl(self, *args: Any, **kwargs: Any) -> None:
+        Global.count += 3
+
+    def _UndoImpl(self) -> str | None:
+        Global.count -= 3
+        return Global.TEST_EVENT
 
 
 def test_HistoryManager_Undo_EmptyHistory() -> None:
@@ -93,3 +104,16 @@ def test_Add_Different_Type_Of_command() -> None:
     HistoryManager.Undo()
     assert Global.count == 0
     assert HistoryManager.IsEmpty()
+
+
+def test_trigger_event_which_is_returned_by_undo(mocker: MockFixture) -> None:
+    Global.count = 0
+
+    HistoryManager.Execute(AddThreeAndTriggerFreeEvent())
+
+    eventTrigger = mocker.patch(
+        "modules.event_system.event_system.EventSystem.TriggerEvent"
+    )
+    HistoryManager.Undo()
+    assert eventTrigger.call_count == 2
+    assert eventTrigger.call_args_list[-1].args[0] == Global.TEST_EVENT
