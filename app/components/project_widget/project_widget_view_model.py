@@ -9,7 +9,6 @@ from modules.event_system.event_system import EventSystem
 from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
-    GetImageMetadataFile,
     GetImageNameBasedOnExistedImageNames,
 )
 from utils.logger import logger  # type: ignore
@@ -47,15 +46,6 @@ class ProjectWidgetViewModel:
             self.application.CurrentProjectDirectory,
             imageName,
         )
-
-        imageMetaPath = GetImageMetadataFile(
-            self.application.CurrentProjectDirectory,
-            imageName,
-        )
-
-        logger.debug(f"imageMetaPath: {imageMetaPath}")
-        with open(imageMetaPath, "w") as f:
-            f.write(ImageMeta().ToJson())
 
         shutil.copyfile(imagePath, targetPath)
 

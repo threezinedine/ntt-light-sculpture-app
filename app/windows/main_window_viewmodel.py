@@ -1,5 +1,3 @@
-from dataclasses import asdict
-import json
 import os
 from datetime import datetime
 
@@ -15,7 +13,6 @@ from utils.application import (
     GetApplicationDataFolder,
     GetApplicationDataFile,
     GetImageFolder,
-    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetProjectNameFromFilePath,
@@ -28,7 +25,6 @@ from constants import (
     MAX_NUMBER_OF_RECENT_PROJECTS,
     RECENT_PROJECTS_EVENT_NAME,
 )
-from Engine import Camera, Position
 
 
 @as_dependency(Application, Project, NewProjectDialogViewModel)
@@ -43,14 +39,6 @@ class MainWindowViewModel:
         self.project = project
         self.newProjectDialogViewModel = newProjectDialogViewModel
         self.newProjectDialogViewModel.SetAcceptCallback(self.CreateNewProject)
-
-        testPosition = Position(1, 2, 3)
-        otherPosition = Position(testPosition)
-        print(otherPosition.x(), otherPosition.y(), otherPosition.z())
-        origin = Camera.GetOrigin()
-        print(origin.x(), origin.y(), origin.z())
-        origin.set(1, 3, 2)
-        print(origin.x(), origin.y(), origin.z())
 
     def Config(self) -> None:
         if not os.environ.get(APP_DATA_KEY, None):
@@ -165,16 +153,6 @@ class MainWindowViewModel:
         return True
 
     def SaveProject(self) -> None:
-        for imageMeta in self.project.images:
-            imageMetaDataFile = GetImageMetadataFile(
-                self.application.CurrentProjectDirectory,
-                imageMeta.name,
-            )
-
-            with open(imageMetaDataFile, "w") as f:
-                logger.debug(f"Saving image metadata to {imageMetaDataFile}")
-                f.write(json.dumps(asdict(imageMeta), indent=4))
-
         self._UpdateProjectDataFile()
 
     def _RemoveRecentProject(self, projectName: str) -> None:

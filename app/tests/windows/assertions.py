@@ -150,7 +150,7 @@ class ApplicationAssertion(Assertable):
             project.Assert()
 
 
-class TabWidgetAssertion:
+class TabWidgetAssertion(Assertable):
     def __init__(self, tabWidget: QTabWidget) -> None:
         self._tabWidget = tabWidget
 
@@ -171,6 +171,9 @@ class TabWidgetAssertion:
         assert imagePreviewWidget.ui.imagePreviewLabel.hasContent
         assert imagePreviewWidget.ui.binaryImageLabel.hasContent
         return self
+
+    def Assert(self) -> None:
+        pass
 
 
 class ImageAssertion(Assertable):

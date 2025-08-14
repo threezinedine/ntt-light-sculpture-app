@@ -56,12 +56,6 @@ def GetImageFilePath(projectDirectory: str, imageName: str) -> str:
     return os.path.normpath(os.path.join(GetImageFolder(projectDirectory), imageName))
 
 
-def GetImageMetadataFile(projectDirectory: str, imageName: str) -> str:
-    return os.path.normpath(
-        os.path.join(GetImageFolder(projectDirectory), f"{imageName}.meta")
-    )
-
-
 def GetImageNameBasedOnExistedImageNames(
     imageName: str,
     existedImageNames: list[str],

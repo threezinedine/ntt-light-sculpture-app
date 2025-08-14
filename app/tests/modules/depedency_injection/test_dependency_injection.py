@@ -234,9 +234,6 @@ def test_register_object_as_singleton_and_its_dependency() -> None:
             assert singleton.singletonValue == 1994
             self.value: int = 0
 
-        def print(self) -> None:
-            print(self.value)
-
     as_singleton(DependencyClass)
     assert DependencyContainer.GetInstance(DependencyClass.__name__).count == 1
     assert DependencyContainer.GetInstance(SingletonClass.__name__).count == 1

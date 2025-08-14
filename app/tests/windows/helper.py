@@ -23,7 +23,6 @@ from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
     GetImageFolder,
-    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetTestProjectDataFolder,
@@ -96,14 +95,18 @@ class ImageBuilder:
         self._importPath = importPath
         return self
 
+    def SetThreshold(self, threshold: int) -> Self:
+        self._imageMeta.threshold = threshold
+        return self
+
     def Build(self, project: Project, fs: FakeFilesystem) -> ImageMeta:
         assert self._importPath, "Import path must be set"
-        fs.add_real_file(self._importPath, read_only=True)  # type: ignore
+        if not os.path.exists(self._importPath):
+            fs.add_real_file(self._importPath, read_only=True)  # type: ignore
 
         imageName = GetImageFileNameFromFilePath(self._importPath)
         projectFolder = GetTestProjectDataFolder(project.projectName)
         imageDataFolder = GetImageFolder(projectFolder)
-        imageDataFile = GetImageMetadataFile(projectFolder, imageName)
         assert fs.exists(imageDataFolder), f"Image data folder {imageDataFolder} does not exist"  # type: ignore
 
         imagePath = GetImageFilePath(projectFolder, imageName=imageName)
@@ -113,9 +116,6 @@ class ImageBuilder:
             self._importPath,
             GetImageFilePath(GetTestProjectDataFolder(project.projectName), imagePath),
         )
-
-        with open(imageDataFile, "w") as f:
-            f.write(self._imageMeta.ToJson())
 
         return self._imageMeta
 

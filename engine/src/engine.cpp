@@ -13,7 +13,6 @@ namespace NTT_NS
 
     Engine::Engine()
     {
-        printf("Initialized Engine");
         m_impl = CreateScope<EngineImpl>();
     }
 
@@ -35,7 +34,6 @@ namespace NTT_NS
     void Engine::Finalize()
     {
         NTT_LOG_INFO("Engine finalized");
-        printf("Finalizing Engine\n");
 
         SingletonManager::Finalize();
     }

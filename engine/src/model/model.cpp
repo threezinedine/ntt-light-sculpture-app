@@ -146,11 +146,9 @@ namespace NTT_NS
     ModelContainer::ModelContainer()
     {
         m_bodies = CreateScope<Container<Body>>(AllocateBody, DeallocateBody); // Initialize with a capacity of 100 bodies
-        printf("ModelContainer created\n");
     }
 
     ModelContainer::~ModelContainer()
     {
-        printf("ModelContainer destructor called\n");
     }
 } // namespace NTT_NS

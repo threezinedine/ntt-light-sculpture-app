@@ -2,8 +2,10 @@ from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
 from converted_uis.image_preview import Ui_ImagePreviewWidget
+
 from modules.dependency_injection.helper import as_dependency
 from .image_preview_viewmodel import ImagePreviewViewModel
+from utils.logger import logger  # type: ignore
 
 
 @as_dependency(ImagePreviewViewModel)

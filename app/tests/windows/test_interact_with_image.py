@@ -1,4 +1,5 @@
 from asyncio.log import logger  # type: ignore
+from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from pytest_mock import MockerFixture
 from constants import (
     DEFAULT_THRESHOLD,
@@ -52,15 +53,13 @@ def test_open_tab_when_interact_with_image(
 
     tabName = GetImageFileNameFromFilePath(TEST_PNG_IMAGE_PATH)
 
-    tabWidgetAssertion = (
-        TabWidgetAssertion(mainWindow.ui.centerTabWidget)
-        .AssertCurrentTabName(tabName)
-        .AssertTabCount(2)
-    )
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertCurrentTabName(
+        tabName
+    ).AssertTabCount(2).Assert()
 
     tabWidgetActor.SetTabWidget(mainWindow.ui.centerTabWidget).CloseTabWithName(tabName)
 
-    tabWidgetAssertion.AssertTabCount(1)
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(1)
 
 
 def test_cannot_close_the_view_tab(
@@ -87,7 +86,7 @@ def test_cannot_close_the_view_tab(
 
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(
         2
-    ).AssertImagePreviewWidgetNotEmpty(1)
+    ).AssertImagePreviewWidgetNotEmpty(1).Assert()
 
 
 def test_cannont_open_image_tab_multiple_times(
@@ -112,15 +111,15 @@ def test_cannont_open_image_tab_multiple_times(
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
 
-    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2).Assert()
 
     tabWidgetActor.CloseTabWithName(TEST_PNG_IMAGE_NAME)
-    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(1)
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(1).Assert()
 
     projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(
         2
-    ).AssertImagePreviewWidgetNotEmpty(1)
+    ).AssertImagePreviewWidgetNotEmpty(1).Assert()
 
 
 def test_cannot_open_the_second_image_multiple_times(
@@ -144,7 +143,7 @@ def test_cannot_open_the_second_image_multiple_times(
 
     projectTreeActor.OpenContextMenuAt(1).ChooseOpenImageTabAction()
     projectTreeActor.OpenContextMenuAt(1).ChooseOpenImageTabAction()
-    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2)
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertTabCount(2).Assert()
 
 
 def test_open_image_tab_with_correct_path(
@@ -230,4 +229,32 @@ def test_modify_threshold_then_binary_image_is_updated(
 
     ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
         ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(123)
+    ).Assert()
+
+
+def test_open_project_with_non_default_image_metadata(
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH).SetThreshold(123))
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    assert projectTreeActor.NumberOfRows == 1
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+
+    imagePreviewWidget: ImagePreviewWidget = (
+        mainWindow.ui.centerTabWidget.currentWidget()  # type: ignore
+    )
+    assert imagePreviewWidget.ui.thresholdSlider.value() == 123
+
+    TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertImagePreviewWidgetNotEmpty(
+        1
     ).Assert()
