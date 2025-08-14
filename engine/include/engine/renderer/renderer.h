@@ -49,13 +49,17 @@ namespace NTT_NS
          */
         void Resize(u32 width, u32 height) NTT_PYTHON_BINDING;
 
+        inline void StartDrawTriangle() { m_triangleVertexProgram.Use(); };
+        inline void StartDrawLine() { m_lineVertexProgram.Use(); };
+
     private:
         /**
          * The window that will be used to render the scene.
          */
         GLFWwindow *m_window;
 
-        Program m_shaderProgram; // Shader program used for rendering
+        Program m_triangleVertexProgram; // Shader program used for rendering
+        Program m_lineVertexProgram;     // Shader program used for rendering
         u32 m_modelID;
     };
 }

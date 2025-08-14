@@ -3,6 +3,7 @@
 #include "engine/singletonManager/singletonManager.h"
 #include <cstdio>
 #include <GL/glew.h>
+#include "engine/renderer/renderer.h"
 
 namespace NTT_NS
 {
@@ -45,18 +46,36 @@ namespace NTT_NS
             }
         }
 
+        body->lineVertexCount = body->vertexCount * 2; // Each node will be connected to the next one
+
         vector<float> vertexData;
         vertexData.resize(body->vertexCount * 3); // 3 components per node (x, y, z)
         u32 vertexIndex = 0;
+
+        vector<float> lineData;
+        lineData.resize(body->vertexCount * 2 * 3); // 3 components per node (x, y, z)
+        u32 lineDataIndex = 0;
 
         for (u32 faceIndex = 0; faceIndex < faceCount; ++faceIndex)
         {
             u32 nodeCount = body->faces[faceIndex].nodes.size();
             for (u32 nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
             {
-                vertexData[vertexIndex++] = body->faces[faceIndex].nodes[nodeIndex].position.x;
-                vertexData[vertexIndex++] = body->faces[faceIndex].nodes[nodeIndex].position.y;
-                vertexData[vertexIndex++] = body->faces[faceIndex].nodes[nodeIndex].position.z;
+                Position pos = body->faces[faceIndex].nodes[nodeIndex].position;
+
+                vertexData[vertexIndex++] = pos.x;
+                vertexData[vertexIndex++] = pos.y;
+                vertexData[vertexIndex++] = pos.z;
+
+                lineData[lineDataIndex++] = pos.x;
+                lineData[lineDataIndex++] = pos.y;
+                lineData[lineDataIndex++] = pos.z;
+
+                u32 nextNodeIndex = (nodeIndex + 1) % nodeCount; // Wrap around to the first node if at the end of the face
+                Position nextPos = body->faces[faceIndex].nodes[nextNodeIndex].position;
+                lineData[lineDataIndex++] = nextPos.x;
+                lineData[lineDataIndex++] = nextPos.y;
+                lineData[lineDataIndex++] = nextPos.z;
             }
         }
 
@@ -71,6 +90,17 @@ namespace NTT_NS
         glBindBuffer(GL_ARRAY_BUFFER, body->vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
         glEnableVertexAttribArray(0);
+
+        glGenBuffers(1, &body->lineVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, body->lineVbo);
+        glBufferData(GL_ARRAY_BUFFER, lineData.size() * sizeof(float), lineData.data(), GL_STATIC_DRAW);
+
+        glGenVertexArrays(1, &body->lineVao);
+        glBindVertexArray(body->lineVao);
+        glBindBuffer(GL_ARRAY_BUFFER, body->lineVbo);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
     }
 
     void Release(Body *body)
@@ -90,8 +120,14 @@ namespace NTT_NS
 
     void Draw(Body *body)
     {
+        Renderer::GetInstance()->StartDrawTriangle();
         glBindVertexArray(body->vao);
         glDrawArrays(GL_TRIANGLES, 0, body->vertexCount);
+
+        Renderer::GetInstance()->StartDrawLine();
+        glBindVertexArray(body->lineVao);
+        glDrawArrays(GL_LINES, 0, body->lineVertexCount);
+
         glBindVertexArray(0);
     }
 

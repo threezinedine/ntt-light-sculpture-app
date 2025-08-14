@@ -12,8 +12,12 @@ namespace NTT_NS
         u32 vbo;
         u32 vertexCount;
 
+        u32 lineVao;
+        u32 lineVbo;
+        u32 lineVertexCount;
+
         Body(const vector<Face> &faces)
-            : faces(faces), vao(0), vbo(0), vertexCount(0)
+            : faces(faces), vao(0), vbo(0), vertexCount(0), lineVao(0), lineVbo(0), lineVertexCount(0)
         {
         }
     };

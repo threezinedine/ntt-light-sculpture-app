@@ -11,7 +11,7 @@ namespace NTT_NS
     NTT_DEFINE_SINGLETON(Renderer);
 
     Renderer::Renderer()
-        : m_window(nullptr), m_shaderProgram(), m_modelID(INVALID_ID)
+        : m_window(nullptr), m_triangleVertexProgram(), m_lineVertexProgram(), m_modelID(INVALID_ID)
     {
     }
 
@@ -40,7 +40,7 @@ namespace NTT_NS
 
         MODEL_TO_GPU(m_modelID);
 
-        m_shaderProgram.AddVertexShader(
+        m_triangleVertexProgram.AddVertexShader(
             R"(
             #version 330 core
             layout (location = 0) in vec3 aPos;
@@ -50,17 +50,39 @@ namespace NTT_NS
             }
         )");
 
-        m_shaderProgram.AddFragmentShader(
+        m_triangleVertexProgram.AddFragmentShader(
             R"(
             #version 330 core
             out vec4 FragColor;
             void main()
             {
-                FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+                FragColor = vec4(0.5f, 0.5f, 0.5f, 0.5f);
             }
         )");
 
-        m_shaderProgram.Compile();
+        m_triangleVertexProgram.Compile();
+
+        m_lineVertexProgram.AddVertexShader(
+            R"(
+            #version 330 core
+            layout (location = 0) in vec3 aPos;
+            void main()
+            {
+                gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+            }
+            )");
+        m_lineVertexProgram.AddFragmentShader(
+            R"(
+            #version 330 core
+            out vec4 FragColor;
+            void main()
+            {
+                FragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+            }
+            )");
+        m_lineVertexProgram.Compile();
+
+        glLineWidth(2.0f);
     }
 
     void Renderer::Shutdown()
@@ -75,7 +97,6 @@ namespace NTT_NS
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render
-        m_shaderProgram.Use();
         MODEL_DRAW(m_modelID);
         // After render
     }
