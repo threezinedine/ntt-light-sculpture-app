@@ -120,13 +120,19 @@ namespace NTT_NS
 
     void Draw(Body *body)
     {
-        Renderer::GetInstance()->StartDrawTriangle();
-        glBindVertexArray(body->vao);
-        glDrawArrays(GL_TRIANGLES, 0, body->vertexCount);
+        if (Renderer::GetInstance()->ShouldDrawFaces())
+        {
+            Renderer::GetInstance()->StartDrawTriangle();
+            glBindVertexArray(body->vao);
+            glDrawArrays(GL_TRIANGLES, 0, body->vertexCount);
+        }
 
-        Renderer::GetInstance()->StartDrawLine();
-        glBindVertexArray(body->lineVao);
-        glDrawArrays(GL_LINES, 0, body->lineVertexCount);
+        if (Renderer::GetInstance()->ShouldDrawEdges())
+        {
+            Renderer::GetInstance()->StartDrawLine();
+            glBindVertexArray(body->lineVao);
+            glDrawArrays(GL_LINES, 0, body->lineVertexCount);
+        }
 
         glBindVertexArray(0);
     }

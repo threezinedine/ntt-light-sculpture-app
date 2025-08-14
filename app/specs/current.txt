@@ -1,1 +1,1 @@
-test_modified_draw_edges
+test_load_project_then_renderer_will_be_set

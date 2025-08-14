@@ -12,6 +12,7 @@ from structs.application import Application
 from structs.image_meta import ImageMeta
 from structs.opengl_setting import OpenGLSetting
 from structs.project import Project
+from utils.logger import logger  # type: ignore
 from windows.main_window import MainWindow
 from constants import (
     APP_DATA_KEY,

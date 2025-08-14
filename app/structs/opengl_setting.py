@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+
+from utils.logger import logger  # type: ignore
 from .struct_base import StructBase
 
 

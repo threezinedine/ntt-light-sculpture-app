@@ -2,6 +2,7 @@ from modules.dependency_injection.helper import as_dependency
 from modules.history_manager import HistoryManager
 from structs.project import Project
 from .commands import ChangeDrawEdgesCommand, ChangeDrawFacesCommand
+from Engine import Renderer
 
 
 @as_dependency(Project)
@@ -9,6 +10,10 @@ class OpenGLSettingViewModel:
     def __init__(self, project: Project) -> None:
         self.project = project
         self.openglSetting = project.openglSetting
+
+    def Config(self) -> None:
+        Renderer.SetShouldDrawEdges(self.openglSetting.drawEdges)
+        Renderer.SetShouldDrawFaces(self.openglSetting.drawFaces)
 
     @property
     def DrawEdges(self) -> bool:
@@ -20,6 +25,8 @@ class OpenGLSettingViewModel:
         else:
             self.openglSetting.drawEdges = value
 
+        Renderer.SetShouldDrawEdges(value)
+
     @property
     def DrawFaces(self) -> bool:
         return self.openglSetting.drawFaces
@@ -29,3 +36,5 @@ class OpenGLSettingViewModel:
             HistoryManager.Execute(ChangeDrawFacesCommand(self.project, value))
         else:
             self.openglSetting.drawFaces = value
+
+        Renderer.SetShouldDrawFaces(value)

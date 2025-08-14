@@ -53,6 +53,12 @@ namespace NTT_NS
         inline void StartDrawTriangle() { m_triangleVertexProgram.Use(); };
         inline void StartDrawLine() { m_lineVertexProgram.Use(); };
 
+        inline b8 ShouldDrawEdges() const;
+        inline void SetShouldDrawEdges(b8 value) NTT_PYTHON_BINDING;
+
+        inline b8 ShouldDrawFaces() const;
+        inline void SetShouldDrawFaces(b8 value) NTT_PYTHON_BINDING;
+
     private:
         /**
          * The window that will be used to render the scene.
@@ -62,5 +68,13 @@ namespace NTT_NS
         Program m_triangleVertexProgram; // Shader program used for rendering
         Program m_lineVertexProgram;     // Shader program used for rendering
         u32 m_modelID;
+        b8 m_shouldDrawEdges;
+        b8 m_shouldDrawFaces;
     };
+
+    b8 Renderer::ShouldDrawEdges() const { return m_shouldDrawEdges; }
+    void Renderer::SetShouldDrawEdges(b8 value) { m_shouldDrawEdges = value; }
+
+    b8 Renderer::ShouldDrawFaces() const { return m_shouldDrawFaces; }
+    void Renderer::SetShouldDrawFaces(b8 value) { m_shouldDrawFaces = value; }
 }

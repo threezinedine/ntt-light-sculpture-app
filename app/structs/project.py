@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import datetime
 from dataclasses import dataclass, field
+from utils.logger import logger  # type: ignore
 
 from structs.image_meta import ImageMeta
 from structs.opengl_setting import OpenGLSetting

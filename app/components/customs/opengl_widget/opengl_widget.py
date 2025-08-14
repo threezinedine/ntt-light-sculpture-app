@@ -1,5 +1,5 @@
 from typing import Optional
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
@@ -14,6 +14,9 @@ class OpenGLWidget(QOpenGLWidget):
         flags: Qt.WindowType = Qt.WindowType.Widget,
     ):
         super(OpenGLWidget, self).__init__(parent, flags=flags)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update)
+        self.timer.start(16)  # Approximately 60 FPS
 
     def initializeGL(self):
         try:
