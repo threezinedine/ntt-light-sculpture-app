@@ -24,38 +24,42 @@ class {{ enum.name }}(Enum):
 
 # ============================ STRUCTS ============================
 {% for struct in structs %}
+    {% if "python" in struct.annotations %}
 class {{ struct.name }}:
-    {% if struct.comment %}
+        {% if struct.comment %}
     """
     {{ struct.comment }}
     """
-    {% endif %}
-    {% for attribute in struct.attributes %}
+        {% endif %}
+        {% for attribute in struct.attributes %}
     @property
     def {{ attribute.name }}(self) -> {{ convertType(attribute.type) }}:
-        {% if attribute.comment %}
+            {% if attribute.comment %}
         """
         {{ attribute.comment }}
         """
-        {% endif %}
+            {% endif %}
         ...
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
 # ===================================================================
 
 # ============================ FUNCTIONS ============================
 {% for function in functions %}
+    {% if "python" in function.annotations %}
 def {{ function.name}}(
-    {% for arg in function.arguments %}
+        {% for arg in function.arguments %}
     {{ arg.name }}: {{ convertType(arg.type) }},
-    {% endfor %}
+        {% endfor %}
 ) -> {{ convertType(function.returnType) }}:
-    {% if function.comment %}
+        {% if function.comment %}
     """
     {{ function.comment }}
     """
-    {% endif %}
+        {% endif %}
     ...
+    {% endif %}
 {% endfor%}
 # ===================================================================
 
@@ -67,6 +71,19 @@ class {{ class.name }}:
     """
     {{ class.comment }}
     """
+        {% endif %}
+
+        {% if class.constructors | length > 0 %}
+            {% for constructor in class.constructors %}
+    @overload
+    def __init__(
+        self,
+                {% for arg in constructor.arguments %}
+        {{ arg.name }}: {{ convertType(arg.type) }},
+                {% endfor %}
+    ) -> None:
+        ...
+            {% endfor %}
         {% endif %}
 
         {% if class.methods != [] %}

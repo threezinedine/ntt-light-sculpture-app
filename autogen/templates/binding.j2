@@ -60,7 +60,17 @@ class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
                 {% endif %}
             {% endfor %}
         {% else %}
+            {% if class.hasDefaultConstructor %}
     .def(init<>())
+            {% endif %}
+            {% for constructor in class.constructors %}
+    .def(init<
+            {% for argument in constructor.arguments %}
+                {{argument.type}}
+                {% if not loop.last %},{% endif %}
+            {% endfor %}
+    >())
+            {% endfor %}
             {% for method in class.methods %}
                 {% if "python" in method.annotations %}
                     {% if method.is_static %}

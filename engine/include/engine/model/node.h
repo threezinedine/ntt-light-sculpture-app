@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/common/common.h"
+#include "engine/renderer/position.h"
 
 namespace NTT_NS
 {

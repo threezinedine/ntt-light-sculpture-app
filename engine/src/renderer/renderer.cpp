@@ -26,16 +26,31 @@ namespace NTT_NS
             throw std::runtime_error("Failed to initialize GLEW");
         }
 
-        Node node1(1, 0, 0);
-        Node node2(0.5f, -0.5f, 0);
-        Node node3(0, 0.5f, 0);
-        Node node4(0.5f, -0.5f, 0);
-        Node node5(0, 0.5f, 0);
-        Node node6(-1, 0, 0);
-        Face face1({node1, node2, node3});
-        Face face2({node4, node5, node6});
+        Face face1({
+            Node(0, 0, 0),
+            Node(0, 1, 0),
+            Node(1, 0, 0),
+        });
 
-        vector<Face> faces = {face1, face2};
+        Face face2({
+            Node(0, 0, 0),
+            Node(0, 1, 0),
+            Node(0, 0, 1),
+        });
+
+        Face face3({
+            Node(0, 0, 0),
+            Node(1, 0, 0),
+            Node(0, 0, 1),
+        });
+
+        Face face4({
+            Node(0, 1, 0),
+            Node(1, 0, 0),
+            Node(0, 0, 1),
+        });
+
+        vector<Face> faces = {face1, face2, face3, face4};
         m_modelID = MODEL_NEW_BODY(faces);
 
         MODEL_TO_GPU(m_modelID);

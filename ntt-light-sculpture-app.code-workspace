@@ -32,7 +32,8 @@
 			"cstdint": "cpp",
 			"string": "cpp",
 			"vector": "cpp",
-			"xmemory": "cpp"
+			"xmemory": "cpp",
+			"*.rh": "cpp"
 		}
 	}
 }

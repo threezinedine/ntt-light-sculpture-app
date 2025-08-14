@@ -21,9 +21,9 @@ namespace NTT_NS
             u32 nodeCount = body->faces[faceIndex].nodes.size();
             for (u32 nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
             {
-                printf("\t\tNode: (%f, %f, %f)\n", body->faces[faceIndex].nodes[nodeIndex].position.x,
-                       body->faces[faceIndex].nodes[nodeIndex].position.y,
-                       body->faces[faceIndex].nodes[nodeIndex].position.z);
+                printf("\t\tNode: (%f, %f, %f)\n", body->faces[faceIndex].nodes[nodeIndex].position.x(),
+                       body->faces[faceIndex].nodes[nodeIndex].position.y(),
+                       body->faces[faceIndex].nodes[nodeIndex].position.z());
             }
 
             printf("\tEnd Face\n");
@@ -63,19 +63,19 @@ namespace NTT_NS
             {
                 Position pos = body->faces[faceIndex].nodes[nodeIndex].position;
 
-                vertexData[vertexIndex++] = pos.x;
-                vertexData[vertexIndex++] = pos.y;
-                vertexData[vertexIndex++] = pos.z;
+                vertexData[vertexIndex++] = pos.x();
+                vertexData[vertexIndex++] = pos.y();
+                vertexData[vertexIndex++] = pos.z();
 
-                lineData[lineDataIndex++] = pos.x;
-                lineData[lineDataIndex++] = pos.y;
-                lineData[lineDataIndex++] = pos.z;
+                lineData[lineDataIndex++] = pos.x();
+                lineData[lineDataIndex++] = pos.y();
+                lineData[lineDataIndex++] = pos.z();
 
                 u32 nextNodeIndex = (nodeIndex + 1) % nodeCount; // Wrap around to the first node if at the end of the face
                 Position nextPos = body->faces[faceIndex].nodes[nextNodeIndex].position;
-                lineData[lineDataIndex++] = nextPos.x;
-                lineData[lineDataIndex++] = nextPos.y;
-                lineData[lineDataIndex++] = nextPos.z;
+                lineData[lineDataIndex++] = nextPos.x();
+                lineData[lineDataIndex++] = nextPos.y();
+                lineData[lineDataIndex++] = nextPos.z();
             }
         }
 
@@ -146,9 +146,11 @@ namespace NTT_NS
     ModelContainer::ModelContainer()
     {
         m_bodies = CreateScope<Container<Body>>(AllocateBody, DeallocateBody); // Initialize with a capacity of 100 bodies
+        printf("ModelContainer created\n");
     }
 
     ModelContainer::~ModelContainer()
     {
+        printf("ModelContainer destructor called\n");
     }
 } // namespace NTT_NS

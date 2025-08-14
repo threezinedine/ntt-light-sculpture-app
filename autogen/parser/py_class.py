@@ -9,11 +9,20 @@ class PyClass:
         self.name = cursor.spelling
         self.methods: List[PyMethod] = []
         self.annotations: List[str] = []
+        self.hasDefaultConstructor = True
+        self.constructors: List[PyMethod] = []
 
         for child in cursor.get_children():
             if child.kind == clang.CursorKind.CXX_METHOD:
                 if child.access_specifier == clang.AccessSpecifier.PUBLIC:
                     self.methods.append(PyMethod(child))
+            elif child.kind == clang.CursorKind.CONSTRUCTOR:
+                if (
+                    child.access_specifier == clang.AccessSpecifier.PUBLIC
+                    and not child.is_default_constructor()
+                ):
+                    self.hasDefaultConstructor = False
+                    self.constructors.append(PyMethod(child))
             elif child.kind == clang.CursorKind.ANNOTATE_ATTR:
                 self.annotations.append(child.spelling)
 

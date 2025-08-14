@@ -1,4 +1,6 @@
 from unittest.mock import MagicMock, patch
+
+import pytest  # type: ignore
 from conftest import AutoGenUtil
 
 
@@ -132,3 +134,93 @@ def test_not_bind_struct_without_annotation(util: AutoGenUtil) -> None:
 """
 
     assert util.ReformatOutput(expected) not in util.ReformatOutput(result)
+
+
+def test_convert_position_to_python(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        class __attribute__((annotate("python"))) Position {
+        public:
+            Position(float x, float y, float z) : m_data(x, y, z) {}
+            Position(const Position &other) : m_data(other.m_data) {}
+            ~Position() {}
+
+            inline float x() __attribute__((annotate("python"))) const;
+            inline float y() __attribute__((annotate("python"))) const;
+            inline float z() __attribute__((annotate("python"))) const;
+
+        private:
+            glm::vec3 m_data;
+        };
+    }
+"""
+    )
+
+    result = util.GenerateOutput("templates/binding.j2")
+
+    expected = """
+        class_<::NTT_NS::Position>(m, "Position")
+            .def(init<float, float, float>())
+            .def(init<const Position &>())
+            .def("x", &::NTT_NS::Position::x, "Method x is not documented")
+            .def("y", &::NTT_NS::Position::y, "Method y is not documented")
+            .def("z", &::NTT_NS::Position::z, "Method z is not documented");
+"""
+
+    assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_binding_position_to_pyi(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        class __attribute__((annotate("python"))) Position {
+        public:
+            Position(float x, float y, float z) : m_data(x, y, z) {}
+            Position(const Position &other) : m_data(other.m_data) {}
+            ~Position() {}
+
+            inline float x() __attribute__((annotate("python"))) const;
+            inline float y() __attribute__((annotate("python"))) const;
+            inline float z() __attribute__((annotate("python"))) const;
+
+        private:
+            glm::vec3 m_data;
+        };
+    }
+"""
+    )
+
+    result = util.GenerateOutput("templates/pyi_binding.j2")
+
+    expected = """
+        class Position:
+            @overload
+            def __init__(self, x: float, y: float, z: float,) -> None:
+                ...
+
+            @overload
+            def __init__(self, other: "Position",) -> None:
+                ...
+
+            def x(self,) -> float:
+                \"\"\"
+                Method x is not documented
+                \"\"\"
+                ...
+
+            def y(self,) -> float:
+                \"\"\"
+                Method y is not documented
+                \"\"\"
+                ...
+
+            def z(self,) -> float:
+                \"\"\"
+                Method z is not documented
+                \"\"\"
+                ...
+    """
+
+    assert util.ReformatOutput(expected) in util.ReformatOutput(result)

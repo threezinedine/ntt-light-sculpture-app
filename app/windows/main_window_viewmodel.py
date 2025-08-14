@@ -28,6 +28,7 @@ from constants import (
     MAX_NUMBER_OF_RECENT_PROJECTS,
     RECENT_PROJECTS_EVENT_NAME,
 )
+from Engine import Camera
 
 
 @as_dependency(Application, Project, NewProjectDialogViewModel)
@@ -42,6 +43,9 @@ class MainWindowViewModel:
         self.project = project
         self.newProjectDialogViewModel = newProjectDialogViewModel
         self.newProjectDialogViewModel.SetAcceptCallback(self.CreateNewProject)
+
+        origin = Camera.GetOrigin()
+        print(origin.x(), origin.y(), origin.z())
 
     def Config(self) -> None:
         if not os.environ.get(APP_DATA_KEY, None):

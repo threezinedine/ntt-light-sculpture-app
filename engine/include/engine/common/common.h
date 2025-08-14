@@ -82,8 +82,6 @@ typedef glm::mat2 Mat2;
 typedef glm::mat3 Mat3;
 typedef glm::mat4 Mat4;
 
-typedef Vec3 Position;
-
 #include "define.h"
 
 const u32 INVALID_ID = u32(-1);

@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "engine/common/common.h"
 #include "engine/renderer/program.h"
+#include "camera.h"
 
 namespace NTT_NS
 {
