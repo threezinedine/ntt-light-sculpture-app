@@ -31,7 +31,8 @@
 			"xutility": "cpp",
 			"cstdint": "cpp",
 			"string": "cpp",
-			"vector": "cpp"
+			"vector": "cpp",
+			"xmemory": "cpp"
 		}
 	}
 }

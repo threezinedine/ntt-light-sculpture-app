@@ -56,8 +56,6 @@ namespace NTT_NS
         GLFWwindow *m_window;
 
         Program m_shaderProgram; // Shader program used for rendering
-        u32 m_VAO;
-        u32 m_VBO;
-        u32 m_vertexCount;
+        u32 m_modelID;
     };
 }

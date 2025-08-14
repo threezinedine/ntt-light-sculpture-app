@@ -2,9 +2,12 @@
 #include "macros.h"
 #include <cstdint>
 #include <string>
+#include <cstring>
 #include <cassert>
 #include <memory>
 #include <vector>
+#include <map>
+#include <set>
 #include <chrono>
 #include <functional>
 #include <glm/glm.hpp>
@@ -43,8 +46,14 @@ typedef std::string string;
 template <typename T>
 using vector = std::vector<T>;
 
+template <typename K, typename V>
+using map = std::map<K, V>;
+
 template <typename T>
-using Scope = std::unique_ptr<T>;
+using set = std::set<T>;
+
+template <typename T>
+using Scope = ::std::unique_ptr<T>;
 
 template <typename T, typename... Args>
 inline Scope<T> CreateScope(Args &&...args)
@@ -53,10 +62,10 @@ inline Scope<T> CreateScope(Args &&...args)
 }
 
 template <typename T>
-using Ref = std::shared_ptr<T>;
+using Reference = ::std::shared_ptr<T>;
 
 template <typename T, typename... Args>
-inline Ref<T> CreateRef(Args &&...args)
+inline Reference<T> CreateRef(Args &&...args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
@@ -76,3 +85,5 @@ typedef glm::mat4 Mat4;
 typedef Vec3 Position;
 
 #include "define.h"
+
+const u32 INVALID_ID = u32(-1);

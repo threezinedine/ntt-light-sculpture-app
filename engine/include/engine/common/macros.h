@@ -46,3 +46,14 @@ public:                                  \
 private:                                                 \
     class className##Impl;                               \
     Scope<className##Impl> m_impl;
+
+#define NTT_NON_COPYABLE(className)                   \
+public:                                               \
+    className(const className &) = delete;            \
+    className &operator=(const className &) = delete; \
+    NTT_NON_MOVABLE(className)
+
+#define NTT_NON_MOVABLE(className)    \
+public:                               \
+    className(className &&) = delete; \
+    className &operator=(className &&) = delete;

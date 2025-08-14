@@ -11,7 +11,7 @@ namespace NTT_NS
     NTT_DEFINE_SINGLETON(Renderer);
 
     Renderer::Renderer()
-        : m_window(nullptr), m_shaderProgram(), m_VAO(0), m_VBO(0), m_vertexCount(0)
+        : m_window(nullptr), m_shaderProgram(), m_modelID(INVALID_ID)
     {
     }
 
@@ -34,15 +34,11 @@ namespace NTT_NS
         Node node6(-1, 0, 0);
         Face face1({node1, node2, node3});
         Face face2({node4, node5, node6});
-        Body body({face1, face2});
 
-        ToGPU(body, m_VBO, m_vertexCount);
+        vector<Face> faces = {face1, face2};
+        m_modelID = MODEL_NEW_BODY(faces);
 
-        glGenVertexArrays(1, &m_VAO);
-        glBindVertexArray(m_VAO);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-        glEnableVertexAttribArray(0);
+        MODEL_TO_GPU(m_modelID);
 
         m_shaderProgram.AddVertexShader(
             R"(
@@ -69,8 +65,7 @@ namespace NTT_NS
 
     void Renderer::Shutdown()
     {
-        glDeleteBuffers(1, &m_VBO);
-        glDeleteVertexArrays(1, &m_VAO);
+        MODEL_RELEASE(m_modelID);
     }
 
     void Renderer::Render()
@@ -81,10 +76,7 @@ namespace NTT_NS
 
         // Render
         m_shaderProgram.Use();
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
-        glBindVertexArray(0);
-
+        MODEL_DRAW(m_modelID);
         // After render
     }
 

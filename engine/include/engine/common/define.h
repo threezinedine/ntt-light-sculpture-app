@@ -1,3 +1,4 @@
 #pragma once
 
 #define ERROR_BUFFER_SIZE 512
+#define MAX_CONTAINER_OBJECTS 1024
