@@ -4,8 +4,6 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
 )
-from pyfakefs.fake_filesystem import FakeFilesystem
-
 from tests.windows.assertions import ApplicationAssertion, ProjectAssertion
 from utils.application import (
     GetProjectDataFolder,
@@ -31,7 +29,6 @@ from components.new_project_dialog.dialog import NewProjectDialog
 def test_create_a_new_project(
     fixtureBuilder: FixtureBuilder,
     folderDialogSetup: FolderDialogSetup,
-    fs: FakeFilesystem,
 ):
     NEW_PROJECT_NAME = "Test Project"
     EXSITED_PROJECT_NAME = "Existed Project"
@@ -136,13 +133,13 @@ def test_create_a_new_project(
 
     okButton.click()
 
-    ProjectAssertion(NEW_PROJECT_NAME, fs).AssertImages([])
+    ProjectAssertion(NEW_PROJECT_NAME).AssertImagesCount(0).Assert()
 
     assert mainWindow.windowTitle() == GetWindowTitle(NEW_PROJECT_NAME)
     assert len(mainWindow.recentProjectsActions) == 1
     assert mainWindow.recentProjectsActions[0].text() == NEW_PROJECT_NAME
 
-    ApplicationAssertion(fs).AssertRecentProjects([NEW_PROJECT_NAME]).AssertRecentProjectFilePaths()
+    ApplicationAssertion().AssertRecentProjects([NEW_PROJECT_NAME]).Assert()
 
 
 def test_create_a_new_project_and_it_the_most_recent_project(

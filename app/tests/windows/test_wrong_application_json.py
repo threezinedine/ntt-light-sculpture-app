@@ -19,7 +19,7 @@ def test_wrong_application_json(fixtureBuilder: FixtureBuilder, mocker: MockerFi
     assert len(mainWindow.recentProjectsActions) == 1
     assert mainWindow.recentProjectsActions[0].text() == TEST_NEW_PROJECT_NAME
 
-    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME])
+    ApplicationAssertion().AssertRecentProjects([TEST_NEW_PROJECT_NAME]).Assert()
     infoMocker.assert_called_once()
 
 

@@ -20,7 +20,7 @@ def test_create_application_data_folder_and_data_file(
     fixtureBuilder.AddApplication(ApplicationBuilder().AddErrorAppDataFile()).Build()
 
     assert warningMocker.call_count == 1
-    ApplicationAssertion(fs).Assert()
+    ApplicationAssertion().Assert()
 
 
 def test_open_application_without_app_data(
@@ -73,4 +73,4 @@ def test_open_application_without_app_data_folder(
 
     assert infoMocker.call_count == 2
 
-    ApplicationAssertion(fs).Assert()
+    ApplicationAssertion().Assert()

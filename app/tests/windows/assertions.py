@@ -1,7 +1,6 @@
 import os
 from typing import Self
 from PyQt6.QtWidgets import QTabWidget
-from pyfakefs.fake_filesystem import FakeFilesystem
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from constants import TEST_NEW_PROJECT_PATH
 from structs.application import Application
@@ -11,73 +10,102 @@ from utils.application import (
     GetApplicationDataFile,
     GetApplicationDataFolder,
     GetImageFilePath,
-    GetImageMetadataFile,
     GetProjectDataFile,
     GetProjectDataFolder,
     GetTestProjectDataFolder,
 )
 from utils.logger import logger  # type: ignore
+from abc import ABC, abstractmethod
 
 
-class ProjectAssertion:
+class Assertable(ABC):
+    """
+    Just the constructed form for all assertions
+    """
+
+    @abstractmethod
+    def Assert(self) -> None:
+        """
+        Only run assertions in this method, other method should be used for storing the
+            information for this assertion operation.
+
+        Args:
+            fs (FakeFilesystem | None): The fake filesystem to use for assertions, this
+                value can be None.
+        """
+        pass
+
+
+class ProjectAssertion(Assertable):
     def __init__(
         self,
         projectName: str,
-        fs: FakeFilesystem | None = None,
     ) -> None:
-        self._fs: FakeFilesystem | None = fs
-
         self._projectFolder = GetProjectDataFolder(TEST_NEW_PROJECT_PATH, projectName)
         self._projectFile = GetProjectDataFile(TEST_NEW_PROJECT_PATH, projectName)
 
-        self._project: Project | None = None
+        self.project: Project | None = None
+        self._shouldProjectFolderExisted = True
+        self._shouldProjectFileExisted = True
+        self._expectedImagesCount: int | None = None
+
+        self._images: list[ImageAssertion] = []
 
         if os.path.exists(self._projectFile):
             with open(self._projectFile, "r") as f:
-                self._project = Project()
-                assert self._project.FromJson(f.read())
+                self.project = Project()
+                assert self.project.FromJson(f.read())
 
     def AssertProjectFolderDoesNotExist(self) -> Self:
-        if self._fs is not None:
-            assert not self._fs.exists(self._projectFolder)  # type: ignore
+        self._shouldProjectFolderExisted = False
         return self
 
     def AssertProjectFileNotExists(self) -> Self:
-        if self._fs is not None:
-            assert not self._fs.exists(self._projectFile)  # type: ignore
-
+        self._shouldProjectFileExisted = False
         return self
 
-    def AssertImages(self, images: list[str]) -> Self:
-        assert self._project is not None
-
-        for image, inputImage in zip(self._project.images, images):
-            assert image.name == inputImage
-
+    def AssertImage(self, image: "ImageAssertion") -> Self:
+        image.SetOwnerProject(self)
+        self._images.append(image)
         return self
 
-    def AssertImageLoadded(self) -> Self:
-        assert self._fs is not None
-        assert self._project is not None
-
-        for image in self._project.images:
-            loadedImagePath = GetImageFilePath(
-                os.path.join(TEST_NEW_PROJECT_PATH, self._project.projectName),
-                image.name,
-            )
-
-            assert self._fs.exists(loadedImagePath), f"Image {loadedImagePath} is not loaded"  # type: ignore
-
+    def AssertImagesCount(self, imageCount: int) -> Self:
+        self._expectedImagesCount = imageCount
         return self
 
+    def Assert(self) -> None:
+        if not self._shouldProjectFolderExisted:
+            assert not os.path.exists(
+                self._projectFolder
+            ), f"Project folder {self._projectFolder} should not exist"
+            return
 
-class ApplicationAssertion:
-    def __init__(self, fs: FakeFilesystem | None = None) -> None:
-        self._fs = fs
+        if not self._shouldProjectFileExisted:
+            assert not os.path.exists(
+                self._projectFile
+            ), f"Project file {self._projectFile} should not exist"
 
+        assert self.project is not None
+
+        if self._expectedImagesCount is not None:
+            assert (
+                len(self._images) == self._expectedImagesCount
+            ), f"Expected {self._expectedImagesCount} images but got {len(self._images)}"
+
+        for image in self._images:
+            image.Assert()
+
+
+class ApplicationAssertion(Assertable):
+    def __init__(self) -> None:
         self._applicationDataFile = GetApplicationDataFile()
 
         self._application: Application | None = None
+        self._shouldAppDataFolderExisted = True
+        self._shouldAppDataFileExisted = True
+
+        self._recentProjectNames: list[str] = []
+        self._projects: list[ProjectAssertion] = []
 
         if os.path.exists(self._applicationDataFile):
             with open(self._applicationDataFile, "r") as f:
@@ -85,49 +113,41 @@ class ApplicationAssertion:
                 assert self._application.FromJson(f.read())
 
     def AssertAppDataFolderDoesNotExist(self) -> Self:
-        if self._fs is not None:
-            assert not self._fs.exists(GetApplicationDataFolder())  # type: ignore
+        self._shouldAppDataFolderExisted = False
         return self
 
     def AssertRecentProjectsFileNotExists(self) -> Self:
-        if self._fs is not None:
-            assert not self._fs.exists(GetApplicationDataFile("recent_projects.json"))  # type: ignore
+        self._shouldAppDataFileExisted = False
         return self
 
     def AssertRecentProjects(self, recentProjects: list[str]) -> Self:
-        if self._fs is not None:
-            assert self._fs.exists(GetApplicationDataFolder())  # type: ignore
-            assert self._fs.exists(GetApplicationDataFile())  # type: ignore
-
-        assert self._application is not None
-
-        for recentProject, inputRecentProject in zip(
-            self._application.recentProjectNames, recentProjects
-        ):
-            assert recentProject == inputRecentProject
+        self._recentProjectNames = recentProjects
 
         return self
 
-    def AssertRecentProjectFilePaths(self) -> Self:
-        assert self._application is not None
-
-        for projectName in self._application.recentProjectNames:
-            dataFile = GetProjectDataFile(TEST_NEW_PROJECT_PATH, projectName)
-            assert self._fs.exists(dataFile)  # type: ignore
-
-            assert self._application.recentProjectFilePaths[projectName] == dataFile
-
+    def AssertProject(self, project: ProjectAssertion) -> Self:
+        self._projects.append(project)
         return self
 
-    def Assert(self) -> Self:
-        if self._fs is not None:
-            assert self._fs.exists(GetApplicationDataFolder())  # type: ignore
-            assert self._fs.exists(GetApplicationDataFile())  # type: ignore
+    def Assert(self) -> None:
+        if not self._shouldAppDataFolderExisted:
+            assert not os.path.exists(
+                GetApplicationDataFolder()
+            ), f"Application data folder {GetApplicationDataFolder()} should not exist"
 
-        assert self._application is not None
-        assert self._application.Compare(Application())
+        if not self._shouldAppDataFileExisted:
+            assert not os.path.exists(
+                GetApplicationDataFile()
+            ), f"Application data file {GetApplicationDataFile()} should not exist"
 
-        return self
+        assert self._application is not None, "Application data is not loaded"
+
+        assert set(self._recentProjectNames) == set(
+            self._application.recentProjectNames
+        ), f"Recent projects do not match: {self._recentProjectNames} != {self._application.recentProjectNames}"
+
+        for project in self._projects:
+            project.Assert()
 
 
 class TabWidgetAssertion:
@@ -153,40 +173,54 @@ class TabWidgetAssertion:
         return self
 
 
-class ImageMetadataAssertion:
-    def __init__(
-        self,
-        projectName: str,
-        imageName: str,
-        fs: FakeFilesystem | None = None,
-    ) -> None:
-        self._fs = fs
+class ImageAssertion(Assertable):
+    def __init__(self, imageName: str) -> None:
+        super().__init__()
+        self._ownerProjectAssertion: ProjectAssertion | None = None
+        self._imageName = imageName
+        self._imageBeCopied = True
+        self._expectedThreshold: int | None = None
 
-        self._metadataFile = GetImageMetadataFile(
-            GetTestProjectDataFolder(projectName), imageName
-        )
-        self._metadata: ImageMeta | None = None
+    def SetOwnerProject(self, project: ProjectAssertion) -> None:
+        self._ownerProjectAssertion = project
 
-        if os.path.exists(self._metadataFile):
-            with open(self._metadataFile, "r") as f:
-                self._metadata = ImageMeta()
-                assert self._metadata.FromJson(f.read())
-                logger.debug(f"Reading from {self._metadataFile}")
-
-    def AssertMetadataFileNotExists(self) -> Self:
-        assert not os.path.exists(self._metadataFile)
-
-        return self
-
-    def AssertFileExists(self) -> Self:
-        assert os.path.exists(self._metadataFile)
+    def AssertImageNotBeCopied(self) -> Self:
+        self._imageBeCopied = False
         return self
 
     def AssertThreshold(self, threshold: int) -> Self:
-        assert self._metadata is not None, "Metadata is not loaded"
-
-        assert (
-            self._metadata.threshold == threshold
-        ), f"Expected {threshold} but got {self._metadata.threshold}"
-
+        self._expectedThreshold = threshold
         return self
+
+    def Assert(self) -> None:
+        assert (
+            self._ownerProjectAssertion is not None
+        ), "Owner project assertion is not set"
+
+        assert self._ownerProjectAssertion.project is not None, "Project is not loaded"
+
+        project = self._ownerProjectAssertion.project
+        imageData: ImageMeta | None = None
+
+        for image in project.images:
+            if image.name == self._imageName:
+                imageData = image
+                break
+
+        assert imageData is not None, "Image data is not found"
+
+        projectFolder = GetTestProjectDataFolder(project.projectName)
+        copiedImagePath = GetImageFilePath(projectFolder, self._imageName)
+        if not self._imageBeCopied:
+            assert not os.path.exists(
+                copiedImagePath
+            ), f"Image file {copiedImagePath} should not exist"
+        else:
+            assert os.path.exists(
+                copiedImagePath
+            ), f"Image file {copiedImagePath} should exist"
+
+        if self._expectedThreshold is not None:
+            assert (
+                imageData.threshold == self._expectedThreshold
+            ), f"Expected {self._expectedThreshold} but got {imageData.threshold}"

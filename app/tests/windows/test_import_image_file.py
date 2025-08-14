@@ -1,6 +1,6 @@
 from pyfakefs.fake_filesystem import FakeFilesystem
 from pytestqt.qtbot import QtBot
-from tests.windows.assertions import ImageMetadataAssertion, ProjectAssertion
+from tests.windows.assertions import ProjectAssertion, ImageAssertion
 from utils.application import GetImageNameBasedOnExistedImageNames
 from .actors import ProjectTreeActor
 
@@ -46,12 +46,9 @@ def test_import_image_file(
     projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
-    ProjectAssertion(TEST_NEW_PROJECT_NAME, fs).AssertImages(
-        [TEST_PNG_IMAGE_NAME]
-    ).AssertImageLoadded()
-    ImageMetadataAssertion(
-        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(DEFAULT_THRESHOLD)
+    ).Assert()
 
     # =================== reopen project ===================
     mainWindow.recentProjectsActions[0].trigger()
@@ -107,9 +104,11 @@ def test_delete_1_among_multiple_images(
     assert projectTreeActor.NumberOfRows == 2
     assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
     assert projectTreeActor.GetItemNameAt(1) == TEST_PNG_IMAGE_NAME_2
-    ProjectAssertion(TEST_NEW_PROJECT_NAME, fs).AssertImages(
-        [TEST_PNG_IMAGE_NAME, TEST_PNG_IMAGE_NAME_2]
-    ).AssertImageLoadded()
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(DEFAULT_THRESHOLD)
+    ).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME_2).AssertThreshold(DEFAULT_THRESHOLD)
+    ).Assert()
 
     # ================== delete the first image ==================
     projectTreeActor.OpenContextMenuAt(0).ChooseDeleteAction()
@@ -117,7 +116,9 @@ def test_delete_1_among_multiple_images(
     # ================== assert image is deleted ==================
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME_2
-    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME_2])
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME_2)
+    ).Assert()
 
 
 def test_delete_the_last_image(
@@ -141,7 +142,9 @@ def test_delete_the_last_image(
 
     assert projectTreeActor.NumberOfRows == 1
     assert projectTreeActor.GetItemNameAt(0) == TEST_PNG_IMAGE_NAME
-    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImages([TEST_PNG_IMAGE_NAME])
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(DEFAULT_THRESHOLD)
+    ).Assert()
 
 
 def test_automatically_modify_the_name_of_when_import_existed_image_name(
@@ -174,10 +177,6 @@ def test_automatically_modify_the_name_of_when_import_existed_image_name(
     )
     assert projectTreeActor.GetItemNameAt(1) == NEW_IMAGE_NAME
 
-    ImageMetadataAssertion(
-        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)
-
-    ImageMetadataAssertion(
-        TEST_NEW_PROJECT_NAME, NEW_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(DEFAULT_THRESHOLD)
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME)
+    ).AssertImage(ImageAssertion(NEW_IMAGE_NAME)).Assert()

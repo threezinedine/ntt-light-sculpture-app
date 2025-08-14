@@ -8,7 +8,11 @@ from constants import (
     VIEW_TAB_NAME,
 )
 from tests.windows.actors import ProjectTreeActor, TabWidgetActor
-from tests.windows.assertions import ImageMetadataAssertion, TabWidgetAssertion
+from tests.windows.assertions import (
+    ImageAssertion,
+    ProjectAssertion,
+    TabWidgetAssertion,
+)
 from tests.windows.helper import (
     ApplicationBuilder,
     FixtureBuilder,
@@ -219,12 +223,11 @@ def test_modify_threshold_then_binary_image_is_updated(
     finalThresholdSliderValue = thresholdSliderValueMocker.call_args[0]
     assert finalThresholdSliderValue[1] == 123  # threshold value
 
-    ImageMetadataAssertion(
-        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(128)
-
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(DEFAULT_THRESHOLD)
+    ).Assert()
     mainWindowActor.SaveWindow()
 
-    ImageMetadataAssertion(
-        TEST_NEW_PROJECT_NAME, TEST_PNG_IMAGE_NAME
-    ).AssertFileExists().AssertThreshold(123)
+    ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
+        ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(123)
+    ).Assert()
