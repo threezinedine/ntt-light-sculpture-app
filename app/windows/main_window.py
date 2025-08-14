@@ -8,6 +8,8 @@ from components.new_project_dialog.dialog import NewProjectDialog
 from components.project_widget.project_widget import ProjectWidget
 from constants import (
     CHANGE_PROJECT_EVENT_NAME,
+    EMPTY_HISTORY_EVENT_NAME,
+    HISTORY_NOT_EMPTY_EVENT_NAME,
     OPEN_IMAGE_TAB_EVENT_NAME,
     RECENT_PROJECTS_EVENT_NAME,
     VIEW_TAB_NAME,
@@ -62,16 +64,16 @@ class MainWindow(QMainWindow):
 
         self._RecentProjectsCallback()
 
-        EventSystem.RegisterEvent(
-            CHANGE_PROJECT_EVENT_NAME, self._ChangeProjectCallback
-        )
+        EventSystem.RegisterEvent(CHANGE_PROJECT_EVENT_NAME, self._UpdateTitle)
+        EventSystem.RegisterEvent(HISTORY_NOT_EMPTY_EVENT_NAME, self._UpdateTitle)
+        EventSystem.RegisterEvent(EMPTY_HISTORY_EVENT_NAME, self._UpdateTitle)
 
         EventSystem.RegisterEvent(
             RECENT_PROJECTS_EVENT_NAME, self._RecentProjectsCallback
         )
         EventSystem.RegisterEvent(OPEN_IMAGE_TAB_EVENT_NAME, self._OpenImageTabCallback)
 
-    def _ChangeProjectCallback(self) -> None:
+    def _UpdateTitle(self) -> None:
         self.setWindowTitle(self.viewModel.WindowTitle)
 
     def _OpenProjectCallback(self) -> None:

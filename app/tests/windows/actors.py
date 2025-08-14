@@ -155,6 +155,7 @@ class ImagePreviewWidgetActor:
         assert self._imagePreviewWidget is not None
         self._imagePreviewWidget.ui.thresholdSlider.setValue(value)
         self.qtbot.wait(100)
+        self._imagePreviewWidget.ui.thresholdSlider.sliderReleased.emit()
         return self
 
 

@@ -620,9 +620,10 @@ def run_engine_test(release: bool = False) -> None:
         exit(1)
 
 
-def run_test_app(specName: str | None = None) -> None:
+def run_test_app(specName: str | None = None, folderName: str | None = None) -> None:
     try:
         target = ""
+        folder = "tests"
         if specName is not None:
             specFile = os.path.normpath(
                 os.path.join(APP_TEST_SPEC_DIR, f"{specName}.txt")
@@ -635,10 +636,13 @@ def run_test_app(specName: str | None = None) -> None:
             with open(specFile, "r") as f:
                 target = f.read()
 
+        if folderName is not None:
+            folder = os.path.join(folder, folderName)
+
         logger.info("Running the test app...")
         pytest_exe_path = get_pytest_exe_path(APP_DIR)
         subprocess.run(
-            f'{pytest_exe_path} -k "{target}"',
+            f'{pytest_exe_path} -k "{target}" "{folder}"',
             cwd=APP_DIR,
             check=True,
             shell=True,
@@ -823,13 +827,18 @@ def main():
     test_parser = subparsers.add_parser("test", help="Test related actions")
     test_parser.add_argument(
         "test_action",
-        choices=["all", "autogen", "engine", "app", "spec"],
+        choices=["all", "autogen", "engine", "app", "spec", "folder"],
         default="all",
     )
     test_parser.add_argument(
         "--specName",
         help="The spec file to be run",
         default="current",
+    )
+    test_parser.add_argument(
+        "--folderName",
+        help="The spec file to be run",
+        default="modules",
     )
 
     subparsers.add_parser("autogen", help="Autogen related actions")
@@ -878,6 +887,8 @@ def main():
             run_test_app()
         elif args.test_action == "spec":
             run_test_app(specName=args.specName)
+        elif args.test_action == "folder":
+            run_test_app(folderName=args.folderName)
     elif args.action == "engine":
         if args.engine_action == "generate":
             generate_build_system(release=args.release)

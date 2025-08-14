@@ -24,6 +24,7 @@ from utils.application import (
     GetImageFileNameFromFilePath,
     GetImageFilePath,
     GetTestProjectDataFolder,
+    GetWindowTitle,
 )
 from utils.images import ConvertToBinary, LoadImage
 from .actors import ImagePreviewWidgetActor, MainWindowActor, tabWidgetActor  # type: ignore
@@ -225,11 +226,19 @@ def test_modify_threshold_then_binary_image_is_updated(
     ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
         ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(DEFAULT_THRESHOLD)
     ).Assert()
+
+    assert mainWindow.windowTitle() == GetWindowTitle(
+        TEST_NEW_PROJECT_NAME,
+        isModified=True,
+    )
     mainWindowActor.SaveWindow()
 
     ProjectAssertion(TEST_NEW_PROJECT_NAME).AssertImage(
         ImageAssertion(TEST_PNG_IMAGE_NAME).AssertThreshold(123)
     ).Assert()
+    assert mainWindow.windowTitle() == GetWindowTitle(
+        TEST_NEW_PROJECT_NAME,
+    )
 
 
 def test_open_project_with_non_default_image_metadata(

@@ -61,4 +61,8 @@ RECENT_PROJECTS_EVENT_NAME = "recent_projects"
 MODIFY_IMAGES_LIST_EVENT_NAME = "load_image"
 
 OPEN_IMAGE_TAB_EVENT_NAME = "open_image_tab"
+
+EMPTY_HISTORY_EVENT_NAME = "clear_history"
+HISTORY_NOT_EMPTY_EVENT_NAME = "history_not_empty"
+COMMAND_CAN_NOT_BE_EXECUTED_EVENT_NAME = "command_can_not_be_executed"
 # ==================================================================================

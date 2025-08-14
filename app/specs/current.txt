@@ -1,1 +1,1 @@
-test_open_project_with_non_default_image_metadata
+test_modify_threshold_then_binary_image_is_updated

@@ -41,11 +41,11 @@ def GetImageFileNameFromFilePath(imageFilePath: str) -> str:
     return os.path.split(imageFilePath)[-1]
 
 
-def GetWindowTitle(projectName: str | None = None) -> str:
+def GetWindowTitle(projectName: str | None = None, isModified: bool = False) -> str:
     if projectName is None or projectName == "":
         return "Light Sculpture Studio"
 
-    return f"Light Sculpture Studio - {projectName}"
+    return f"Light Sculpture Studio - {projectName}{'*' if isModified else ''}"
 
 
 def GetImageFolder(projectDirectory: str) -> str:

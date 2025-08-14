@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QMessageBox
 from components.new_project_dialog.viewmodel import NewProjectDialogViewModel
 from modules.dependency_injection.helper import as_dependency
 from modules.event_system.event_system import EventSystem
+from modules.history_manager import HistoryManager
 from structs.application import Application
 from structs.project import Project
 
@@ -154,6 +155,7 @@ class MainWindowViewModel:
 
     def SaveProject(self) -> None:
         self._UpdateProjectDataFile()
+        HistoryManager.Reset()
 
     def _RemoveRecentProject(self, projectName: str) -> None:
         if projectName in self.application.recentProjectNames:
@@ -190,7 +192,10 @@ class MainWindowViewModel:
 
     @property
     def WindowTitle(self) -> str:
-        return GetWindowTitle(self.project.projectName)
+        return GetWindowTitle(
+            projectName=self.project.projectName,
+            isModified=not HistoryManager.IsEmpty(),
+        )
 
     @property
     def RecentProjects(self) -> list[tuple[str, str]]:
