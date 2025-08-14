@@ -28,7 +28,7 @@ from constants import (
     MAX_NUMBER_OF_RECENT_PROJECTS,
     RECENT_PROJECTS_EVENT_NAME,
 )
-from Engine import Camera
+from Engine import Camera, Position
 
 
 @as_dependency(Application, Project, NewProjectDialogViewModel)
@@ -44,7 +44,12 @@ class MainWindowViewModel:
         self.newProjectDialogViewModel = newProjectDialogViewModel
         self.newProjectDialogViewModel.SetAcceptCallback(self.CreateNewProject)
 
+        testPosition = Position(1, 2, 3)
+        otherPosition = Position(testPosition)
+        print(otherPosition.x(), otherPosition.y(), otherPosition.z())
         origin = Camera.GetOrigin()
+        print(origin.x(), origin.y(), origin.z())
+        origin.set(1, 3, 2)
         print(origin.x(), origin.y(), origin.z())
 
     def Config(self) -> None:

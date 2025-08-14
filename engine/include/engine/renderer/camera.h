@@ -9,9 +9,14 @@ namespace NTT_NS
         NTT_DECLARE_SINGLETON(Camera);
 
     public:
-        inline const Position &GetOrigin() const NTT_PYTHON_BINDING { return m_origin; }
+        inline const Position &GetOrigin() const NTT_PYTHON_BINDING;
 
     private:
         Position m_origin;
     };
+
+    const Position &Camera::GetOrigin() const
+    {
+        return m_origin;
+    }
 } // namespace NTT_NS
