@@ -267,3 +267,35 @@ def test_open_project_with_non_default_image_metadata(
     TabWidgetAssertion(mainWindow.ui.centerTabWidget).AssertImagePreviewWidgetNotEmpty(
         1
     ).Assert()
+
+
+def test_undo_with_threshold_slider(
+    fixtureBuilder: FixtureBuilder,
+    projectTreeActor: ProjectTreeActor,
+):
+    mainWindow = (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddImage(ImageBuilder().ImportPath(TEST_PNG_IMAGE_PATH).SetThreshold(123))
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    projectTreeActor.SetProjectTreeView(mainWindow.projectWidget.ui.projectTreeView)
+    assert projectTreeActor.NumberOfRows == 1
+    projectTreeActor.OpenContextMenuAt(0).ChooseOpenImageTabAction()
+
+    imagePreviewWidget: ImagePreviewWidget = (
+        mainWindow.ui.centerTabWidget.currentWidget()  # type: ignore
+    )
+
+    imagePreviewWidget.ui.thresholdSlider.setValue(200)
+    imagePreviewWidget.ui.thresholdSlider.sliderReleased.emit()
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME, True)
+
+    mainWindow.ui.undoAction.trigger()
+
+    assert imagePreviewWidget.ui.thresholdSlider.value() == 123
+    assert mainWindow.windowTitle() == GetWindowTitle(TEST_NEW_PROJECT_NAME)

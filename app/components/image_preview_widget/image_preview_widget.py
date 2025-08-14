@@ -1,9 +1,11 @@
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
+from constants import IMAGE_PREVIEW_CHANGED_EVENT_NAME
 from converted_uis.image_preview import Ui_ImagePreviewWidget
 
 from modules.dependency_injection.helper import as_dependency
+from modules.event_system.event_system import EventSystem
 from .image_preview_viewmodel import ImagePreviewViewModel
 from utils.logger import logger  # type: ignore
 
@@ -27,6 +29,11 @@ class ImagePreviewWidget(QWidget):
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore
 
+        EventSystem.RegisterEvent(
+            IMAGE_PREVIEW_CHANGED_EVENT_NAME,
+            self._OnImagePreviewChanged,
+        )
+
         self.ui.imagePreviewLabel.SetImage(self.viewModel.Image)
         self.ui.thresholdSlider.setValue(self.viewModel.Threshold)
         self.ui.thresholdSlider.valueChanged.connect(self._UpdateBinaryImage)
@@ -34,6 +41,12 @@ class ImagePreviewWidget(QWidget):
             self.viewModel.CompleteThresholdModification
         )
         self._UpdateBinaryImage()
+
+    def _OnImagePreviewChanged(self, index: int) -> None:
+        if self.viewModel.Index != index:
+            return
+
+        self.ui.thresholdSlider.setValue(self.viewModel.Threshold)
 
     def _UpdateBinaryImage(self) -> None:
         value = self.ui.thresholdSlider.value()

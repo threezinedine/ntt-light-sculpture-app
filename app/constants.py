@@ -66,5 +66,6 @@ EMPTY_HISTORY_EVENT_NAME = "clear_history"
 HISTORY_NOT_EMPTY_EVENT_NAME = "history_not_empty"
 COMMAND_CAN_NOT_BE_EXECUTED_EVENT_NAME = "command_can_not_be_executed"
 
+IMAGE_PREVIEW_CHANGED_EVENT_NAME = "image_preview_changed"
 OPENGL_SETTING_CHANGED_EVENT_NAME = "opengl_setting_changed"
 # ==================================================================================

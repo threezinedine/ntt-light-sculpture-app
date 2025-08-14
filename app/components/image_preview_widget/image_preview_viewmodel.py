@@ -83,6 +83,6 @@ class ImagePreviewViewModel:
     def CompleteThresholdModification(self) -> None:
         assert self._metaFile is not None, "Meta file is not set"
         HistoryManager.Execute(
-            ChangeThesholdCommand(self._metaFile, self._tempThreshold)
+            ChangeThesholdCommand(self._project, self.Index, self._tempThreshold)
         )
         self._tempThreshold = self._metaFile.threshold
