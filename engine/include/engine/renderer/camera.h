@@ -11,8 +11,11 @@ namespace NTT_NS
     public:
         inline const Position &GetOrigin() const NTT_PYTHON_BINDING;
 
+        inline const Mat4 &GetViewMatrix() const { return m_viewMatrix; }
+
     private:
         Position m_origin;
+        Mat4 m_viewMatrix;
     };
 
     const Position &Camera::GetOrigin() const

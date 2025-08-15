@@ -9,20 +9,33 @@
 namespace NTT_NS
 {
     /**
-     * This method is only be used for debugging purposes.
+     * This method is only be used for debugging purposes. If Body is null
+     *      do nothing.
      */
     void PrintModel(Body *body);
 
     /**
      * Call once at the config stage for starting to rendering the body.
      *
-     * @param body The body to be rendered.
+     * @param body The body to be rendered, if not null
      * @param id The ID of the vertex buffer object that will be created for the body.
      * @param vertexCount the number of nodes in the body.
      */
     void ToGPU(Body *body);
 
+    /**
+     * Used for delete all needed resources like vertex buffer and vertex array on both
+     *      GPU and cpu side. Should be call if the Body is pushed into GPU.
+     *
+     * @param body The body to be released, if not null
+     */
     void Release(Body *body);
+
+    /**
+     * Be called in every frame to render the body
+     *
+     * @param body The body to be rendered, if not null
+     */
     void Draw(Body *body);
 
     class ModelContainer

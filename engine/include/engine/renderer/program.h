@@ -48,6 +48,9 @@ namespace NTT_NS
          */
         void Use();
 
+        template <typename T>
+        void SetUniform(const string &name, const T &value);
+
     private:
         void CompileShader(u32 shaderId, const char *shaderSource);
 

@@ -19,12 +19,16 @@ class OpenGLSettingWidget(QWidget):
     ) -> None:
         super().__init__(parent, flags)
         self.viewModel = viewModel
-        EventSystem.RegisterEvent(CHANGE_PROJECT_EVENT_NAME, self.viewModel.Config)
+        EventSystem.RegisterEvent(CHANGE_PROJECT_EVENT_NAME, self._OnProjectChange)
 
         self.ui = Ui_OpenGLSettingWidget()
 
         self._inUpdate: bool = False
         self._SetupUI()
+
+    def _OnProjectChange(self):
+        self.viewModel.Config()
+        self._UpdateInfo()
 
     def _SetupUI(self) -> None:
         self.ui.setupUi(self)  # type: ignore

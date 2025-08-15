@@ -5,7 +5,7 @@
 
 using namespace NTT_NS;
 
-TEST(FaceTest, DISABLED_Auto_Create_Normal_Vector_From_Input_Nodes)
+TEST(FaceTest, Auto_Create_Normal_Vector_From_Input_Nodes)
 {
     Node node1(0, 0, 0);
     Node node2(1, 0, 0);

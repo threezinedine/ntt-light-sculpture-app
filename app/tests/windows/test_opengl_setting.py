@@ -47,7 +47,8 @@ def test_modified_draw_edges(fixtureBuilder: FixtureBuilder):
 
 
 def test_load_project_then_renderer_will_be_set(
-    fixtureBuilder: FixtureBuilder, mocker: MockerFixture
+    fixtureBuilder: FixtureBuilder,
+    mocker: MockerFixture,
 ):
     engineMocker = mocker.patch("Engine.Renderer.SetShouldDrawEdges")
 
@@ -61,11 +62,31 @@ def test_load_project_then_renderer_will_be_set(
         .Build()
     )
 
-    assert engineMocker.call_count == 1
-    assert engineMocker.call_args_list[0].args[0] is False
+    assert engineMocker.call_count >= 1
+    assert engineMocker.call_args_list[-1].args[0] is False
+    assert mainWindow.openglSettingWidget.ui.drawEdgesCheckbox.isChecked() is False
 
     mainWindow.openglSettingWidget.ui.drawEdgesCheckbox.stateChanged.emit(2)
 
-    print(engineMocker.call_args_list)
-    assert engineMocker.call_count == 2
-    assert engineMocker.call_args_list[1].args[0] is True
+    assert engineMocker.call_count >= 2
+    assert engineMocker.call_args_list[-1].args[0] is True
+
+
+def test_load_project_with_default_draw_edges(
+    fixtureBuilder: FixtureBuilder,
+    mocker: MockerFixture,
+):
+    engineMocker = mocker.patch("Engine.Renderer.SetShouldDrawEdges")
+
+    (
+        fixtureBuilder.AddProject(
+            ProjectBuilder()
+            .Name(TEST_NEW_PROJECT_NAME)
+            .AddOpenGLSetting(OpenGLSettingBuilder())
+        )
+        .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
+        .Build()
+    )
+
+    assert engineMocker.call_count >= 1
+    assert engineMocker.call_args_list[-1].args[0] is True

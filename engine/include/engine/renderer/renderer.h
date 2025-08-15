@@ -50,8 +50,14 @@ namespace NTT_NS
          */
         void Resize(u32 width, u32 height) NTT_PYTHON_BINDING;
 
-        inline void StartDrawTriangle() { m_triangleVertexProgram.Use(); };
-        inline void StartDrawLine() { m_lineVertexProgram.Use(); };
+        inline u32 GetWidth() const { return m_width; }
+        inline u32 GetHeight() const { return m_height; }
+
+        inline Program &GetTriangleVertexProgram() { return m_triangleVertexProgram; }
+        inline Program &GetLineVertexProgram() { return m_lineVertexProgram; }
+
+        void StartDrawTriangle();
+        void StartDrawLine();
 
         inline b8 ShouldDrawEdges() const;
         inline void SetShouldDrawEdges(b8 value) NTT_PYTHON_BINDING;
@@ -68,6 +74,8 @@ namespace NTT_NS
         Program m_triangleVertexProgram; // Shader program used for rendering
         Program m_lineVertexProgram;     // Shader program used for rendering
         u32 m_modelID;
+        u32 m_width;
+        u32 m_height;
         b8 m_shouldDrawEdges;
         b8 m_shouldDrawFaces;
     };

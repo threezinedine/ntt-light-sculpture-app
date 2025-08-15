@@ -85,3 +85,5 @@ typedef glm::mat4 Mat4;
 #include "define.h"
 
 const u32 INVALID_ID = u32(-1);
+
+#include "assertion.h"

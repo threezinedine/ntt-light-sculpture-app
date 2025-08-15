@@ -21,5 +21,12 @@ namespace NTT_NS
             : position(other.position)
         {
         }
+
+        Vec3 operator-(const Node &other) const
+        {
+            return Vec3(position.x() - other.position.x(),
+                        position.y() - other.position.y(),
+                        position.z() - other.position.z());
+        }
     };
 } // namespace NTT_NS

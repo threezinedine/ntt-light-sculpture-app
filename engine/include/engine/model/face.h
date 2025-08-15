@@ -13,7 +13,13 @@ namespace NTT_NS
         Face(const vector<Node> &nodes)
             : nodes(nodes)
         {
-            normal = Vec3(0.0f, 0.0f, 0.0f); // Default normal, will be calculated based on nodes
+            NTT_ASSERT(nodes.size() >= 3);
+            Node &node1 = this->nodes[0];
+            Node &node2 = this->nodes[1];
+            Node &node3 = this->nodes[2];
+            Vec3 uv1 = node1 - node2;
+            Vec3 uv2 = node2 - node3;
+            normal = glm::normalize(glm::cross(uv1, uv2));
         }
 
         Face(const Face &other)

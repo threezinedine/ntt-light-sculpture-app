@@ -59,9 +59,11 @@ namespace NTT_NS
             R"(
             #version 330 core
             layout (location = 0) in vec3 aPos;
+            uniform mat4 u_view;
+
             void main()
             {
-                gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+                gl_Position = u_view * vec4(aPos.x, aPos.y, aPos.z, 1.0);
             }
         )");
 
@@ -81,9 +83,12 @@ namespace NTT_NS
             R"(
             #version 330 core
             layout (location = 0) in vec3 aPos;
+
+            uniform mat4 u_view;
+
             void main()
             {
-                gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+                gl_Position = u_view * vec4(aPos.x, aPos.y, aPos.z, 1.0);
             }
             )");
         m_lineVertexProgram.AddFragmentShader(
@@ -97,12 +102,24 @@ namespace NTT_NS
             )");
         m_lineVertexProgram.Compile();
 
-        glLineWidth(2.0f);
+        glLineWidth(4.0f);
     }
 
     void Renderer::Shutdown()
     {
         MODEL_RELEASE(m_modelID);
+    }
+
+    void Renderer::StartDrawTriangle()
+    {
+        m_triangleVertexProgram.Use();
+        m_triangleVertexProgram.SetUniform("u_view", Camera::GetInstance()->GetViewMatrix());
+    }
+
+    void Renderer::StartDrawLine()
+    {
+        m_lineVertexProgram.Use();
+        m_lineVertexProgram.SetUniform("u_view", Camera::GetInstance()->GetViewMatrix());
     }
 
     void Renderer::Render()
@@ -118,6 +135,8 @@ namespace NTT_NS
 
     void Renderer::Resize(unsigned int width, unsigned int height)
     {
+        m_width = width;
+        m_height = height;
         glViewport(0, 0, width, height);
     }
 } // namespace NTT_NS

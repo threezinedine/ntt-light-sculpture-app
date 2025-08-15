@@ -9,6 +9,11 @@ namespace NTT_NS
 {
     void PrintModel(Body *body)
     {
+        if (!body)
+        {
+            return;
+        }
+
         printf("Body:\n");
         u32 faceCount = body->faces.size();
         for (u32 faceIndex = 0; faceIndex < faceCount; ++faceIndex)
@@ -34,6 +39,11 @@ namespace NTT_NS
 
     void ToGPU(Body *body)
     {
+        if (!body)
+        {
+            return;
+        }
+
         body->vertexCount = 0;
 
         u32 faceCount = body->faces.size();
@@ -105,6 +115,11 @@ namespace NTT_NS
 
     void Release(Body *body)
     {
+        if (!body)
+        {
+            return;
+        }
+
         if (body->vbo != 0)
         {
             glDeleteBuffers(1, &body->vbo);
@@ -120,6 +135,11 @@ namespace NTT_NS
 
     void Draw(Body *body)
     {
+        if (!body)
+        {
+            return;
+        }
+
         if (Renderer::GetInstance()->ShouldDrawFaces())
         {
             Renderer::GetInstance()->StartDrawTriangle();
