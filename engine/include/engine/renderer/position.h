@@ -11,6 +11,10 @@ namespace NTT_NS
         Position(const Position &other);
         ~Position();
 
+    private:
+        inline Position(const glm::vec3 &data) : m_data(data) {}
+
+    public:
         inline const float x() const NTT_PYTHON_BINDING;
         inline void setX(float x) NTT_PYTHON_BINDING;
 
@@ -24,8 +28,21 @@ namespace NTT_NS
 
         inline glm::vec3 &data();
 
+        inline Position operator+(const Position &other) const { return Position(m_data + other.m_data); }
+        inline void operator+=(const Position &other) { m_data += other.m_data; }
+        inline Position operator-(const Position &other) const { return Position(m_data - other.m_data); }
+        inline void operator-=(const Position &other) { m_data -= other.m_data; }
+
+        inline Position operator+(const glm::vec3 &other) const { return Position(m_data + other); }
+        inline void operator+=(const glm::vec3 &other) { m_data += other; }
+        inline Position operator-(const glm::vec3 &other) const { return Position(m_data - other); }
+        inline void operator-=(const glm::vec3 &other) { m_data -= other; }
+
+        inline Position operator*(float scalar) const { return Position(m_data * scalar); }
+        inline Position operator/(float scalar) const { return Position(m_data / scalar); }
+
     private:
-        Vec3 m_data;
+        glm::vec3 m_data;
     };
 
     const float Position::x() const
@@ -69,4 +86,6 @@ namespace NTT_NS
     {
         return m_data;
     }
+
+    typedef Position Vec3;
 } // namespace NTT_NS

@@ -19,7 +19,8 @@ namespace NTT_NS
             Node &node3 = this->nodes[2];
             Vec3 uv1 = node1 - node2;
             Vec3 uv2 = node2 - node3;
-            normal = glm::normalize(glm::cross(uv1, uv2));
+            glm::vec3 temporaryNormal = glm::normalize(glm::cross(uv1.data(), uv2.data()));
+            normal.set(temporaryNormal.x, temporaryNormal.y, temporaryNormal.z);
         }
 
         Face(const Face &other)

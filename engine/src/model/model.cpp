@@ -19,9 +19,9 @@ namespace NTT_NS
         for (u32 faceIndex = 0; faceIndex < faceCount; ++faceIndex)
         {
             printf("\tFace: %d\n - Normal vector: (%f, %f, %f)\n", faceIndex,
-                   body->faces[faceIndex].normal.x,
-                   body->faces[faceIndex].normal.y,
-                   body->faces[faceIndex].normal.z);
+                   body->faces[faceIndex].normal.x(),
+                   body->faces[faceIndex].normal.y(),
+                   body->faces[faceIndex].normal.z());
 
             u32 nodeCount = body->faces[faceIndex].nodes.size();
             for (u32 nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)

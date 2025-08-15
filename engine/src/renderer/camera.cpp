@@ -13,9 +13,18 @@ namespace NTT_NS
     Camera::Camera()
         : m_origin(1.0f, 1.0f, 2.0f)
     {
+        RecalculateViewMatrix();
+    }
+
+    Camera::~Camera()
+    {
+    }
+
+    void Camera::RecalculateViewMatrix()
+    {
         Position target(0.0f, 0.0f, 0.0f); // Always look at the origin
         Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
-        Mat4 viewMatrix = glm::lookAt(m_origin.data(), target.data(), up);
+        Mat4 viewMatrix = glm::lookAt(m_origin.data(), target.data(), up.data());
 
         // Project matrix
         f32 fov = glm::radians(45.0f);
@@ -27,8 +36,10 @@ namespace NTT_NS
         m_viewMatrix = projectionMatrix * viewMatrix; // Combine projection and view matrices
     }
 
-    Camera::~Camera()
+    void Camera::Move(const Vec3 &direction, f32 dt)
     {
+        m_origin += direction * dt;
+        RecalculateViewMatrix();
     }
 
     template <>

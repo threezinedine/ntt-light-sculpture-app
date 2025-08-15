@@ -3,14 +3,19 @@
 ::testing::AssertionResult AssertVec3(const Vec3 &actual, const Vec3 &expected)
 {
     char errorBuffer[ERROR_BUFFER_SIZE];
-    snprintf(errorBuffer, sizeof(errorBuffer), "\n\tExpected: (%.3f, %.3f, %.3f), \n\tActual:   (%.3f, %.3f, %.3f)", expected[0], expected[1], expected[2], actual[0], actual[1], actual[2]);
+    snprintf(errorBuffer, sizeof(errorBuffer), "\n\tExpected: (%.3f, %.3f, %.3f), \n\tActual:   (%.3f, %.3f, %.3f)", expected.x(), expected.y(), expected.z(), actual.x(), actual.y(), actual.z());
 
-    for (int i = 0; i < 3; ++i)
+    if (expected.x() != actual.x())
     {
-        if (expected[i] != actual[i])
-        {
-            return ::testing::AssertionFailure() << errorBuffer;
-        }
+        return ::testing::AssertionFailure() << errorBuffer;
+    }
+    if (expected.y() != actual.y())
+    {
+        return ::testing::AssertionFailure() << errorBuffer;
+    }
+    if (expected.z() != actual.z())
+    {
+        return ::testing::AssertionFailure() << errorBuffer;
     }
     return ::testing::AssertionSuccess();
 }

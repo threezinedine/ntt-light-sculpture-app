@@ -10,8 +10,12 @@ namespace NTT_NS
 
     public:
         inline const Position &GetOrigin() const NTT_PYTHON_BINDING;
+        void Move(const Vec3 &direction, f32 dt) NTT_PYTHON_BINDING;
 
         inline const Mat4 &GetViewMatrix() const { return m_viewMatrix; }
+
+    private:
+        void RecalculateViewMatrix();
 
     private:
         Position m_origin;
