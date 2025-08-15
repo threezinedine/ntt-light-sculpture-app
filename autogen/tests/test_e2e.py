@@ -160,7 +160,8 @@ def test_convert_position_to_python(util: AutoGenUtil) -> None:
     result = util.GenerateOutput("templates/binding.j2")
 
     expected = """
-        class_<::NTT_NS::Position>(m, "Position")
+        class_<::NTT_NS::Position>Position_Obj(m, "Position");
+        Position_Obj
             .def(init<float, float, float>())
             .def(init<const Position &>())
             .def("x", &::NTT_NS::Position::x, "Method x is not documented")
@@ -219,6 +220,49 @@ def test_binding_position_to_pyi(util: AutoGenUtil) -> None:
             def z(self,) -> float:
                 \"\"\"
                 Method z is not documented
+                \"\"\"
+                ...
+    """
+
+    assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_not_binding_non_attribute_method_to_pyi(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        class __attribute__((annotate("python"))) Position {
+        public:
+            Position(float x, float y, float z) : m_data(x, y, z) {}
+            Position(const Position &other) : m_data(other.m_data) {}
+            ~Position() {}
+
+            inline float x();
+            inline float y() __attribute__((annotate("python"))) const;
+            inline float z();
+
+        private:
+            glm::vec3 m_data;
+        };
+    }
+    """
+    )
+
+    result = util.GenerateOutput("templates/pyi_binding.j2")
+
+    expected = """
+        class Position:
+            @overload
+            def __init__(self, x: float, y: float, z: float,) -> None:
+                ...
+
+            @overload
+            def __init__(self, other: "Position",) -> None:
+                ...
+
+            def y(self,) -> float:
+                \"\"\"
+                Method y is not documented
                 \"\"\"
                 ...
     """

@@ -88,24 +88,26 @@ class {{ class.name }}:
 
         {% if class.methods != [] %}
             {% for method in class.methods %}
-                {% if method.isStatic or "singleton" in class.annotations %}
-    @staticmethod
-                {% endif %}
-    def {{ method.name }}(
+                {% if "python" in method.annotations %}
                     {% if method.isStatic or "singleton" in class.annotations %}
-                    {% else %}
-        self,
+    @staticmethod
                     {% endif %}
-                    {% for arg in method.arguments %}
+    def {{ method.name }}(
+                        {% if method.isStatic or "singleton" in class.annotations %}
+                        {% else %}
+        self,
+                        {% endif %}
+                        {% for arg in method.arguments %}
         {{ arg.name }}: {{ convertType(arg.type) }},
-                    {% endfor %}
+                        {% endfor %}
     ) -> {{ convertType(method.returnType) }}: 
-            {% if method.comment %}
+                    {% if method.comment %}
         """
         {{ method.comment }}
         """
-            {% endif %}
+                    {% endif %}
         ...
+                {% endif %}
             {% endfor %}
         {% else %}
         ...

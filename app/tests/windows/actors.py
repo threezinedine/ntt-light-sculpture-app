@@ -1,6 +1,7 @@
 from typing import Generator, Self
 from PyQt6.QtCore import QAbstractItemModel, Qt
-from PyQt6.QtWidgets import QMenu, QTabWidget
+from PyQt6.QtWidgets import QMenu, QTabWidget, QWidget
+from components.customs.opengl_widget.opengl_widget import OpenGLWidget
 from pyfakefs.fake_filesystem import FakeFilesystem
 import pytest
 from pytestqt.qtbot import QtBot
@@ -8,6 +9,7 @@ from pytestqt.qtbot import QtBot
 from components.customs.tree_view.tree_view import CustomTreeView
 from components.image_preview_widget.image_preview_widget import ImagePreviewWidget
 from constants import IMAGE_CONTEXT_DELETE_OPTION, IMAGE_CONTEXT_OPEN_OPTION
+from tests.windows.simulation import simulateMouseDrag
 from utils.logger import logger  # type: ignore
 from windows.main_window import MainWindow
 
@@ -112,9 +114,29 @@ class TabWidgetActor:
         self.fs = fs
 
         self._tabWidget: QTabWidget | None = None
+        self._currentWidget: QWidget | None = None
 
     def SetTabWidget(self, tabWidget: QTabWidget) -> Self:
         self._tabWidget = tabWidget
+        self._currentWidget = tabWidget.currentWidget()
+        return self
+
+    def FocusOpenGLTab(self) -> Self:
+        assert self._tabWidget is not None
+        self._tabWidget.setCurrentIndex(0)
+        self._currentWidget = self._tabWidget.currentWidget()
+        return self
+
+    def DragDown(self) -> Self:
+        assert self._currentWidget is not None
+
+        openglWdiget = self._currentWidget.findChild(OpenGLWidget)  # type: ignore
+
+        assert isinstance(
+            openglWdiget, OpenGLWidget
+        ), "Current widget is not OpenGLWidget"
+
+        simulateMouseDrag(self.qtbot, openglWdiget, (10, 10), (10, 100))
         return self
 
     def CloseTabWithName(self, name: str) -> Self:

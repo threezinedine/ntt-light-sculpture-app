@@ -39,7 +39,8 @@ m.def("{{ function.name }}", &::NTT_NS::{{ function.name }}, "{{ function.commen
 // ============================ CLASSES ============================
 {% for class in classes %}
     {% if "python" in class.annotations %}
-class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
+class_<::NTT_NS::{{ class.name }}>{{ class.name }}_Obj (m, "{{ class.name }}");
+{{ class.name }}_Obj
         {% if "singleton" in class.annotations %}
             {% for method in class.methods %}
                 {% if "python" in method.annotations %}
@@ -84,5 +85,9 @@ class_<::NTT_NS::{{ class.name }}>(m, "{{ class.name }}")
         ;
     {%endif%}
 {% endfor %}
+// ===================================================================
+
+// ============================ ALIAS ================================
+#include "alias.h.in"
 // ===================================================================
 }
