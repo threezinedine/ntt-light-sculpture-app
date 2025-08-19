@@ -25,10 +25,16 @@ namespace NTT_NS
         inline void setZ(float z) NTT_PYTHON_BINDING;
 
         inline void set(float x, float y, float z) NTT_PYTHON_BINDING;
-
+        string toString() const NTT_PYTHON_BINDING;
+        f32 DistanceFrom(const Position &other) const NTT_PYTHON_BINDING;
         inline glm::vec3 &data();
 
-        inline Position operator+(const Position &other) const { return Position(m_data + other.m_data); }
+        inline bool IsEqual(const Position &other) const NTT_PYTHON_BINDING;
+
+        inline Position operator+(const Position &other) const
+        {
+            return Position(m_data + other.m_data);
+        }
         inline void operator+=(const Position &other) { m_data += other.m_data; }
         inline Position operator-(const Position &other) const { return Position(m_data - other.m_data); }
         inline void operator-=(const Position &other) { m_data -= other.m_data; }
@@ -85,6 +91,11 @@ namespace NTT_NS
     glm::vec3 &Position::data()
     {
         return m_data;
+    }
+
+    bool Position::IsEqual(const Position &other) const
+    {
+        return x() == other.x() && y() == other.y() && z() == other.z();
     }
 
     typedef Position Vec3;

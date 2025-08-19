@@ -20,4 +20,14 @@ namespace NTT_NS
     Position::~Position()
     {
     }
+
+    f32 Position::DistanceFrom(const Position &other) const
+    {
+        return glm::distance(m_data, other.m_data);
+    }
+
+    string Position::toString() const
+    {
+        return "(" + std::to_string(x()) + ", " + std::to_string(y()) + ", " + std::to_string(z()) + ")";
+    }
 } // namespace NTT_NS

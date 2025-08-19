@@ -268,3 +268,76 @@ def test_not_binding_non_attribute_method_to_pyi(util: AutoGenUtil) -> None:
     """
 
     assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_binding_default_constructor_if_exists(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        class __attribute__((annotate("python"))) Position {
+        public:
+            Position();
+            Position(float x, float y, float z) : m_data(x, y, z);
+            Position(const Position &other) : m_data(other.m_data);
+            ~Position();
+
+        private:
+            glm::vec3 m_data;
+        };
+    }
+    """
+    )
+
+    result = util.GenerateOutput("templates/pyi_binding.j2")
+
+    expected = """
+        class Position:
+            @overload
+            def __init__(self,) -> None:
+                ...
+
+            @overload
+            def __init__(self, x: float, y: float, z: float,) -> None:
+                ...
+
+            @overload
+            def __init__(self, other: "Position",) -> None:
+                ...
+    """
+
+    print(util.ReformatOutput(expected), util.ReformatOutput(result))
+    assert util.ReformatOutput(expected) in util.ReformatOutput(result)
+
+
+def test_cpp_binding_with_default_constructor(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+    namespace ntt {
+        class __attribute__((annotate("python"))) Position {
+        public:
+            Position();
+            Position(float x, float y, float z) : m_data(x, y, z);
+            Position(const Position &other) : m_data(other.m_data);
+            ~Position();
+
+        private:
+            glm::vec3 m_data;
+        };
+    }
+    """
+    )
+
+    result = util.GenerateOutput("templates/binding.j2")
+
+    expected = """
+        class_<::NTT_NS::Position>Position_Obj(m, "Position");
+        Position_Obj
+            .def(init<>())
+            .def(init<float, float, float>())
+            .def(init<const Position &>())
+            .def("x", &::NTT_NS::Position::x, "Method x is not documented")
+            .def("y", &::NTT_NS::Position::y, "Method y is not documented")
+            .def("z", &::NTT_NS::Position::z, "Method z is not documented");
+    """
+
+    print(util.ReformatOutput(expected), util.ReformatOutput(result))

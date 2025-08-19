@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Optional
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QMouseEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
-from Engine import Camera, Renderer, Vec3
+from Engine import Camera, Position, Renderer, Vec3
 from utils.logger import logger
 
 
@@ -19,6 +20,8 @@ class OpenGLWidget(QOpenGLWidget):
         self.timer.start(16)  # Approximately 60 FPS
 
         self._moving = False
+        self._startTime: datetime = datetime.now()
+        self._prevMousePosition: Position | None = None
 
     def initializeGL(self):
         try:
@@ -41,13 +44,29 @@ class OpenGLWidget(QOpenGLWidget):
 
     def mousePressEvent(self, a0: QMouseEvent) -> None:
         self._moving = True
-        logger.debug(f"Mouse pressed at: {a0.position()}")
+        self._startTime = datetime.now()
+        self._prevMousePosition = Position(a0.position().x(), a0.position().y(), 0)
         return super().mousePressEvent(a0)
 
     def mouseMoveEvent(self, a0: QMouseEvent) -> None:
         if self._moving:
-            Camera.Move(Vec3(a0.position().x(), a0.position().y(), 0), 0)
-            logger.debug(f"Mouse moved to: {a0.position()}")
+            assert (
+                self._prevMousePosition is not None
+            ), "Previous mouse position must be set before moving"
+
+            currentTime = datetime.now()
+            elapsed = currentTime - self._startTime
+            currentPosition = Position(a0.position().x(), a0.position().y(), 0)
+            Camera.Move(
+                Vec3(
+                    currentPosition.x() - self._prevMousePosition.x(),
+                    currentPosition.y() - self._prevMousePosition.y(),
+                    0,
+                ),
+                elapsed.total_seconds(),
+            )
+            self._prevMousePosition = currentPosition
+            self._startTime = currentTime
 
         return super().mouseMoveEvent(a0)
 

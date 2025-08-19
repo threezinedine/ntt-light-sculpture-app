@@ -10,6 +10,7 @@ from tests.windows.helper import (
 )
 from utils.logger import logger  # type: ignore
 from utils.application import GetWindowTitle
+from Engine import Position
 
 
 def test_default_opengl_setting(fixtureBuilder: FixtureBuilder):
@@ -51,12 +52,15 @@ def test_load_project_then_renderer_will_be_set(
     mocker: MockerFixture,
 ):
     engineMocker = mocker.patch("Engine.Renderer.SetShouldDrawEdges")
+    originMocker = mocker.patch("Engine.Camera.SetOrigin")
 
     mainWindow = (
         fixtureBuilder.AddProject(
             ProjectBuilder()
             .Name(TEST_NEW_PROJECT_NAME)
-            .AddOpenGLSetting(OpenGLSettingBuilder().NotDrawEdges())
+            .AddOpenGLSetting(
+                OpenGLSettingBuilder().NotDrawEdges().SetOrigin(Position(1, 1, 2))
+            )
         )
         .AddApplication(ApplicationBuilder().AddRecentProject(TEST_NEW_PROJECT_NAME))
         .Build()
@@ -65,6 +69,9 @@ def test_load_project_then_renderer_will_be_set(
     assert engineMocker.call_count >= 1
     assert engineMocker.call_args_list[-1].args[0] is False
     assert mainWindow.openglSettingWidget.ui.drawEdgesCheckbox.isChecked() is False
+
+    assert originMocker.call_count >= 1
+    assert originMocker.call_args_list[-1].args[0].IsEqual(Position(1, 1, 2))
 
     mainWindow.openglSettingWidget.ui.drawEdgesCheckbox.stateChanged.emit(2)
 

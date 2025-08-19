@@ -9,7 +9,7 @@ class PyClass:
         self.name = cursor.spelling
         self.methods: List[PyMethod] = []
         self.annotations: List[str] = []
-        self.hasDefaultConstructor = True
+        self.hasDefaultConstructor = False
         self.constructors: List[PyMethod] = []
 
         for child in cursor.get_children():
@@ -17,12 +17,10 @@ class PyClass:
                 if child.access_specifier == clang.AccessSpecifier.PUBLIC:
                     self.methods.append(PyMethod(child))
             elif child.kind == clang.CursorKind.CONSTRUCTOR:
-                if (
-                    child.access_specifier == clang.AccessSpecifier.PUBLIC
-                    and not child.is_default_constructor()
-                ):
-                    self.hasDefaultConstructor = False
-                    self.constructors.append(PyMethod(child))
+                if child.access_specifier == clang.AccessSpecifier.PUBLIC:
+                    self.hasDefaultConstructor |= child.is_default_constructor()
+                    if not child.is_default_constructor():
+                        self.constructors.append(PyMethod(child))
             elif child.kind == clang.CursorKind.ANNOTATE_ATTR:
                 self.annotations.append(child.spelling)
 

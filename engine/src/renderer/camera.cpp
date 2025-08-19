@@ -36,9 +36,25 @@ namespace NTT_NS
         m_viewMatrix = projectionMatrix * viewMatrix; // Combine projection and view matrices
     }
 
+    void Camera::RecalculateTheOrigin(f32 originalDistance)
+    {
+        f32 newDistance = m_origin.DistanceFrom(m_target);
+        f32 scale = originalDistance / newDistance;
+        Vec3 currentDirection = m_origin - m_target;
+        m_origin = currentDirection * scale + m_target;
+    }
+
+    void Camera::SetOrigin(const Position &origin)
+    {
+        m_origin = origin;
+        RecalculateViewMatrix();
+    }
+
     void Camera::Move(const Vec3 &direction, f32 dt)
     {
+        f32 originalDistance = m_origin.DistanceFrom(m_target); // Default distance from the origin
         m_origin += direction * dt;
+        RecalculateTheOrigin(originalDistance);
         RecalculateViewMatrix();
     }
 

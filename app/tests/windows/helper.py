@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import shutil
 from typing import Generator, Self
+from Engine import Position
 from PyQt6.QtWidgets import QFileDialog
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
@@ -127,6 +128,10 @@ class OpenGLSettingBuilder:
         self._openglSetting = OpenGLSetting()
         self._openglSetting.drawEdges = True
         self._openglSetting.drawFaces = True
+
+    def SetOrigin(self, origin: Position) -> Self:
+        self._openglSetting.origin = (origin.x(), origin.y(), origin.z())
+        return self
 
     def NotDrawEdges(self) -> Self:
         self._openglSetting.drawEdges = False

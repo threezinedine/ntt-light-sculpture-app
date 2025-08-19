@@ -74,6 +74,11 @@ class {{ class.name }}:
         {% endif %}
 
         {% if class.constructors | length > 0 %}
+            {% if class.hasDefaultConstructor %}
+    @overload
+    def __init__(self,) -> None:
+        ...
+            {% endif %}
             {% for constructor in class.constructors %}
     @overload
     def __init__(

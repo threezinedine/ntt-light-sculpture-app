@@ -3,6 +3,8 @@ import sys
 from PyQt6.QtWidgets import QApplication
 from modules.dependency_injection import DependencyContainer
 from windows.main_window import MainWindow
+import qdarktheme
+
 from utils.logger import engineLogger, logger
 
 from Engine import Logging, LogLevel, EngineLogRecord, Engine
@@ -43,6 +45,7 @@ def main() -> None:
     Logging.SetLogCallback(HandleLog)
 
     app = LighSculptureApplication(sys.argv)
+    qdarktheme.setup_theme()
 
     DependencyInjectionConfig()
 

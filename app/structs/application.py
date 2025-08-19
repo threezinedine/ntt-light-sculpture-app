@@ -16,8 +16,8 @@ class Application(StructBase):
     """
 
     version: Version = field(default_factory=Version)
-    recentProjectNames: list[str] = field(default_factory=list)
-    recentProjectFilePaths: dict[str, str] = field(default_factory=dict)
+    recentProjectNames: list[str] = field(default_factory=list)  # type: ignore
+    recentProjectFilePaths: dict[str, str] = field(default_factory=dict)  # type: ignore
 
     def Update(self, other: "StructBase") -> None:
         if not isinstance(other, Application):

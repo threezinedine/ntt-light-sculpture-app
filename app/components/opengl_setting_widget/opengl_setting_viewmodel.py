@@ -2,7 +2,7 @@ from modules.dependency_injection.helper import as_dependency
 from modules.history_manager import HistoryManager
 from structs.project import Project
 from .commands import ChangeDrawEdgesCommand, ChangeDrawFacesCommand
-from Engine import Renderer
+from Engine import Position, Renderer, Camera
 
 
 @as_dependency(Project)
@@ -14,6 +14,8 @@ class OpenGLSettingViewModel:
     def Config(self) -> None:
         Renderer.SetShouldDrawEdges(self.openglSetting.drawEdges)
         Renderer.SetShouldDrawFaces(self.openglSetting.drawFaces)
+        origin = self.openglSetting.origin
+        Camera.SetOrigin(Position(origin[0], origin[1], origin[2]))
 
     @property
     def DrawEdges(self) -> bool:

@@ -295,3 +295,38 @@ def test_parse_position_class(util: AutoGenUtil) -> None:
     assert len(parsedClass.constructors) == 2
     assert_method(parsedClass.constructors[0], "Position", False, "void")
     assert_method(parsedClass.constructors[1], "Position", False, "void")
+
+
+def test_parse_position_class_with_default_constructor(util: AutoGenUtil) -> None:
+    util.CreateInputFile(
+        """
+        namespace ntt 
+        {
+            class __attribute__((annotate("python"))) Position 
+            {
+            public:
+                Position();
+                Position(float x, float y, float z) : m_data(x, y, z) {}
+                Position(const Position &other) : m_data(other.m_data) {}
+                ~Position() {}
+
+                inline float x() __attribute__((annotate("python"))) const;
+                inline float y() __attribute__((annotate("python"))) const;
+                inline float z() __attribute__((annotate("python"))) const;
+
+            private:
+                glm::vec3 m_data;
+            };
+        }
+        """,
+    )
+
+    parsedData = util.GetParsedData()
+    assert len(parsedData["classes"]) == 1
+    parsedClass: PyClass = parsedData["classes"][0]  # type: ignore
+    assert_class(parsedClass, "Position", ["python"])
+    assert len(parsedClass.methods) == 3
+    assert parsedClass.hasDefaultConstructor
+    assert len(parsedClass.constructors) == 2
+    assert_method(parsedClass.constructors[0], "Position", False, "void")
+    assert_method(parsedClass.constructors[1], "Position", False, "void")
