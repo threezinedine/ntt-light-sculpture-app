@@ -127,7 +127,13 @@ class TabWidgetActor:
         self._currentWidget = self._tabWidget.currentWidget()
         return self
 
-    def DragDown(self) -> Self:
+    def DragDown(
+        self,
+        startPos: tuple[int, int] = (10, 10),
+        endPos: tuple[int, int] = (10, 100),
+        delay: float = 0.01,
+        finalDelay: float = 0.01,
+    ) -> Self:
         assert self._currentWidget is not None
 
         openglWdiget = self._currentWidget.findChild(OpenGLWidget)  # type: ignore
@@ -136,7 +142,9 @@ class TabWidgetActor:
             openglWdiget, OpenGLWidget
         ), "Current widget is not OpenGLWidget"
 
-        simulateMouseDrag(self.qtbot, openglWdiget, (10, 10), (10, 100))
+        simulateMouseDrag(self.qtbot, openglWdiget, startPos, endPos, delay=delay)
+
+        self.qtbot.wait(int(finalDelay * 1000))
         return self
 
     def CloseTabWithName(self, name: str) -> Self:

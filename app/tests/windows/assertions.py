@@ -245,6 +245,7 @@ class OpenGLSettingAssertion(Assertable):
         self._openglSetting = OpenGLSetting()
         self._shouldDrawEdges = True
         self._shouldDrawFaces = True
+        self._noMatchOrigin: list[float] | None = None
 
     def SetProject(self, project: Project) -> None:
         self.project = project
@@ -257,11 +258,27 @@ class OpenGLSettingAssertion(Assertable):
         self._shouldDrawFaces = False
         return self
 
+    def AssertOriginNot(self, position: list[float]) -> Self:
+        assert len(position) == 3, "The position must be a list of 3 floats"
+        self._noMatchOrigin = position
+        return self
+
     def Assert(self) -> None:
         assert self.project is not None, "Project is not set"
 
         assert self.project.openglSetting is not None, "OpenGL setting is not set"
         assert self.project.openglSetting.drawEdges == self._shouldDrawEdges
         assert self.project.openglSetting.drawFaces == self._shouldDrawFaces
+
+        if self._noMatchOrigin is not None:
+            isMatchAll: bool = True
+            for i in range(3):
+                if self._noMatchOrigin[i] != self.project.openglSetting.origin[i]:
+                    isMatchAll = False
+
+            if isMatchAll:
+                assert (
+                    False
+                ), f"The {self._noMatchOrigin} equals {self.project.openglSetting.origin}"
 
         return super().Assert()

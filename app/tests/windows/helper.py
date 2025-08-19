@@ -130,7 +130,7 @@ class OpenGLSettingBuilder:
         self._openglSetting.drawFaces = True
 
     def SetOrigin(self, origin: Position) -> Self:
-        self._openglSetting.origin = (origin.x(), origin.y(), origin.z())
+        self._openglSetting.origin = [origin.x(), origin.y(), origin.z()]
         return self
 
     def NotDrawEdges(self) -> Self:

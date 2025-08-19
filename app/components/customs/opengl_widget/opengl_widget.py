@@ -5,7 +5,11 @@ from PyQt6.QtGui import QCloseEvent, QMouseEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from Engine import Camera, Position, Renderer, Vec3
+from modules.dependency_injection import DependencyContainer
+from modules.history_manager import HistoryManager
+from structs.project import Project
 from utils.logger import logger
+from .commands import ChangeOriginCommand
 
 
 class OpenGLWidget(QOpenGLWidget):
@@ -22,6 +26,8 @@ class OpenGLWidget(QOpenGLWidget):
         self._moving = False
         self._startTime: datetime = datetime.now()
         self._prevMousePosition: Position | None = None
+
+        self._project: Project = DependencyContainer.GetInstance(Project.__name__)
 
     def initializeGL(self):
         try:
@@ -72,4 +78,7 @@ class OpenGLWidget(QOpenGLWidget):
 
     def mouseReleaseEvent(self, a0: QMouseEvent) -> None:
         self._moving = False
+        HistoryManager.Execute(
+            ChangeOriginCommand(self._project.openglSetting, Camera.GetOrigin())
+        )
         return super().mouseReleaseEvent(a0)
