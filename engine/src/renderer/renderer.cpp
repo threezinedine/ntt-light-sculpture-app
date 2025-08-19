@@ -138,5 +138,6 @@ namespace NTT_NS
         m_width = width;
         m_height = height;
         glViewport(0, 0, width, height);
+        Camera::GetInstance()->RecalculateViewMatrix();
     }
 } // namespace NTT_NS

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QMouseEvent
+from PyQt6.QtGui import QCloseEvent, QMouseEvent, QWheelEvent
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from Engine import Camera, Position, Renderer, Vec3
@@ -47,6 +47,19 @@ class OpenGLWidget(QOpenGLWidget):
     def closeEvent(self, a0: QCloseEvent):
         Renderer.Shutdown()
         a0.accept()
+
+    def wheelEvent(self, a0: QWheelEvent) -> None:
+        origin = self._project.openglSetting.origin
+        factor = 1.1 if a0.angleDelta().y() < 0 else 0.9
+        newPosition = Position(
+            origin[0] * factor,
+            origin[1] * factor,
+            origin[2] * factor,
+        )
+        Camera.SetOrigin(newPosition)
+        HistoryManager.Execute(
+            ChangeOriginCommand(self._project.openglSetting, newPosition)
+        )
 
     def mousePressEvent(self, a0: QMouseEvent) -> None:
         self._moving = True

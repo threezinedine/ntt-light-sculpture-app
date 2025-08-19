@@ -82,7 +82,6 @@ class MainWindow(QMainWindow):
         EventSystem.RegisterEvent(OPEN_IMAGE_TAB_EVENT_NAME, self._OpenImageTabCallback)
 
     def _UpdateTitle(self) -> None:
-        logger.debug("Updating window title")
         self.setWindowTitle(self.viewModel.WindowTitle)
 
     def _OpenProjectCallback(self) -> None:

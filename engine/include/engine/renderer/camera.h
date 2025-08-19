@@ -34,8 +34,9 @@ namespace NTT_NS
 
         inline const Mat4 &GetViewMatrix() const { return m_viewMatrix; }
 
-    private:
         void RecalculateViewMatrix();
+
+    private:
         void RecalculateTheOrigin(f32 originalDistance);
 
     private:
