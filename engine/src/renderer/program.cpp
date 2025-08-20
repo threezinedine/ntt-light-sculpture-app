@@ -4,6 +4,30 @@
 
 namespace NTT_NS
 {
+    void GetShaderNameByType(u32 shaderType, string &outName)
+    {
+        switch (shaderType)
+        {
+        case GL_VERTEX_SHADER:
+            outName = "Vertex Shader";
+            break;
+        case GL_FRAGMENT_SHADER:
+            outName = "Fragment Shader";
+            break;
+        case GL_COMPUTE_SHADER:
+            outName = "Compute Shader";
+            break;
+        default:
+            outName = "Unknown Shader";
+            break;
+        }
+    }
+
+    u32 MakeShader(u32 shaderType, const char *shaderSource)
+    {
+        return 0;
+    }
+
     Program::Program()
     {
     }

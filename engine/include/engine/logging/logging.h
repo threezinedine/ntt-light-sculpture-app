@@ -54,8 +54,14 @@ namespace NTT_NS
     };
 } // namespace NTT_NS
 
-#define NTT_LOG_DEBUG(message) ::NTT_NS::Logging::GetInstance()->Log(::NTT_NS::LogLevel::DEBUG, message)
-#define NTT_LOG_INFO(message) ::NTT_NS::Logging::GetInstance()->Log(::NTT_NS::LogLevel::INFO, message)
-#define NTT_LOG_WARN(message) ::NTT_NS::Logging::GetInstance()->Log(::NTT_NS::LogLevel::WARNING, message)
-#define NTT_LOG_ERROR(message) ::NTT_NS::Logging::GetInstance()->Log(::NTT_NS::LogLevel::ERROR, message)
-#define NTT_LOG_FATAL(message) ::NTT_NS::Logging::GetInstance()->Log(::NTT_NS::LogLevel::FATAL, message)
+#define NTT_LOG(level, message, ...)                          \
+    {                                                         \
+        char buffer[ERROR_BUFFER_SIZE];                       \
+        sprintf(buffer, message, __VA_ARGS__);                \
+        ::NTT_NS::Logging::GetInstance()->Log(level, buffer); \
+    }
+#define NTT_LOG_DEBUG(message, ...) NTT_LOG(::NTT_NS::LogLevel::DEBUG, message, __VA_ARGS__)
+#define NTT_LOG_INFO(message, ...) NTT_LOG(::NTT_NS::LogLevel::INFO, message, __VA_ARGS__)
+#define NTT_LOG_WARN(message, ...) NTT_LOG(::NTT_NS::LogLevel::WARNING, message, __VA_ARGS__)
+#define NTT_LOG_ERROR(message, ...) NTT_LOG(::NTT_NS::LogLevel::ERROR, message, __VA_ARGS__)
+#define NTT_LOG_FATAL(message, ...) NTT_LOG(::NTT_NS::LogLevel::FATAL, message, __VA_ARGS__)

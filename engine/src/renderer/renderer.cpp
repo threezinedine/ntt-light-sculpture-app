@@ -5,6 +5,7 @@
 #include "engine/renderer/renderer.h"
 #include "engine/singletonManager/singletonManager.h"
 #include "engine/model/model.h"
+#include "engine/logging/logging.h"
 
 #include "shader.h"
 
@@ -27,6 +28,9 @@ namespace NTT_NS
         {
             throw std::runtime_error("Failed to initialize GLEW");
         }
+
+        auto version = glGetString(GL_VERSION);
+        NTT_LOG_INFO("OpenGL version: %s", version);
 
         Face face1({
             Node(0, 0, 0),

@@ -4,6 +4,16 @@
 namespace NTT_NS
 {
     /**
+     * Get the shader name by its type.
+     */
+    void GetShaderNameByType(u32 shaderType, string &outName);
+
+    /**
+     * Used for creating shader with a specific type and source code.
+     */
+    u32 MakeShader(u32 shaderType, const char *shaderSource);
+
+    /**
      * Simple interface to opengl shader programming. User can easy to attach this program for using in the next rendering block.
      *
      * @example
