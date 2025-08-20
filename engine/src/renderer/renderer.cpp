@@ -6,6 +6,8 @@
 #include "engine/singletonManager/singletonManager.h"
 #include "engine/model/model.h"
 
+#include "shader.h"
+
 namespace NTT_NS
 {
     NTT_DEFINE_SINGLETON(Renderer);
@@ -55,51 +57,12 @@ namespace NTT_NS
 
         MODEL_TO_GPU(m_modelID);
 
-        m_triangleVertexProgram.AddVertexShader(
-            R"(
-            #version 330 core
-            layout (location = 0) in vec3 aPos;
-            uniform mat4 u_view;
-
-            void main()
-            {
-                gl_Position = u_view * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-            }
-        )");
-
-        m_triangleVertexProgram.AddFragmentShader(
-            R"(
-            #version 330 core
-            out vec4 FragColor;
-            void main()
-            {
-                FragColor = vec4(0.5f, 0.5f, 0.5f, 0.5f);
-            }
-        )");
-
+        m_triangleVertexProgram.AddVertexShader(triangleVertexShader);
+        m_triangleVertexProgram.AddFragmentShader(triangleFragmentShader);
         m_triangleVertexProgram.Compile();
 
-        m_lineVertexProgram.AddVertexShader(
-            R"(
-            #version 330 core
-            layout (location = 0) in vec3 aPos;
-
-            uniform mat4 u_view;
-
-            void main()
-            {
-                gl_Position = u_view * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-            }
-            )");
-        m_lineVertexProgram.AddFragmentShader(
-            R"(
-            #version 330 core
-            out vec4 FragColor;
-            void main()
-            {
-                FragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-            }
-            )");
+        m_lineVertexProgram.AddVertexShader(lineVertexShader);
+        m_lineVertexProgram.AddFragmentShader(lineFragmentShader);
         m_lineVertexProgram.Compile();
 
         glLineWidth(4.0f);

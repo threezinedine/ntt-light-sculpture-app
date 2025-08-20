@@ -37,13 +37,18 @@ namespace NTT_NS
         void RecalculateViewMatrix();
 
     private:
-        void RecalculateTheOrigin(f32 originalDistance);
+        void RecalculatePolarCoordinates();
+        void RecalculateUpVector();
+        void RecalculateTheOrigin();
 
     private:
         Position m_origin;
+        Position m_up;     // The up direction of the camera.
         Position m_target; // Always look at the this point.
         Mat4 m_viewMatrix;
-        Vec3 m_upVector; // Indicate the rotation of the camera.
+        float m_distance; // Distance from the target to the camera origin.
+        float m_phi;      // for polar coordinates
+        float m_theta;    // for polar coordinates
     };
 
     const Position &Camera::GetOrigin() const

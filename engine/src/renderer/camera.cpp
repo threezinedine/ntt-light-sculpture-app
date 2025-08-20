@@ -11,8 +11,11 @@ namespace NTT_NS
     NTT_DEFINE_SINGLETON(Camera);
 
     Camera::Camera()
-        : m_origin(1.0f, 1.0f, 2.0f)
+        : m_origin(1.0f, 1.0f, 2.0f),
+          m_up(0.0f, 1.0f, 0.0f),
+          m_target(0.0f, 0.0f, 0.0f)
     {
+        RecalculatePolarCoordinates();
         RecalculateViewMatrix();
     }
 
@@ -20,11 +23,35 @@ namespace NTT_NS
     {
     }
 
+    void Camera::RecalculatePolarCoordinates()
+    {
+        Vec3 diff = m_origin - m_target;
+        m_distance = m_origin.DistanceFrom(m_target);
+        m_phi = glm::atan(diff.y() / diff.z());
+        m_theta = glm::atan(diff.x() / diff.z());
+    }
+
+    void Camera::RecalculateUpVector()
+    {
+        if (m_origin.z() == 0)
+        {
+            return;
+        }
+
+        float x = m_origin.x();
+        float y = m_origin.y();
+        float z = m_origin.z();
+
+        glm::vec3 direction = glm::normalize(glm::vec3(-z * x / (x * x + y * y), -z * y / (x * x + y * y), 1.0f));
+
+        m_up.set(direction.x, direction.y, direction.z);
+    }
+
     void Camera::RecalculateViewMatrix()
     {
-        Position target(0.0f, 0.0f, 0.0f); // Always look at the origin
-        Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
-        Mat4 viewMatrix = glm::lookAt(m_origin.data(), target.data(), up.data());
+        RecalculateUpVector();
+        Mat4 viewMatrix = glm::lookAt(m_origin.data(), m_target.data(), m_up.data());
+        // Mat4 viewMatrix = glm::lookAt(m_origin.data(), m_target.data(), glm::vec3(0, 0, 1));
 
         // Project matrix
         f32 fov = glm::radians(45.0f);
@@ -36,25 +63,46 @@ namespace NTT_NS
         m_viewMatrix = projectionMatrix * viewMatrix; // Combine projection and view matrices
     }
 
-    void Camera::RecalculateTheOrigin(f32 originalDistance)
+    void Camera::RecalculateTheOrigin()
     {
-        f32 newDistance = m_origin.DistanceFrom(m_target);
-        f32 scale = originalDistance / newDistance;
-        Vec3 currentDirection = m_origin - m_target;
-        m_origin = currentDirection * scale + m_target;
+        m_origin = Position(m_distance * glm::sin(m_phi) * glm::cos(m_theta),
+                            m_distance * glm::sin(m_phi) * glm::sin(m_theta),
+                            m_distance * glm::cos(m_phi));
     }
 
     void Camera::SetOrigin(const Position &origin)
     {
         m_origin = origin;
+        RecalculatePolarCoordinates();
         RecalculateViewMatrix();
     }
 
     void Camera::Move(const Vec3 &direction, f32 dt)
     {
-        f32 originalDistance = m_origin.DistanceFrom(m_target); // Default distance from the origin
-        m_origin += direction * dt;
-        RecalculateTheOrigin(originalDistance);
+        f32 factor = dt;
+
+        m_phi += direction.y() * factor;
+        m_theta += direction.x() * factor;
+
+        // if (m_phi < -glm::pi<float>())
+        // {
+        //     m_phi = -glm::pi<float>();
+        // }
+        // else if (m_phi > glm::pi<float>())
+        // {
+        //     m_phi = glm::pi<float>();
+        // }
+
+        // if (m_theta < -glm::half_pi<float>())
+        // {
+        //     m_theta = -glm::half_pi<float>();
+        // }
+        // else if (m_theta > glm::half_pi<float>())
+        // {
+        //     m_theta = glm::half_pi<float>();
+        // }
+
+        RecalculateTheOrigin();
         RecalculateViewMatrix();
     }
 

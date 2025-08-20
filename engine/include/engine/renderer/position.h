@@ -28,6 +28,7 @@ namespace NTT_NS
         string toString() const NTT_PYTHON_BINDING;
         f32 DistanceFrom(const Position &other) const NTT_PYTHON_BINDING;
         inline glm::vec3 &data();
+        inline const glm::vec3 &data() const { return m_data; }
 
         inline bool IsEqual(const Position &other) const NTT_PYTHON_BINDING;
 
