@@ -81,26 +81,28 @@ namespace NTT_NS
     {
         f32 factor = dt;
 
-        m_phi += direction.y() * factor;
-        m_theta += direction.x() * factor;
+        m_phi -= direction.y() * factor;
+        m_theta -= direction.x() * factor;
 
-        // if (m_phi < -glm::pi<float>())
-        // {
-        //     m_phi = -glm::pi<float>();
-        // }
-        // else if (m_phi > glm::pi<float>())
-        // {
-        //     m_phi = glm::pi<float>();
-        // }
+        float twoPi = glm::pi<float>() * 2;
 
-        // if (m_theta < -glm::half_pi<float>())
-        // {
-        //     m_theta = -glm::half_pi<float>();
-        // }
-        // else if (m_theta > glm::half_pi<float>())
-        // {
-        //     m_theta = glm::half_pi<float>();
-        // }
+        if (m_phi < 0)
+        {
+            m_phi += twoPi;
+        }
+        else if (m_phi > glm::pi<float>())
+        {
+            m_phi -= twoPi;
+        }
+
+        if (m_theta < 0)
+        {
+            m_theta += twoPi;
+        }
+        else if (m_theta > twoPi)
+        {
+            m_theta -= twoPi;
+        }
 
         RecalculateTheOrigin();
         RecalculateViewMatrix();
