@@ -131,6 +131,18 @@ namespace NTT_NS
             glDeleteVertexArrays(1, &body->vao);
             body->vao = 0;
         }
+
+        if (body->lineVbo != 0)
+        {
+            glDeleteBuffers(1, &body->lineVbo);
+            body->lineVbo = 0;
+        }
+
+        if (body->lineVao != 0)
+        {
+            glDeleteVertexArrays(1, &body->lineVao);
+            body->lineVao = 0;
+        }
     }
 
     void Draw(Body *body)

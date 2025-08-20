@@ -61,12 +61,12 @@ namespace NTT_NS
 
         MODEL_TO_GPU(m_modelID);
 
-        m_triangleVertexProgram.AddVertexShader(triangleVertexShader);
-        m_triangleVertexProgram.AddFragmentShader(triangleFragmentShader);
+        m_triangleVertexProgram.Append(MakeShader(GL_VERTEX_SHADER, triangleVertexShader));
+        m_triangleVertexProgram.Append(MakeShader(GL_FRAGMENT_SHADER, triangleFragmentShader));
         m_triangleVertexProgram.Compile();
 
-        m_lineVertexProgram.AddVertexShader(lineVertexShader);
-        m_lineVertexProgram.AddFragmentShader(lineFragmentShader);
+        m_lineVertexProgram.Append(MakeShader(GL_VERTEX_SHADER, lineVertexShader));
+        m_lineVertexProgram.Append(MakeShader(GL_FRAGMENT_SHADER, lineFragmentShader));
         m_lineVertexProgram.Compile();
 
         glLineWidth(4.0f);

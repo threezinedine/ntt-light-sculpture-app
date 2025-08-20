@@ -25,16 +25,28 @@ namespace NTT_NS
 
     u32 MakeShader(u32 shaderType, const char *shaderSource)
     {
-        return 0;
+        u32 shaderId = glCreateShader(shaderType);
+        glShaderSource(shaderId, 1, &shaderSource, nullptr);
+        glCompileShader(shaderId);
+
+        // error checking
+        int success;
+
+        glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            char infoLog[512];
+            glGetShaderInfoLog(shaderId, 512, nullptr, infoLog);
+            throw std::runtime_error("Failed to compile shader: " + string(infoLog));
+        }
+
+        return shaderId;
     }
 
     Program::Program()
+        : m_programID(0)
     {
-    }
-
-    Program::Program(string vertexShader, string fragmentShader)
-        : m_programID(0), m_vertexShaderSource(vertexShader), m_fragmentShaderSource(fragmentShader)
-    {
+        m_shaderIDs.reserve(MAX_SHADERS_PER_PROGRAM);
     }
 
     Program::~Program()
@@ -42,39 +54,32 @@ namespace NTT_NS
         glDeleteProgram(m_programID);
     }
 
+    void Program::Append(u32 shaderID)
+    {
+        if (m_shaderIDs.size() >= MAX_SHADERS_PER_PROGRAM)
+        {
+            throw std::runtime_error("Maximum shader limit reached");
+        }
+        m_shaderIDs.push_back(shaderID);
+    }
+
     void Program::Compile()
     {
         m_programID = glCreateProgram();
 
-        u32 vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-        CompileShader(vertexShaderID, m_vertexShaderSource.c_str());
-
-        u32 fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-        CompileShader(fragmentShaderID, m_fragmentShaderSource.c_str());
-
-        glLinkProgram(m_programID);
-        glDeleteShader(vertexShaderID);
-        glDeleteShader(fragmentShaderID);
-        glUseProgram(0);
-    }
-
-    void Program::CompileShader(u32 shaderID, const char *shaderSource)
-    {
-        glShaderSource(shaderID, 1, &shaderSource, nullptr);
-        glCompileShader(shaderID);
-
-        // error checking
-        int success;
-
-        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-        if (!success)
+        for (const auto &shaderID : m_shaderIDs)
         {
-            char infoLog[512];
-            glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
-            throw std::runtime_error("Failed to compile shader: " + string(infoLog));
+            glAttachShader(m_programID, shaderID);
         }
 
-        glAttachShader(m_programID, shaderID);
+        glLinkProgram(m_programID);
+
+        for (const auto &shaderID : m_shaderIDs)
+        {
+            glDeleteShader(shaderID);
+        }
+
+        glUseProgram(0);
     }
 
     void Program::Use()
