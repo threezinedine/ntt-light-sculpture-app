@@ -61,11 +61,28 @@ layout (std430, binding = 1) buffer TriangleBuffer
     Triangle triangles[];
 };
 
+uniform vec3 u_cameraOrigin;
+uniform float u_viewAngle;
+
 void main()
 {
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 textureSize = imageSize(renderedOutput);
 
-    imageStore(renderedOutput, pixelCoords, vec4(0.5, 0.5, 0.5, 1.0));
+    if (pixelCoords.x < 0 || pixelCoords.x >= textureSize.x || pixelCoords.y < 0 || pixelCoords.y >= textureSize.y)
+    {
+        return;
+    }
+
+    // random a color
+    vec4 color = vec4(
+        float(pixelCoords.x) / float(textureSize.x),
+        float(pixelCoords.y) / float(textureSize.y),
+        0.0f,
+        1.0f
+    );
+
+    imageStore(renderedOutput, pixelCoords, color);
 }
 )";
 

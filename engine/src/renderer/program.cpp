@@ -1,6 +1,7 @@
 #include "engine/renderer/program.h"
 #include "GL/glew.h"
 #include <stdexcept>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace NTT_NS
 {
@@ -85,5 +86,37 @@ namespace NTT_NS
     void Program::Use()
     {
         glUseProgram(m_programID);
+    }
+
+    template <>
+    void Program::SetUniform(const string &name, const Mat4 &value)
+    {
+        glUseProgram(m_programID);
+        GLuint location = glGetUniformLocation(m_programID, name.c_str());
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    template <>
+    void Program::SetUniform(const string &name, const glm::vec3 &value)
+    {
+        glUseProgram(m_programID);
+        GLuint location = glGetUniformLocation(m_programID, name.c_str());
+        glUniform3fv(location, 1, glm::value_ptr(value));
+    }
+
+    template <>
+    void Program::SetUniform(const string &name, const glm::vec4 &value)
+    {
+        glUseProgram(m_programID);
+        GLuint location = glGetUniformLocation(m_programID, name.c_str());
+        glUniform4fv(location, 1, glm::value_ptr(value));
+    }
+
+    template <>
+    void Program::SetUniform(const string &name, const float &value)
+    {
+        glUseProgram(m_programID);
+        GLuint location = glGetUniformLocation(m_programID, name.c_str());
+        glUniform1f(location, value);
     }
 } // namespace NTT_NS

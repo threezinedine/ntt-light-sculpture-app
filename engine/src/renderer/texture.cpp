@@ -5,13 +5,14 @@
 
 namespace NTT_NS
 {
-    Texture::Texture(f32 centerX, f32 centerY, f32 width, f32 height, u32 format)
+    Texture::Texture(f32 centerX, f32 centerY, f32 width, f32 height,
+                     u32 textureWidth, u32 textureHeight, u32 format)
         : m_centerX(centerX), m_centerY(centerY), m_width(width),
           m_height(height), m_format(format), m_program()
     {
         glGenTextures(1, &m_textureId);
         glBindTexture(GL_TEXTURE_2D, m_textureId);
-        glTexStorage2D(GL_TEXTURE_2D, 1, m_format, width, height);
+        glTexStorage2D(GL_TEXTURE_2D, 1, m_format, textureWidth, textureHeight);
 
         // create texture rectangle
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

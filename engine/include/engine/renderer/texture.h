@@ -11,7 +11,8 @@ namespace NTT_NS
     class Texture
     {
     public:
-        Texture(f32 centerX, f32 centerY, f32 width, f32 height, u32 format = GL_RGBA8);
+        Texture(f32 centerX, f32 centerY, f32 width, f32 height,
+                u32 textureWidth, u32 textureHeight, u32 format = GL_RGBA8);
         ~Texture();
 
         inline f32 GetWidth() const { return m_width; }

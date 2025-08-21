@@ -33,7 +33,8 @@
 			"string": "cpp",
 			"vector": "cpp",
 			"xmemory": "cpp",
-			"*.rh": "cpp"
+			"*.rh": "cpp",
+			"xstring": "cpp"
 		}
 	}
 }

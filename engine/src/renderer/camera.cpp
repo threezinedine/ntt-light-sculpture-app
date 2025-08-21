@@ -1,8 +1,6 @@
 #include "engine/renderer/camera.h"
 #include "engine/singletonManager/singletonManager.h"
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "engine/renderer/renderer.h"
 #include "engine/renderer/program.h"
 
@@ -106,13 +104,5 @@ namespace NTT_NS
 
         RecalculateTheOrigin();
         RecalculateViewMatrix();
-    }
-
-    template <>
-    void Program::SetUniform(const string &name, const Mat4 &value)
-    {
-        glUseProgram(m_programID);
-        GLuint location = glGetUniformLocation(m_programID, name.c_str());
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
 } // namespace NTT_NS

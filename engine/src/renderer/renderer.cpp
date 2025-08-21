@@ -73,8 +73,6 @@ namespace NTT_NS
         m_rayTracerProgram.Compile();
 
         glLineWidth(4.0f);
-
-        m_texture = CreateScope<Texture>(0.0f, 0.0f, 1.0f, 1.0f, GL_RGBA8);
     }
 
     void Renderer::Shutdown()
@@ -104,6 +102,8 @@ namespace NTT_NS
         if (m_texture)
         {
             m_rayTracerProgram.Use();
+            m_rayTracerProgram.SetUniform("u_cameraOrigin", Camera::GetInstance()->GetOrigin().data());
+            m_rayTracerProgram.SetUniform("u_viewAngle", 3.1416f / 4);
             m_texture->ToCompute(0);
             ModelContainer::GetInstance()->ToCompute(1, {m_modelID});
             glDispatchCompute((GetWidth() + 7) / 8, (GetHeight() + 7) / 8, 1);
@@ -120,6 +120,11 @@ namespace NTT_NS
     {
         m_width = width;
         m_height = height;
+        if (m_texture)
+        {
+            m_texture.reset(); // Reset the texture if it already exists
+        }
+        m_texture = CreateScope<Texture>(0.0f, 0.0f, 2.0f, 2.0f, GetWidth(), GetHeight(), GL_RGBA8);
         glViewport(0, 0, width, height);
         Camera::GetInstance()->RecalculateViewMatrix();
     }
