@@ -137,6 +137,12 @@ namespace NTT_NS
             glDeleteVertexArrays(1, &m_lineVao);
             m_lineVao = 0;
         }
+
+        if (m_shaderBuffer != 0)
+        {
+            glDeleteBuffers(1, &m_shaderBuffer);
+            m_shaderBuffer = 0;
+        }
     }
 
     void Body::Draw()
@@ -158,8 +164,21 @@ namespace NTT_NS
         glBindVertexArray(0);
     }
 
-    void Body::ToCompute(u32 index)
+    void Body::ToCompute(vector<FaceData> &faceData)
     {
+        u32 faceDataCount = faceData.size();
+        u32 faceCount = m_faces.size();
+        faceData.resize(faceCount + faceDataCount);
+
+        for (u32 faceIndex = faceDataCount; faceIndex < faceCount; ++faceIndex)
+        {
+            FaceData data;
+            data.normal = m_faces[faceIndex].normal.data();
+            data.nodes[0] = m_faces[faceIndex].nodes[0].position.data();
+            data.nodes[1] = m_faces[faceIndex].nodes[1].position.data();
+            data.nodes[2] = m_faces[faceIndex].nodes[2].position.data();
+            faceData[faceIndex] = data;
+        }
     }
 
 } // namespace NTT_NS

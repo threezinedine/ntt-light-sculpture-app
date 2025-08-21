@@ -16,12 +16,36 @@ namespace NTT_NS
     public:
         inline const Scope<Container<Body>> &GetBodies() const { return m_bodies; }
 
+        u32 CreateBody(const vector<Face> &faces);
+
+        /**
+         * Passing all bodies to the compute shader
+         */
+        void ToCompute(u32 index);
+
+        /**
+         * Passing all body faces into the compute shader for ray tracing
+         *
+         * @param index The binding index for the compute shader (see more in `example`)
+         *
+         * @example
+         * ```c++
+         * u32 bodyId = MODEL_NEW_BODY(faces);
+         *
+         * ModelContainer::GetInstance()->ToCompute(1, {bodyId}); // data will be passed into (layout std430, binding = 1)
+         * ```
+         */
+        void ToCompute(u32 index, const vector<u32> &bodyIds);
+
     private:
         Scope<Container<Body>> m_bodies;
+        vector<u32> m_bodyIds; // Store the IDs of bodies for easy access
+        u32 m_shaderBuffer;
     };
 } // namespace NTT_NS
 
-#define MODEL_NEW_BODY(faces) NTT_NS::ModelContainer::GetInstance()->GetBodies()->Create(&(faces))
-#define MODEL_TO_GPU(bodyId) (NTT_NS::ModelContainer::GetInstance()->GetBodies()->Get(bodyId))->ToGPU()
-#define MODEL_RELEASE(bodyId) (NTT_NS::ModelContainer::GetInstance()->GetBodies()->Get(bodyId))->Release()
-#define MODEL_DRAW(bodyId) (NTT_NS::ModelContainer::GetInstance()->GetBodies()->Get(bodyId))->Draw()
+#define GET_BODY(bodyId) (NTT_NS::ModelContainer::GetInstance()->GetBodies()->Get(bodyId))
+#define MODEL_NEW_BODY(faces) NTT_NS::ModelContainer::GetInstance()->CreateBody(faces)
+#define MODEL_TO_GPU(bodyId) (GET_BODY(bodyId))->ToGPU()
+#define MODEL_RELEASE(bodyId) (GET_BODY(bodyId))->Release()
+#define MODEL_DRAW(bodyId) (GET_BODY(bodyId))->Draw()

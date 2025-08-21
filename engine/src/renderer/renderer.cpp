@@ -6,7 +6,7 @@
 #include "engine/singletonManager/singletonManager.h"
 #include "engine/model/model.h"
 #include "engine/logging/logging.h"
-
+#include "engine/renderer/texture.h"
 #include "shader.h"
 
 namespace NTT_NS
@@ -14,7 +14,7 @@ namespace NTT_NS
     NTT_DEFINE_SINGLETON(Renderer);
 
     Renderer::Renderer()
-        : m_window(nullptr), m_triangleVertexProgram(), m_lineVertexProgram(), m_modelID(INVALID_ID)
+        : m_window(nullptr), m_triangleVertexProgram(), m_lineVertexProgram(), m_rayTracerProgram(), m_modelID(INVALID_ID)
     {
     }
 
@@ -69,7 +69,12 @@ namespace NTT_NS
         m_lineVertexProgram.Append(MakeShader(GL_FRAGMENT_SHADER, lineFragmentShader));
         m_lineVertexProgram.Compile();
 
+        m_rayTracerProgram.Append(MakeShader(GL_COMPUTE_SHADER, rayTracingComputeShader));
+        m_rayTracerProgram.Compile();
+
         glLineWidth(4.0f);
+
+        m_texture = CreateScope<Texture>(0.0f, 0.0f, 1.0f, 1.0f, GL_RGBA8);
     }
 
     void Renderer::Shutdown()
@@ -96,6 +101,17 @@ namespace NTT_NS
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render
+        if (m_texture)
+        {
+            m_rayTracerProgram.Use();
+            m_texture->ToCompute(0);
+            ModelContainer::GetInstance()->ToCompute(1, {m_modelID});
+            glDispatchCompute((GetWidth() + 7) / 8, (GetHeight() + 7) / 8, 1);
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+            m_texture->Draw();
+        }
+
         MODEL_DRAW(m_modelID);
         // After render
     }

@@ -4,6 +4,15 @@
 namespace NTT_NS
 {
     struct Face;
+    /**
+     * The data which will be sent to the GPU for computing shader
+     *      The main usage of it is used for ray tracing
+     */
+    struct FaceData
+    {
+        glm::vec3 normal;
+        glm::vec3 nodes[3];
+    };
 
     class Body
     {
@@ -36,16 +45,17 @@ namespace NTT_NS
         /**
          * Transfer all the triangles and their normals to the compute shader for ray tracing purpose
          *
-         * @param index The binding index for the compute shader (see more in `example`)
+         * @param faceData The face data to be transferred, the data will be added into this array.
          *
          * @example
          * ```c++
          * Body body;
+         * vector<FaceData> faceData = {}; // contains all other triangles
          *
-         * body.ToCompute(1); // binding to position 1 (layout std430, binding = 1)
+         * body.ToCompute(faceData);
          * ```
          */
-        void ToCompute(u32 index = 0);
+        void ToCompute(vector<FaceData> &faceData);
 
     private:
         vector<Face> m_faces;
@@ -56,5 +66,10 @@ namespace NTT_NS
         u32 m_lineVao;
         u32 m_lineVbo;
         u32 m_lineVertexCount;
+
+        /**
+         * @brief The buffer used for passing data to the compute shader
+         */
+        u32 m_shaderBuffer;
     };
 } // namespace NTT_NS

@@ -7,6 +7,8 @@
 
 namespace NTT_NS
 {
+    class Texture;
+
     /**
      * @brief The renderer class is responsible for rendering the scene.
      */
@@ -73,11 +75,14 @@ namespace NTT_NS
 
         Program m_triangleVertexProgram; // Shader program used for rendering
         Program m_lineVertexProgram;     // Shader program used for rendering
+        Program m_rayTracerProgram;      // Shader program used for rendering
         u32 m_modelID;
         u32 m_width;
         u32 m_height;
         b8 m_shouldDrawEdges;
         b8 m_shouldDrawFaces;
+
+        Scope<Texture> m_texture;
     };
 
     b8 Renderer::ShouldDrawEdges() const { return m_shouldDrawEdges; }
