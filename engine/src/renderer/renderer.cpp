@@ -56,7 +56,8 @@ namespace NTT_NS
             Node(0, 0, 1),
         });
 
-        vector<Face> faces = {face1, face2, face3, face4};
+        // vector<Face> faces = {face1, face2, face3, face4};
+        vector<Face> faces = {face1, face2, face3};
         m_modelID = MODEL_NEW_BODY(faces);
 
         MODEL_TO_GPU(m_modelID);
@@ -71,6 +72,11 @@ namespace NTT_NS
 
         m_rayTracerProgram.Append(MakeShader(GL_COMPUTE_SHADER, rayTracingComputeShader));
         m_rayTracerProgram.Compile();
+
+#if 1
+        m_rayTracerProgram.Use();
+        ModelContainer::GetInstance()->ToCompute(1, {m_modelID});
+#endif
 
         glLineWidth(4.0f);
     }
@@ -103,9 +109,14 @@ namespace NTT_NS
         {
             m_rayTracerProgram.Use();
             m_rayTracerProgram.SetUniform("u_cameraOrigin", Camera::GetInstance()->GetOrigin().data());
-            m_rayTracerProgram.SetUniform("u_viewAngle", 3.1416f / 4);
+            m_rayTracerProgram.SetUniform("u_upVector", Camera::GetInstance()->GetUpVector().data());
+            m_rayTracerProgram.SetUniform("u_rightVector", Camera::GetInstance()->GetRightVector().data());
             m_texture->ToCompute(0);
-            ModelContainer::GetInstance()->ToCompute(1, {m_modelID});
+#if 0
+            ModelContainer::GetInstance()->ToCompute(1);
+#endif
+            vector<FaceData> readData(3);
+            glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, readData.size() * sizeof(FaceData), readData.data());
             glDispatchCompute((GetWidth() + 7) / 8, (GetHeight() + 7) / 8, 1);
             glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 

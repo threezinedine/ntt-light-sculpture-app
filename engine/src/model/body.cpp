@@ -3,6 +3,7 @@
 #include "engine/model/body.h"
 #include <GL/glew.h>
 #include "engine/renderer/renderer.h"
+#include "engine/logging/logging.h"
 
 namespace NTT_NS
 {
@@ -166,17 +167,17 @@ namespace NTT_NS
 
     void Body::ToCompute(vector<FaceData> &faceData)
     {
-        u32 faceDataCount = faceData.size();
+        u32 offset = faceData.size();
         u32 faceCount = m_faces.size();
-        faceData.resize(faceCount + faceDataCount);
+        faceData.resize(offset + faceCount);
 
-        for (u32 faceIndex = faceDataCount; faceIndex < faceCount; ++faceIndex)
+        for (u32 faceIndex = offset; faceIndex < offset + faceCount; ++faceIndex)
         {
             FaceData data;
-            data.normal = m_faces[faceIndex].normal.data();
-            data.nodes[0] = m_faces[faceIndex].nodes[0].position.data();
-            data.nodes[1] = m_faces[faceIndex].nodes[1].position.data();
-            data.nodes[2] = m_faces[faceIndex].nodes[2].position.data();
+            data.normal = glm::vec4(m_faces[faceIndex].normal.data(), 0.0);
+            data.nodes[0] = glm::vec4(m_faces[faceIndex].nodes[0].position.data(), 0.0);
+            data.nodes[1] = glm::vec4(m_faces[faceIndex].nodes[1].position.data(), 0.0);
+            data.nodes[2] = glm::vec4(m_faces[faceIndex].nodes[2].position.data(), 0.0);
             faceData[faceIndex] = data;
         }
     }

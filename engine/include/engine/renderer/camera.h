@@ -33,17 +33,21 @@ namespace NTT_NS
         void Move(const Vec3 &direction, f32 dt) NTT_PYTHON_BINDING;
 
         inline const Mat4 &GetViewMatrix() const { return m_viewMatrix; }
+        inline const Vec3 &GetUpVector() const { return m_up; }
+        inline const Vec3 &GetRightVector() const { return m_right; }
 
         void RecalculateViewMatrix();
 
     private:
         void RecalculatePolarCoordinates();
         void RecalculateUpVector();
+        void RecalculateRightVector();
         void RecalculateTheOrigin();
 
     private:
         Position m_origin;
-        Position m_up;     // The up direction of the camera.
+        Position m_up; // The up direction of the camera.
+        Position m_right;
         Position m_target; // Always look at the this point.
         Mat4 m_viewMatrix;
         float m_distance; // Distance from the target to the camera origin.

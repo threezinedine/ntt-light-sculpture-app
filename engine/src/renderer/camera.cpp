@@ -11,6 +11,7 @@ namespace NTT_NS
     Camera::Camera()
         : m_origin(1.0f, 1.0f, 2.0f),
           m_up(0.0f, 1.0f, 0.0f),
+          m_right(1.0f, 0.0f, 0.0f),
           m_target(0.0f, 0.0f, 0.0f)
     {
         RecalculatePolarCoordinates();
@@ -45,9 +46,16 @@ namespace NTT_NS
         m_up.set(direction.x, direction.y, direction.z);
     }
 
+    void Camera::RecalculateRightVector()
+    {
+        glm::vec3 right = glm::cross(m_up.data(), -m_origin.data());
+        m_right.set(right.x, right.y, right.z);
+    }
+
     void Camera::RecalculateViewMatrix()
     {
         RecalculateUpVector();
+        RecalculateRightVector();
         Mat4 viewMatrix = glm::lookAt(m_origin.data(), m_target.data(), m_up.data());
         // Mat4 viewMatrix = glm::lookAt(m_origin.data(), m_target.data(), glm::vec3(0, 0, 1));
 

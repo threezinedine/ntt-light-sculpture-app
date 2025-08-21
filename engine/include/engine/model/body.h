@@ -4,15 +4,17 @@
 namespace NTT_NS
 {
     struct Face;
-    /**
-     * The data which will be sent to the GPU for computing shader
-     *      The main usage of it is used for ray tracing
-     */
+/**
+ * The data which will be sent to the GPU for computing shader
+ *      The main usage of it is used for ray tracing
+ */
+#pragma pack(push, 1)
     struct FaceData
     {
-        glm::vec3 normal;
-        glm::vec3 nodes[3];
+        glm::vec4 normal;
+        glm::vec4 nodes[3];
     };
+#pragma pack(pop)
 
     class Body
     {
