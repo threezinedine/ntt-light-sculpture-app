@@ -42,12 +42,12 @@ namespace NTT_NS
         return id;
     }
 
-    void ModelContainer::ToCompute(u32 index)
+    u32 ModelContainer::ToCompute(u32 index)
     {
-        ToCompute(index, m_bodyIds);
+        return ToCompute(index, m_bodyIds);
     }
 
-    void ModelContainer::ToCompute(u32 index, const vector<u32> &bodyIds)
+    u32 ModelContainer::ToCompute(u32 index, const vector<u32> &bodyIds)
     {
         vector<FaceData> faceData;
 
@@ -77,5 +77,7 @@ namespace NTT_NS
         }
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, m_shaderBuffer);
+
+        return faceData.size();
     }
 } // namespace NTT_NS

@@ -20,13 +20,19 @@ namespace NTT_NS
 
         /**
          * Passing all bodies to the compute shader
+         *
+         * @param index The binding index for the compute shader (see more in `example`)
+         *
+         * @return number of triangles passed to the compute shader
          */
-        void ToCompute(u32 index);
+        u32 ToCompute(u32 index);
 
         /**
          * Passing all body faces into the compute shader for ray tracing
          *
          * @param index The binding index for the compute shader (see more in `example`)
+         *
+         * @return number of triangles passed to the compute shader
          *
          * @example
          * ```c++
@@ -35,7 +41,7 @@ namespace NTT_NS
          * ModelContainer::GetInstance()->ToCompute(1, {bodyId}); // data will be passed into (layout std430, binding = 1)
          * ```
          */
-        void ToCompute(u32 index, const vector<u32> &bodyIds);
+        u32 ToCompute(u32 index, const vector<u32> &bodyIds);
 
     private:
         Scope<Container<Body>> m_bodies;

@@ -57,7 +57,7 @@ namespace NTT_NS
         });
 
         // vector<Face> faces = {face1, face2, face3, face4};
-        vector<Face> faces = {face1, face2, face3};
+        vector<Face> faces = {face1, face2, face3, face4};
         m_modelID = MODEL_NEW_BODY(faces);
 
         MODEL_TO_GPU(m_modelID);
@@ -111,9 +111,12 @@ namespace NTT_NS
             m_rayTracerProgram.SetUniform("u_cameraOrigin", Camera::GetInstance()->GetOrigin().data());
             m_rayTracerProgram.SetUniform("u_upVector", Camera::GetInstance()->GetUpVector().data());
             m_rayTracerProgram.SetUniform("u_rightVector", Camera::GetInstance()->GetRightVector().data());
+            m_rayTracerProgram.SetUniform("u_factor", 400.0f);
             m_texture->ToCompute(0);
 #if 0
-            ModelContainer::GetInstance()->ToCompute(1);
+            m_rayTracerProgram.SetUniform("u_triangleCount", ModelContainer::GetInstance()->ToCompute(1));
+#else
+            m_rayTracerProgram.SetUniform("u_triangleCount", 4u);
 #endif
             vector<FaceData> readData(3);
             glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, readData.size() * sizeof(FaceData), readData.data());
@@ -123,7 +126,7 @@ namespace NTT_NS
             m_texture->Draw();
         }
 
-        MODEL_DRAW(m_modelID);
+        // MODEL_DRAW(m_modelID);
         // After render
     }
 

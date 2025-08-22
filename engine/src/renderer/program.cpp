@@ -113,10 +113,18 @@ namespace NTT_NS
     }
 
     template <>
-    void Program::SetUniform(const string &name, const float &value)
+    void Program::SetUniform(const string &name, const f32 &value)
     {
         glUseProgram(m_programID);
         GLuint location = glGetUniformLocation(m_programID, name.c_str());
         glUniform1f(location, value);
+    }
+
+    template <>
+    void Program::SetUniform(const string &name, const u32 &value)
+    {
+        glUseProgram(m_programID);
+        GLuint location = glGetUniformLocation(m_programID, name.c_str());
+        glUniform1ui(location, value);
     }
 } // namespace NTT_NS
