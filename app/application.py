@@ -28,7 +28,9 @@ class LighSculptureApplication(QApplication):
 
 
 def HandleLog(record: EngineLogRecord) -> None:
-    if record.level == LogLevel.INFO:
+    if record.level == LogLevel.DEBUG:
+        engineLogger.debug(record.message)
+    elif record.level == LogLevel.INFO:
         engineLogger.info(record.message)
     elif record.level == LogLevel.WARNING:
         engineLogger.warning(record.message)

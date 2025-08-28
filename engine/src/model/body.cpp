@@ -8,9 +8,16 @@
 namespace NTT_NS
 {
     Body::Body(const vector<Face> &faces)
-        : m_faces(faces), m_vao(0), m_vbo(0), m_vertexCount(0),
+        : m_vao(0), m_vbo(0), m_vertexCount(0),
           m_lineVao(0), m_lineVbo(0), m_lineVertexCount(0)
     {
+        m_faces = {};
+
+        for (const Face &face : faces)
+        {
+            vector<Face> triangulatedFaces = FromFace(face);
+            m_faces.insert(m_faces.end(), triangulatedFaces.begin(), triangulatedFaces.end());
+        }
     }
 
     Body::~Body()
@@ -23,7 +30,7 @@ namespace NTT_NS
         u32 faceCount = m_faces.size();
         for (u32 faceIndex = 0; faceIndex < faceCount; ++faceIndex)
         {
-            printf("\tFace: %d\n - Normal vector: (%f, %f, %f)\n", faceIndex,
+            printf("\tFace: %d\n\t\tNormal: (%f, %f, %f)\n", faceIndex,
                    m_faces[faceIndex].normal.x(),
                    m_faces[faceIndex].normal.y(),
                    m_faces[faceIndex].normal.z());
@@ -31,7 +38,7 @@ namespace NTT_NS
             u32 nodeCount = m_faces[faceIndex].nodes.size();
             for (u32 nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
             {
-                printf("\t\tNode: (%f, %f, %f)\n", m_faces[faceIndex].nodes[nodeIndex].position.x(),
+                printf("\t\tNode  : (%f, %f, %f)\n", m_faces[faceIndex].nodes[nodeIndex].position.x(),
                        m_faces[faceIndex].nodes[nodeIndex].position.y(),
                        m_faces[faceIndex].nodes[nodeIndex].position.z());
             }

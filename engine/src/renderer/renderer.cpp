@@ -32,6 +32,7 @@ namespace NTT_NS
         auto version = glGetString(GL_VERSION);
         NTT_LOG_INFO("OpenGL version: %s", version);
 
+#if 0
         Face face1({
             Node(0, 0, 0),
             Node(0, 1, 0),
@@ -55,9 +56,32 @@ namespace NTT_NS
             Node(1, 0, 0),
             Node(0, 0, 1),
         });
-
-        // vector<Face> faces = {face1, face2, face3, face4};
         vector<Face> faces = {face1, face2, face3, face4};
+#else
+        Face face1({
+            Node(0, 0, 0),
+            Node(0, 1, 0),
+            Node(1, 1, 0),
+            Node(1, 0, 0),
+        });
+
+        Face face2({
+            Node(0, 0, 0),
+            Node(0, 0, 1),
+            Node(0, 1, 1),
+            Node(0, 1, 0),
+        });
+
+        Face face3({
+            Node(0, 0, 0),
+            Node(0, 0, 1),
+            Node(1, 0, 1),
+            Node(1, 0, 0),
+        });
+
+        vector<Face> faces = {face1, face2, face3};
+#endif
+
         m_modelID = MODEL_NEW_BODY(faces);
 
         MODEL_TO_GPU(m_modelID);
@@ -113,11 +137,7 @@ namespace NTT_NS
             m_rayTracerProgram.SetUniform("u_rightVector", Camera::GetInstance()->GetRightVector().data());
             m_rayTracerProgram.SetUniform("u_factor", 400.0f);
             m_texture->ToCompute(0);
-#if 0
             m_rayTracerProgram.SetUniform("u_triangleCount", ModelContainer::GetInstance()->ToCompute(1));
-#else
-            m_rayTracerProgram.SetUniform("u_triangleCount", 4u);
-#endif
             vector<FaceData> readData(3);
             glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, readData.size() * sizeof(FaceData), readData.data());
             glDispatchCompute((GetWidth() + 7) / 8, (GetHeight() + 7) / 8, 1);

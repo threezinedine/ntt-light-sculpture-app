@@ -90,25 +90,25 @@ namespace NTT_NS
         m_phi -= direction.y() * factor;
         m_theta -= direction.x() * factor;
 
-        float twoPi = glm::pi<float>() * 2;
+        // float twoPi = glm::pi<float>() * 2;
 
-        if (m_phi < 0)
-        {
-            m_phi += twoPi;
-        }
-        else if (m_phi > glm::pi<float>())
-        {
-            m_phi -= twoPi;
-        }
+        // if (m_phi < 0)
+        // {
+        //     m_phi += twoPi;
+        // }
+        // else if (m_phi > twoPi)
+        // {
+        //     m_phi -= twoPi;
+        // }
 
-        if (m_theta < 0)
-        {
-            m_theta += twoPi;
-        }
-        else if (m_theta > twoPi)
-        {
-            m_theta -= twoPi;
-        }
+        // if (m_theta < 0)
+        // {
+        //     m_theta += twoPi;
+        // }
+        // else if (m_theta > twoPi)
+        // {
+        //     m_theta -= twoPi;
+        // }
 
         RecalculateTheOrigin();
         RecalculateViewMatrix();

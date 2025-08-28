@@ -30,4 +30,6 @@ namespace NTT_NS
         {
         }
     };
+
+    vector<Face> FromFace(const Face &face);
 } // namespace NTT_NS
